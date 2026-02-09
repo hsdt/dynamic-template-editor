@@ -59,7 +59,7 @@
 						"demo": {
 							"outputHashing": "all",
 							"extraWebpackConfig": "projects/shell/webpack.prod.config.js",
-							"baseHref": "/mfe-angular/shell/",
+							"baseHref": "/dynamic-template-editor/shell/",
 							"fileReplacements": [
 								{
 									"replace": "projects/shell/src/environments/environment.ts",
