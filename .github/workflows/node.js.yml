@@ -50,7 +50,7 @@ jobs:
         mkdir deploy/shell
         mkdir deploy/template-editor
 
-        cp -r dist/shell/browser/* deploy/shell/
+        cp -r dist/shell/* deploy/shell/
         cp -r dist/template-editor/* deploy/template-editor/
 
     - name: Deploy to GitHub Pages
