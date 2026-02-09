@@ -19,12 +19,6 @@
       "path": "./projects/shell/tsconfig.spec.json"
     },
     {
-      "path": "./projects/first-mf/tsconfig.app.json"
-    },
-    {
-      "path": "./projects/first-mf/tsconfig.spec.json"
-    },
-    {
       "path": "./projects/template-editor"
     }
   ]

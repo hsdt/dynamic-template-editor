@@ -48,11 +48,9 @@ jobs:
       run: |
         mkdir deploy
         mkdir deploy/shell
-        mkdir deploy/first-mf
         mkdir deploy/template-editor
 
         cp -r dist/shell/browser/* deploy/shell/
-        cp -r dist/first-mf/browser/* deploy/first-mf/
         cp -r dist/template-editor/* deploy/template-editor/
 
     - name: Deploy to GitHub Pages

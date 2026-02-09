@@ -23,10 +23,5 @@ export const routes: Routes = [
         createVueWrapperComponent(m.createApp)
       ),
   },
-  {
-    path: 'first',
-    loadComponent: () =>
-      loadRemoteModule('firstMf', './Component').then((m) => m.App),
-  },
   { path: '**', component: Home },
 ];

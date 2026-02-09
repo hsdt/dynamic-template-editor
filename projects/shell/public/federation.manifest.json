@@ -1,4 +1,3 @@
 {
-    "firstMf": "http://localhost:4201/remoteEntry.json",
     "templateEditor": "http://localhost:4202/assets/remoteEntry.js"
 }
