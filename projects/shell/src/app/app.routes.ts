@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { loadRemoteModule } from 'shared/helpers';
+import { loadRemoteModule } from '@angular-architects/module-federation';
 import { Home } from './pages/home/home';
 import { createVueWrapperComponent } from '../helpers';
 import { VueModule } from 'shared/types';
