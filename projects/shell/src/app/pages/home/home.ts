@@ -29,6 +29,7 @@ export class Home{
     pad-start="0"
   />
 
-</PageA4>`
+</PageA4>`;
+  editMode = true;
   data: any = { name: 'duynnz' }
 }

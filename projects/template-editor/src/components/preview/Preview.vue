@@ -90,7 +90,10 @@
     <div class="preview-container" ref="container">
       <div class="preview-header">
         Preview
-        <button @click="printPreview" class="print-btn">Print</button>
+        <div class="header-actions">
+          <button @click="toggleEditMode" :class="['edit-mode-btn', { off: !editMode }]">{{ editMode ? 'Edit: On' : 'Edit: Off' }}</button>
+          <button @click="printPreview" class="print-btn">Print</button>
+        </div>
       </div>
       <div class="preview">
         <div c-name="root" :c-id="rootId" class="content-root" ref="content"></div>
@@ -127,9 +130,13 @@ export default {
     data: {
       type: Object,
       default: () => ({})
+    },
+    editMode: {
+      type: Boolean,
+      default: true
     }
   },
-  emits: ['update:template'],
+  emits: ['update:template', 'update:editMode'],
   data() {
     const rootId = '123456'
     let rootNode = VirtualHTMLParser.parseToTree(this.template, 'Root', { 'c-id': rootId });
@@ -233,6 +240,7 @@ export default {
     },
 
     contextMenuHandler(e: MouseEvent) {
+      if (!this.editMode) return;
       e.preventDefault();
       e.stopPropagation();
 
@@ -344,6 +352,15 @@ export default {
       this.unHighlightElement()
     },
 
+    toggleEditMode() {
+      this.$emit('update:editMode', !this.editMode);
+      if (this.editMode) {
+        this.ContextMenuVisible = false;
+        this.insertMenuVisible = false;
+        this.unHighlightElement();
+      }
+    },
+
     isClosingTag(cid: string) {
       return this.rootNode.querySelector(`[c-id=${cid}]`)?.isClosingTag;
     },
@@ -425,5 +442,25 @@ export default {
 
 .print-btn:hover {
   background: #2980b9;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.edit-mode-btn {
+  padding: 8px 16px;
+  background: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.edit-mode-btn.off {
+  background: #95a5a6;
 }
 </style>

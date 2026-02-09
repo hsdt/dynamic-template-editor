@@ -1,5 +1,5 @@
 <template>
-  <Preview v-model:template="template" :data="data"/>
+  <Preview v-model:template="template" v-model:editMode="editMode" :data="data"/>
   <!-- <Codemirror v-model:value="template" :options="{ mode: 'text/html', theme: 'default', tabSize: 2 }" height="400px" :border="true" /> -->
 </template>
 
@@ -13,6 +13,7 @@ export default {
   components: { Preview },
   data() {
     return {
+      editMode: true,
       data: { },
       template: `<PageA4 style="padding: 3mm 15mm 3mm 15mm;" c-name="PageA4" c-id="ngk54ac">
   <div c-name="div" c-id="d25qofp">{{ data.name }}</div>

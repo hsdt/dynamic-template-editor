@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { loadRemoteModule } from '@angular-architects/module-federation';
-import { VueModule } from 'shared/types';
+import { ComponentFactory } from 'shared/types';
+import { App } from 'vue';
 @Injectable({ providedIn: 'root' })
 export class VueLoader {
-  module: VueModule | null = null;
-  private async _initVueModule() {
+  module: ComponentFactory | null = null;
+  private async _initComponentFactory() {
     if (this.module) return;
     try {
       this.module = await loadRemoteModule({
@@ -17,11 +18,11 @@ export class VueLoader {
     }
   }
 
-  async createPreview() {
-    await this._initVueModule();
+  async createPreview(): Promise<App | null> {
+    await this._initComponentFactory();
     try {
       if (!this.module?.createPreview) {
-        throw new Error('Vue module does not export createPreview.');
+        throw new Error('Component factory does not export createPreview.');
       }
       return this.module.createPreview();
     } catch(error) {
