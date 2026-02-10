@@ -23,7 +23,7 @@
           v-if="!readonly && !disabled"
           class="remove"
           @click.stop="removeItem(item)"
-        >×</span>
+        >❌</span>
       </span>
 
       <input
@@ -78,7 +78,7 @@ export default {
     readonly: Boolean,
     label: String,
   },
-  emits: ['update:modelValue'],
+  emits: ['update:modelValue', 'search'],
   setup(props, { emit }) {
     const isOpen = ref(false);
     const search = ref('');
@@ -209,6 +209,12 @@ export default {
 
     watch(() => props.modelValue, initSelected);
     watch(() => props.items, initSelected);
+    watch(search, (value) => {
+      emit('search', {
+        term: value,
+        items: filteredItems.value
+      });
+    });
 
     onMounted(() => {
       initSelected();
@@ -292,6 +298,7 @@ export default {
   opacity: 0;
   transition: opacity 0.12s ease;
   pointer-events: none;
+  font-size: 8px;
 }
 
 .tag:hover .remove {

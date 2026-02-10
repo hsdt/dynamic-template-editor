@@ -19,12 +19,13 @@ export class Home{
   <InputOTP v-model="data.age" :maskLength="[1,1,1]" pad-start="0" />
   <Select v-model="data.category" label="Danh mục:" placeholder="Chọn danh mục"
     bindLabel="name" bindValue="id" :items="categoryList" />
-  <Select v-model="data.tags" label="Tags:" placeholder="Chọn tags"
+  <Select v-model="data.tags" label="Tags:" placeholder="Chọn tags" @search="log($event)"
     bindLabel="label" bindValue="value" :items="tagList" :multiple="true" />
     {{data.tags}}
 </PageA4>`;
   editMode = true;
   context = {
+    log: console.log,
     data: {
       name: "Nguyễn Ngọc Duy",
       age: "18",
