@@ -117,6 +117,7 @@ import { templateCategories } from 'shared/constants';
 import { App, ComponentPublicInstance } from 'vue';
 import { TemplateItem } from 'shared/types';
 import Select from '../forms/Select.vue';
+import Checkbox from '../forms/Checkbox.vue';
 
 export default {
   name: 'Preview',
@@ -213,7 +214,8 @@ export default {
           .component('PageA5', PageA5)
           .component('Textarea', Textarea)
           .component('InputOTP', InputOTP)
-          .component('Select', Select);
+          .component('Select', Select)
+          .component('Checkbox', Checkbox);
 
         this.vm = this.app.mount(contentEl);
 
