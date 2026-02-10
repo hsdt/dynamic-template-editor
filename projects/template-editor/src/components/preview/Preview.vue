@@ -118,6 +118,8 @@ import { App, ComponentPublicInstance } from 'vue';
 import { TemplateItem } from 'shared/types';
 import Select from '../forms/Select.vue';
 import Checkbox from '../forms/Checkbox.vue';
+import DatePicker from '../forms/DatePicker.vue';
+import { installMaskDirective } from '../../directives/mask';
 
 export default {
   name: 'Preview',
@@ -209,13 +211,18 @@ export default {
         };
 
         contentEl.innerHTML = '';
-        this.app = createApp(DynamicComponent)
+        this.app = createApp(DynamicComponent);
+
+        installMaskDirective(this.app);
+
+        this.app
           .component('PageA4', PageA4)
           .component('PageA5', PageA5)
           .component('Textarea', Textarea)
           .component('InputOTP', InputOTP)
           .component('Select', Select)
-          .component('Checkbox', Checkbox);
+          .component('Checkbox', Checkbox)
+          .component('DatePicker', DatePicker);
 
         this.vm = this.app.mount(contentEl);
 
