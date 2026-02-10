@@ -116,6 +116,7 @@ import { ContextMenuItem } from '@imengyu/vue3-context-menu';
 import { templateCategories } from 'shared/constants';
 import { App, ComponentPublicInstance } from 'vue';
 import { TemplateItem } from 'shared/types';
+import Select from '../forms/Select.vue';
 
 export default {
   name: 'Preview',
@@ -127,7 +128,7 @@ export default {
       type: String,
       required: true
     },
-    data: {
+    context: {
       type: Object,
       default: () => ({})
     },
@@ -171,6 +172,11 @@ export default {
       handler() {
         this.processTemplate();
       }
+    },
+    context: {
+      handler() {
+        this.renderPreview();
+      }
     }
   },
   mounted() {
@@ -189,7 +195,7 @@ export default {
       this.renderPreview();
     },
 
-    renderPreview() {
+    renderPreview() {      
       const contentEl = this.$refs['content'] as HTMLElement;
       if (!contentEl) return;
 
@@ -198,7 +204,7 @@ export default {
       try {
         const DynamicComponent = {
           template: this.processedTemplate,
-          data: () => ({ data: this.data })
+          data: () => (this.context)
         };
 
         contentEl.innerHTML = '';
@@ -206,7 +212,8 @@ export default {
           .component('PageA4', PageA4)
           .component('PageA5', PageA5)
           .component('Textarea', Textarea)
-          .component('InputOTP', InputOTP);
+          .component('InputOTP', InputOTP)
+          .component('Select', Select);
 
         this.vm = this.app.mount(contentEl);
 

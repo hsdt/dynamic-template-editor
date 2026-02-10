@@ -16,8 +16,8 @@ export class TemplateEditor implements OnInit, OnChanges, OnDestroy {
   @Input('template') template = '';
   @Output() templateChange = new EventEmitter<string>();
   
-  @Input('data') data = {};
-  @Output() dataChange = new EventEmitter<any>();
+  @Input('context') context = {};
+  @Output() contextChange = new EventEmitter<any>();
 
   @Input('editMode') editMode = true;
   @Output() editModeChange = new EventEmitter<boolean>();
@@ -30,9 +30,9 @@ export class TemplateEditor implements OnInit, OnChanges, OnDestroy {
     this.vm = this.app.mount('#template-editor');
     const data = this.vm.$data as any;
     data.template = this.template;
-    data.data = this.data;
-    data.editMode = this.editMode;
-    this.dataChange.emit(data.data);
+    data.context = this.context;
+    this.contextChange.emit(data.context);
+    data.editMode = true;
     this.vm.$watch('template', (newVal: any) => {
       this.templateChange.emit(newVal);
     });
