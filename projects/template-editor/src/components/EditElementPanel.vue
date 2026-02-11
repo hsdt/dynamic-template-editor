@@ -416,7 +416,7 @@ export default {
 }
 
 .modal-body input {
-  width: 100%;
+  width: 95%;
   padding: 8px;
   border: 1px solid #ddd;
   border-radius: 4px;

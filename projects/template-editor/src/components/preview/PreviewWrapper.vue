@@ -58,6 +58,13 @@ export default {
         <Checkbox v-model="data.sizeTest" value="xlarge" beforeText="[xl]" afterText="X-Large" size="xl" />
 
         <div style="color:#0066cc">Giá trị: <b>{{ data.sizeTest }}</b></div>
+
+        <div><b>Paint - Chữ ký</b></div>
+        <Paint style="width:400px; height:150px;" v-model="data.signature" />
+        <div v-if="data.signature">
+          <div>Ảnh đã lưu:</div>
+          <img :src="data.signature" alt="signature" style="max-width:200px;border:1px solid #ccc;" />
+        </div>
       </PageA4>
       `,
       context: {
@@ -70,7 +77,8 @@ export default {
           sizeTest: 'large',
           birthday: '',
           birthdayText: '',
-          appointment: ''
+          appointment: '',
+          signature: ''
         },
         categoryList: [
           { id: 'tech', name: 'Công Nghệ' },

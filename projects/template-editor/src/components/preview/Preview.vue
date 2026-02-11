@@ -120,6 +120,7 @@ import Select from '../forms/Select.vue';
 import Checkbox from '../forms/Checkbox.vue';
 import DatePicker from '../forms/DatePicker.vue';
 import { installMaskDirective } from '../../directives/mask-datetime';
+import Paint from '../forms/Paint.vue';
 
 export default {
   name: 'Preview',
@@ -222,7 +223,8 @@ export default {
           .component('InputOTP', InputOTP)
           .component('Select', Select)
           .component('Checkbox', Checkbox)
-          .component('DatePicker', DatePicker);
+          .component('DatePicker', DatePicker)
+          .component('Paint', Paint);
 
         this.vm = this.app.mount(contentEl);
 
