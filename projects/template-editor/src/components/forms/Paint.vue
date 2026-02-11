@@ -288,8 +288,12 @@ export default {
     const emitImage = () => {
       const merged = mergeCanvases();
       if (!merged) return;
-      const dataUrl = merged.toDataURL('image/png');
-      emit('update:modelValue', dataUrl);
+      try {
+        const dataUrl = merged.toDataURL('image/png');
+        emit('update:modelValue', dataUrl);
+      } catch (err) {
+        console.error('Xuất ảnh thất bại do CORS/taint', err);
+      }
     };
 
     const mergeCanvases = () => {
@@ -311,6 +315,7 @@ export default {
       const box = boxRef.value;
       if (!baseCanvas || !baseCtx.value || !dataUrl) return;
       const img = new Image();
+      img.crossOrigin = 'anonymous';
       img.onload = () => {
         const drawW = box?.clientWidth ?? img.width;
         const drawH = box?.clientHeight ?? img.height;
@@ -327,6 +332,7 @@ export default {
       const box = boxRef.value;
       if (!overlayCanvas || !drawCtx.value || !dataUrl) return;
       const img = new Image();
+      img.crossOrigin = 'anonymous';
       img.onload = () => {
         const drawW = w ?? box?.clientWidth ?? 0;
         const drawH = h ?? box?.clientHeight ?? 0;
@@ -342,6 +348,7 @@ export default {
       const box = boxRef.value;
       if (!baseCanvas || !baseCtx.value || !dataUrl) return;
       const img = new Image();
+      img.crossOrigin = 'anonymous';
       img.onload = () => {
         const drawW = w ?? box?.clientWidth ?? 0;
         const drawH = h ?? box?.clientHeight ?? 0;

@@ -60,7 +60,9 @@ export default {
         <div style="color:#0066cc">Giá trị: <b>{{ data.sizeTest }}</b></div>
 
         <div><b>Paint - Chữ ký</b></div>
-        <Paint style="width:400px; height:150px;" v-model="data.signature" />
+        <Paint style="width:400px; height:150px;" v-model="data.signature"
+          src="https://fastly.picsum.photos/id/237/250/250.jpg?hmac=tNmO3YWXALG9JM81cghI9nflo3dWc3e5vlNsf_jmKWw"
+        />
         <div v-if="data.signature">
           <div>Ảnh đã lưu:</div>
           <img :src="data.signature" alt="signature" style="max-width:200px;border:1px solid #ccc;" />
