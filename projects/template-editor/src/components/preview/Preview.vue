@@ -119,7 +119,7 @@ import { TemplateItem } from 'shared/types';
 import Select from '../forms/Select.vue';
 import Checkbox from '../forms/Checkbox.vue';
 import DatePicker from '../forms/DatePicker.vue';
-import { installMaskDirective } from '../../directives/mask';
+import { installMaskDirective } from '../../directives/mask-datetime';
 
 export default {
   name: 'Preview',

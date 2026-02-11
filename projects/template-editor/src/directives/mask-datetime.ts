@@ -447,4 +447,5 @@ export default mask;
 
 export const installMaskDirective = (app: App) => {
   app.directive('mask', mask);
+  app.directive('mask-datetime', mask);
 };
