@@ -16,21 +16,21 @@ export default {
   data() {
     return {
       editMode: true,
-            template: `
+      template: `
       <PageA4 style="padding:3mm 15mm">
         <div><b>Textarea</b></div>
         <Textarea v-model="data.name" label="Họ và tên:" line :suffix="{ length:1, char:'❤️' }" />
 
         <div><b>InputOTP</b></div>
-        <InputOTP v-model="data.age" :maskLength="[1,1,1]" pad-start="0" />
+        <InputOTP v-model="data.age" :mask-length="[1,1,1]" pad-start="0" />
 
         <div><b>Select one</b></div>
         <Select v-model="data.category" label="Danh mục:" placeholder="Chọn danh mục"
-          bindLabel="name" bindValue="id" :items="categoryList" />
+          bind-label="name" bind-value="id" :items="categoryList" />
 
         <div><b>Select multiple</b></div>
         <Select v-model="data.tags" label="Tags:" placeholder="Chọn tags"
-          bindLabel="label" bindValue="value" :items="tagList" multiple />
+          bind-label="label" bind-value="value" :items="tagList" multiple />
         <div style="color:#0066cc">Tags đã chọn {{ data.tags }}</b></div>
 
         <div><b>DatePicker - Chọn ngày sinh</b></div>
@@ -47,7 +47,7 @@ export default {
 
         <div><b>DatePicker (datetime) - Giờ hẹn</b></div>
         <DatePicker v-model="data.appointment" mode="datetime" placeholder="Chọn ngày giờ"
-          format="DD/MM/YYYY HH:mm" :minute-step="15"
+          format="HH:mm DD/MM/YYYY" :minute-step="15"
         />
         <div style="color:#0066cc">Ngày giờ đã chọn: <b>{{ data.appointment }}</b></div>
 
