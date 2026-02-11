@@ -14,7 +14,7 @@
       class="textarea-line no-print"
       :class="{ 'textarea-line-none': !line }"
       v-model="input"
-      :style="{ ...textareaStyleComputed, textIndent: labelSpanWidth + 'px' }"
+      :style="[textareaStyleNormalized, { textIndent: labelSpanWidth + 'px' }]"
       :placeholder="placeholder"
       :disabled="disabled"
       :readonly="readonly"
@@ -30,7 +30,7 @@
     <template v-if="!input">
       <div
         class="textarea-line yes-print"
-        :style="{ ...textareaStyleComputed, textIndent: labelSpanWidth + 'px', height: textareaHeight + 'px' }"
+        :style="[textareaStyleNormalized, { textIndent: labelSpanWidth + 'px', height: textareaHeight + 'px' }]"
       ></div>
     </template>
     <template v-else>
@@ -38,7 +38,7 @@
         v-for="(lineText, i) in splitString(input)"
         :key="i"
         class="textarea-line yes-print"
-        :style="{ ...textareaStyleComputed, textIndent: i === 0 ? labelSpanWidth + 'px' : '0px' }"
+        :style="[textareaStyleNormalized, { textIndent: i === 0 ? labelSpanWidth + 'px' : '0px' }]"
       >
         {{ lineText }}
       </div>
@@ -54,11 +54,12 @@ export default {
   name: 'HsTextarea',
   props: {
     modelValue: { type: String, default: '' },
+    type: { type: String as PropType<'text' | 'number'>, default: 'text' },
     label: { type: String, default: '' },
     placeholder: { type: String, default: '' },
     disabled: { type: Boolean, default: false },
     readonly: { type: Boolean, default: false },
-    maxlength: { type: Number, default: 2000 },
+    maxlength: { type: [Number, String], default: 2000 },
     rows: { type: Number, default: 1 },
     line: { type: Boolean, default: true },
     suffix: {
@@ -81,36 +82,65 @@ export default {
     const textareaHeight = ref(20)
 
     const labelSpanWidth = computed(() => labelSpan.value?.offsetWidth ?? 0)
-    const textareaStyleComputed = computed(() =>
-      typeof props.textareaStyle === 'string' ? {} : props.textareaStyle
-    )
+    const textareaStyleNormalized = computed(() => props.textareaStyle)
+
+    const normalizeValue = (val: string) =>
+      props.type === 'number' ? (val ?? '').replace(/[^0-9]/g, '') : val ?? ''
+
+    const computePad = () => props.suffix.char?.repeat(props.suffix.length || 0) || ''
+    const ensurePad = (val: string) => {
+      const pad = padEnd.value
+      if (!pad) return val
+      return val.endsWith(pad) ? val : val + pad
+    }
+    const stripPad = (val: string) => {
+      const pad = padEnd.value
+      if (!pad) return val
+      return val.endsWith(pad) ? val.slice(0, -pad.length) : val
+    }
 
     // --- Init
     onMounted(() => {
-      padEnd.value = props.suffix.char?.repeat(props.suffix.length || 0) || ''
-      input.value = props.modelValue + padEnd.value
+      padEnd.value = computePad()
+      input.value = ensurePad(normalizeValue(props.modelValue))
       nextTick(() => {
         textareaHeight.value = textarea.value?.offsetHeight ?? 20
       })
     })
 
+    watch(
+      () => props.suffix,
+      () => {
+        padEnd.value = computePad()
+        input.value = ensurePad(normalizeValue(stripPad(input.value)))
+        nextTick(() => setCaretPosition())
+      },
+      { deep: true }
+    )
+
     // --- Watch: external -> internal
     watch(
       () => props.modelValue,
       newVal => {
-        if (newVal + padEnd.value !== input.value) {
-          input.value = newVal + padEnd.value
+        const padded = ensurePad(normalizeValue(newVal ?? ''))
+        if (padded !== input.value) {
+          input.value = padded
         }
       }
     )
 
     // --- Watch: internal -> emit
     watch(input, newVal => {
-      if (!newVal.includes(padEnd.value)) {
-        input.value = newVal + padEnd.value
+      const padded = ensurePad(normalizeValue(stripPad(newVal)))
+      if (padded !== newVal) {
+        input.value = padded
         nextTick(() => setCaretPosition())
+        return
       }
-      emit('update:modelValue', input.value.replace(padEnd.value, ''))
+      emit('update:modelValue', stripPad(padded))
+      nextTick(() => {
+        textareaHeight.value = textarea.value?.offsetHeight ?? textareaHeight.value
+      })
     })
 
     // --- Caret control
@@ -118,7 +148,7 @@ export default {
       const el = textarea.value
       if (!el) return
       const caret = el.selectionStart
-      const actualLength = el.value.replace(padEnd.value, '').length
+      const actualLength = stripPad(el.value).length
       if (caret > actualLength) el.setSelectionRange(actualLength, actualLength)
     }
 
@@ -127,7 +157,7 @@ export default {
       if (!el) return
       const start = el.selectionStart
       const end = el.selectionEnd
-      const actualLength = el.value.replace(padEnd.value, '').length
+      const actualLength = stripPad(el.value).length
       const maxLen = actualLength - start
       if (end - start > maxLen) el.setSelectionRange(start, start + maxLen)
     }
@@ -140,7 +170,7 @@ export default {
       labelSpan,
       labelSpanWidth,
       textareaHeight,
-      textareaStyleComputed,
+      textareaStyleNormalized,
       setCaretPosition,
       limitSelection,
       splitString

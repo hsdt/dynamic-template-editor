@@ -28,7 +28,6 @@ export default {
   props: {
     modelValue: { type: String, default: '' },
     type: { type: String as () => 'text' | 'number', default: 'text' },
-    length: { type: Number },
     readonly: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
     maskLength: { type: Array as () => number[] },
@@ -48,8 +47,8 @@ export default {
 
     const specialKeys = ['Backspace', 'Tab', 'End', 'Home', 'ArrowLeft', 'ArrowRight', 'Delete', ' '];
 
-    let maskLength = ref<number[]>(props.maskLength || []);
-    const totalLength = computed(() => props.length || maskLength.value.length);
+    let maskLength = ref<number[]>(props.maskLength && props.maskLength.length ? props.maskLength : [1, 1, 1, 1]);
+    const totalLength = computed(() => maskLength.value.length);
 
     const splitStringByPattern = (input: string, pattern: number[]) => {
       const result: string[] = [];
@@ -177,13 +176,8 @@ export default {
     );
 
     onMounted(() => {
-        // Nếu maskLength chưa có, tạo mặc định 1 cho mỗi ô
-        if (!maskLength.value.length) {
-            maskLength.value = Array.from({ length: totalLength.value }).fill(1) as number[];
-        }
-
         // Khởi tạo arrayLength để v-for render đúng số ô
-        arrayLength.value = Array(totalLength.value).fill('');
+        arrayLength.value = Array(totalLength.value || 0).fill('');
 
         // --- Khởi tạo giá trị hiển thị với padStart / padChar ---
         const initialValue = props.modelValue || '';
