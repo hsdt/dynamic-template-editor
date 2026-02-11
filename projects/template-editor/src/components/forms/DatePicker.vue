@@ -1,7 +1,6 @@
 <template>
   <div class="datepicker-wrapper" ref="wrapperRef">
     <input
-      ref="inputRef"
       type="text"
       class="datepicker-input"
       :placeholder="placeholder"
@@ -38,9 +37,7 @@ export default {
   emits: ['update:modelValue'],
   setup(props, { emit }) {
     const wrapperRef = ref<HTMLElement | null>(null);
-    const inputRef = ref<HTMLInputElement | null>(null);
     const displayValue = ref('');
-    const selectedMoment = ref<moment.Moment | null>(null);
     const { open, syncValue } = useDatePickerService();
 
     const tokenRegex = /[YyMDHhms]/;
@@ -56,9 +53,10 @@ export default {
         ? moment(masked, props.format, true)
         : moment.invalid();
       if (m.isValid()) {
-        selectedMoment.value = m;
-        emit('update:modelValue', m.format(props.format));
-        syncValue(displayValue.value, wrapperRef.value);
+        const display = m.format(props.format);
+        displayValue.value = display;
+        emit('update:modelValue', m.format());
+        syncValue(display, wrapperRef.value);
       }
     };
 
@@ -67,15 +65,13 @@ export default {
       () => props.modelValue,
       (val) => {
         const parsed = val
-          ? moment(val, props.format, true).isValid()
-            ? moment(val, props.format, true)
-            : moment(val)
+          ? moment(val).isValid()
+            ? moment(val)
+            : moment(val, props.format, true)
           : null;
         if (parsed && parsed.isValid()) {
-          selectedMoment.value = parsed;
           displayValue.value = parsed.format(props.format);
         } else {
-          selectedMoment.value = null;
           displayValue.value = '';
         }
         syncValue(displayValue.value, wrapperRef.value);
@@ -91,15 +87,21 @@ export default {
         mode: props.mode as 'date' | 'datetime',
         minuteStep: props.minuteStep,
         onSelect: (val: string) => {
-          displayValue.value = val;
-          emit('update:modelValue', val);
+          const parsed = moment(val, props.format, true).isValid()
+            ? moment(val, props.format, true)
+            : moment(val);
+          if (parsed.isValid()) {
+            const display = parsed.format(props.format);
+            displayValue.value = display;
+            emit('update:modelValue', parsed.format());
+            syncValue(display, wrapperRef.value);
+          }
         }
       });
     };
 
     return {
       wrapperRef,
-      inputRef,
       displayValue,
       onInput,
       openPicker

@@ -283,7 +283,7 @@ export default {
   border-radius: 4px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   padding: 8px;
-  z-index: 1000;
+  z-index: 100;
 }
 .calendar-header {
   display: flex;
