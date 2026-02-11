@@ -41,13 +41,13 @@
         </table>
         <div v-if="isDateTime" class="time-row">
           <label class="time-field">
-            <span>Giờ</span>
+            <span>Hour</span>
             <select :value="hours" @change="onHourChange($event)">
               <option v-for="h in 24" :key="h" :value="h - 1">{{ String(h - 1).padStart(2, '0') }}</option>
             </select>
           </label>
           <label class="time-field">
-            <span>Phút</span>
+            <span>Minute</span>
             <select :value="minutes" @change="onMinuteChange($event)">
               <option v-for="m in minuteOptions" :key="m" :value="m">{{ String(m).padStart(2, '0') }}</option>
             </select>
@@ -117,14 +117,15 @@ export default {
       if (!state.isOpen || !popupRef.value) return;
       const popupRect = popupRef.value.getBoundingClientRect();
       const viewportH = window.innerHeight;
-      const gap = 6;
+      const gap = 2;
+      const fixedWidth = 210;
       const placeBelow = state.rect.top + state.rect.height + gap + popupRect.height <= viewportH;
       const top = placeBelow ? state.rect.top + state.rect.height + gap : state.rect.top - popupRect.height - gap;
       popupStyle.value = {
         position: 'fixed',
         top: `${Math.max(8, top)}px`,
         left: `${state.rect.left}px`,
-        minWidth: `${Math.max(200, state.rect.width)}px`
+        width: `${fixedWidth}px`
       };
     };
 
@@ -314,17 +315,17 @@ export default {
 .calendar-label select::-webkit-scrollbar-thumb:hover { background: #0857cc; }
 .calendar-nav {
   background: #97c1ff;
-  border: 1px solid #0a6cff;
+  border: 1px solid #4b93ff;
   color: #fff;
   font-size: 14px;
   cursor: pointer;
-  padding: 4px 10px;
+  padding: 4px;
   border-radius: 6px;
   transition: transform 0.1s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
 .calendar-nav:hover {
   background: #3d8bff;
-  border-color: #085ad1;
+  border-color: #4e95ff;
   box-shadow: 0 2px 6px rgba(8, 90, 209, 0.25);
 }
 .calendar-nav:active {
@@ -368,8 +369,7 @@ export default {
 .time-field {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  font-size: 13px;
+  font-size: 12px;
   color: #333;
 }
 .time-field select {

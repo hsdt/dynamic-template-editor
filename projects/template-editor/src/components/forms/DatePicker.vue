@@ -44,7 +44,10 @@ export default {
     const { open, syncValue } = useDatePickerService();
 
     const tokenRegex = /[YyMDHhms]/;
-    const expectedDigits = props.format.split('').reduce((acc, ch) => acc + (tokenRegex.test(ch) ? 1 : 0), 0);
+    const literalStrippedFormat = props.format.replace(/\[[^\]]*]/g, '');
+    const expectedDigits = literalStrippedFormat
+      .split('')
+      .reduce((acc, ch) => acc + (tokenRegex.test(ch) ? 1 : 0), 0);
 
     const onInput = () => {
       const masked = displayValue.value;
@@ -114,9 +117,16 @@ export default {
 }
 .datepicker-input {
   width: 100%;
-  padding: 6px 8px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  padding: 2px 4px;
+  font-size: 12pt;
+  line-height: 20px;
+  border: none;
+  border-radius: 0;
+  background: url(@/assets/img/icon/bg-line-textarea.png);
+  background-position-y: 1px;
+}
+.datepicker-input:focus {
+  outline: none;
+  box-shadow: none;
 }
 </style>
