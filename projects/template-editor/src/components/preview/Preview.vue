@@ -108,6 +108,7 @@ import PageA4 from '../layouts/PageA4.vue';
 import PageA5 from '../layouts/PageA5.vue';
 import Textarea from '../forms/Textarea.vue';
 import InputOTP from '../forms/InputOTP.vue';
+import Signature from '../forms/Signature.vue';
 import { VirtualHTMLParser, VirtualNode } from 'shared/utils';
 import EditElementPanel from '../EditElementPanel.vue';
 import { handlePrint, printElement } from 'shared/helpers';
@@ -221,6 +222,7 @@ export default {
           .component('PageA5', PageA5)
           .component('Textarea', Textarea)
           .component('InputOTP', InputOTP)
+          .component('Signature', Signature)
           .component('Select', Select)
           .component('Checkbox', Checkbox)
           .component('DatePicker', DatePicker)

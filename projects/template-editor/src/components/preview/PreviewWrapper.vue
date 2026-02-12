@@ -67,6 +67,9 @@ export default {
           <div>Ảnh đã lưu:</div>
           <img :src="data.signature" alt="signature" style="max-width:200px;border:1px solid #ccc;" />
         </div>
+
+        <div><b>Signature - Ký</b></div>
+        <Signature code="BacSi" />
       </PageA4>
       `,
       context: {
@@ -92,7 +95,67 @@ export default {
           { value: 'typescript', label: 'TypeScript' },
           { value: 'tailwind', label: 'Tailwind' },
           { value: 'react', label: 'React' }
-        ]
+        ],
+
+        // required functions, data for Signature component
+        MauHoSo: 'HSThongTinBenhAn',
+        openSignatureHistory: (code: string) => {
+          console.log('openSignatureHistory', code);
+        },
+        handleSign: (code: string) => {
+          console.log('handleSign', code);
+        },
+        "signature": {
+          "BacSi": [
+            {
+              "Domain": "01004",
+              "IdBenhAn": "9e3b5531-bc6d-4486-8b38-7777c2a3ffbc",
+              "IdHoSo": "9e3b5531-bc6d-4486-8b38-7777c2a3ffbc",
+              "MauHoSo": "HSThongTinBenhAn",
+              "ViTri": "BacSi",
+              "IdNguoiKy": "649565c9-1a00-4b3a-9219-d52621eefe39",
+              "NguoiKy": "Nguyễn Thị Tĩnh Tĩnh",
+              "IdChuKy": "2545fb0d-cdb5-4b9a-b416-66aa4dda6b54",
+              "AnhChuKy": "\\Content\\folderUploadChuKy\\ChuKy\\202412250142422545fb0d-cdb5-4b9a-b416-66aa4dda6b54.png",
+              "ThongTinChuKy": "Chữ ký nội bộ",
+              "NgayKy": "2025-04-14T14:07:16.937",
+              "FileXML": "\\Content\\HSDT\\2025\\3\\BA25000131\\20250414020716_BA25000131_HSThongTinBenhAn_1.xml",
+              "LanKySo": 1,
+              "IsChuKyNhay": false,
+              "IdNguoiHuy": "649565c9-1a00-4b3a-9219-d52621eefe39",
+              "NguoiHuy": "Nguyễn Thị Tĩnh Tĩnh",
+              "NgayHuy": "2025-04-14T14:07:59.53",
+              "Active": false,
+              "IsChuKySo": false,
+              "IsChuKyVietTay": false,
+              "IdDiKemViTriKy": "0f4d0816-49f5-4d9b-b75d-374586fe44fc",
+              "IdHSDiKem": "b8b3bf57-5ef6-4f07-83b3-c40f0dde700d",
+              "Id": "9b1c86e3-e5cc-4b57-82ae-aae439cc7855",
+            },
+            {
+              "Domain": "01004",
+              "IdBenhAn": "9e3b5531-bc6d-4486-8b38-7777c2a3ffbc",
+              "IdHoSo": "9e3b5531-bc6d-4486-8b38-7777c2a3ffbc",
+              "MauHoSo": "HSThongTinBenhAn",
+              "ViTri": "BacSi",
+              "IdNguoiKy": "649565c9-1a00-4b3a-9219-d52621eefe39",
+              "NguoiKy": "Nguyễn Thị Tĩnh Tĩnh",
+              "IdChuKy": "2545fb0d-cdb5-4b9a-b416-66aa4dda6b54",
+              "AnhChuKy": "\\Content\\folderUploadChuKy\\ChuKy\\202412250142422545fb0d-cdb5-4b9a-b416-66aa4dda6b54.png",
+              "ThongTinChuKy": "Chữ ký nội bộ",
+              "NgayKy": "2025-04-14T14:08:07.373",
+              "FileXML": "\\Content\\HSDT\\2025\\3\\BA25000131\\20250414020807_BA25000131_HSThongTinBenhAn_1.xml",
+              "LanKySo": 1,
+              "IsChuKyNhay": false,
+              "Active": true,
+              "IsChuKySo": false,
+              "IsChuKyVietTay": false,
+              "IdDiKemViTriKy": "0f4d0816-49f5-4d9b-b75d-374586fe44fc",
+              "IdHSDiKem": "b8b3bf57-5ef6-4f07-83b3-c40f0dde700d",
+              "Id": "f074d6af-71e3-4c4c-8221-5361751459ec",
+            }
+          ]
+        }
       }
     }
   }
