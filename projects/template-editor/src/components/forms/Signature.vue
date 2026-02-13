@@ -45,7 +45,7 @@ type SignatureItem = {
 type SignatureHandler = (code: string) => void;
 
 export default {
-  name: 'HsSignature',
+  name: 'Signature',
   components: {
     ContextMenu,
     ContextMenuItem

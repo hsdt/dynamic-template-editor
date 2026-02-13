@@ -33,7 +33,6 @@ export default {
   height: 210mm;
   background: white;
   box-sizing: border-box;
-  margin: 10px;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
 }
 

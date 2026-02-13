@@ -88,16 +88,7 @@
 
     <!-- Preview container -->
     <div class="preview-container" ref="container">
-      <div class="preview-header">
-        Preview
-        <div class="header-actions">
-          <button @click="toggleEditMode" :class="['edit-mode-btn', { off: !editMode }]">{{ editMode ? 'Edit: On' : 'Edit: Off' }}</button>
-          <button @click="printPreview" class="print-btn">Print</button>
-        </div>
-      </div>
-      <div class="preview">
-        <div c-name="root" :c-id="rootId" class="content-root" ref="content"></div>
-      </div>
+      <div c-name="root" :c-id="rootId" class="content-root" ref="content"></div>
     </div>
   </div>
 </template>
@@ -196,7 +187,8 @@ export default {
       this.rootNode.innerHTML = this.template;
       this.rootNode.genComponentId();
       this.rootNode.setAttribute('c-id', this.rootId);
-      this.processedTemplate = this.rootNode.innerHTML;
+      // Use outerHTML to keep the Root wrapper for single root element requirement
+      this.processedTemplate = this.rootNode.outerHTML;
       this.renderPreview();
     },
 
@@ -214,6 +206,7 @@ export default {
 
         contentEl.innerHTML = '';
         this.app = createApp(DynamicComponent);
+        this.app.config.compilerOptions.isCustomElement = (tag) => tag === 'Root';
 
         installMaskDirective(this.app);
 
@@ -252,7 +245,7 @@ export default {
       elements.forEach(el => {
         const cid = el.getAttribute('c-id');
         const fakeElement = this.rootNode.querySelector(`[c-id=${cid}]`);
-        if (fakeElement?.childNodes.length === 0 && !fakeElement.isClosingTag) {
+        if (this.editMode && fakeElement?.childNodes.length === 0 && !fakeElement.isClosingTag) {
           el.classList.add('empty-placeholder');
         }
         el.addEventListener('contextmenu', this.contextMenuHandler as EventListener);
@@ -361,7 +354,7 @@ export default {
 
     updateTemplate() {
       const newHTML = this.rootNode.innerHTML;
-      this.processedTemplate = newHTML;
+      this.processedTemplate = this.rootNode.outerHTML;
       this.$emit('update:template', newHTML);
       this.renderPreview();
     },
@@ -370,15 +363,6 @@ export default {
       this.selectedNode = null;
       this.updateTemplate();
       this.unHighlightElement()
-    },
-
-    toggleEditMode() {
-      this.$emit('update:editMode', !this.editMode);
-      if (this.editMode) {
-        this.ContextMenuVisible = false;
-        this.insertMenuVisible = false;
-        this.unHighlightElement();
-      }
     },
 
     isClosingTag(cid: string) {
@@ -395,29 +379,7 @@ export default {
 <style scoped>
 .preview-container {
   width: 100%;
-  border: 1px solid #ccc;
-  border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.preview-header {
-  background-color: #2c3e50;
-  color: white;
-  padding: 10px 15px;
-  font-weight: bold;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: 20px;
-}
-
-.preview {
-  height: 800px;
-  overflow: auto;
-  border: 1px solid;
-  scrollbar-width: thin;
-  scrollbar-color: #2c3e50 #f0f0f0;
 }
 
 .preview-editor {
@@ -438,49 +400,13 @@ export default {
 }
 
 .content-root {
-  background: #ecf0f1;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   min-height: 148mm;
-  padding: 10px;
 }
 
 @media print {
   .content-root {
     padding: 0;
   }
-}
-
-.print-btn {
-  padding: 8px 16px;
-  background: #3498db;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.print-btn:hover {
-  background: #2980b9;
-}
-
-.header-actions {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.edit-mode-btn {
-  padding: 8px 16px;
-  background: #27ae60;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.edit-mode-btn.off {
-  background: #95a5a6;
 }
 </style>

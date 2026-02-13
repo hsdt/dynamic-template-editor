@@ -87,7 +87,10 @@ export default {
     const normalizeValue = (val: string) =>
       props.type === 'number' ? (val ?? '').replace(/[^0-9]/g, '') : val ?? ''
 
-    const computePad = () => props.suffix.char?.repeat(props.suffix.length || 0) || ''
+    const computePad = () => {
+      const char = props.suffix.char ?? '\u00A0'
+      return char.repeat(props.suffix.length || 0)
+    }
     const ensurePad = (val: string) => {
       const pad = padEnd.value
       if (!pad) return val

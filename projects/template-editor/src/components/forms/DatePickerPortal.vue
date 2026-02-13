@@ -118,7 +118,7 @@ export default {
       const popupRect = popupRef.value.getBoundingClientRect();
       const viewportH = window.innerHeight;
       const gap = 2;
-      const fixedWidth = 210;
+      const fixedWidth = 230;
       const placeBelow = state.rect.top + state.rect.height + gap + popupRect.height <= viewportH;
       const top = placeBelow ? state.rect.top + state.rect.height + gap : state.rect.top - popupRect.height - gap;
       popupStyle.value = {
