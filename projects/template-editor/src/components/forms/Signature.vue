@@ -22,19 +22,20 @@
       </span>
     </div>
 
-    <ContextMenu v-model:show="menuVisible" :options="menuOption">
-      <ContextMenuItem label="Lịch sử ký" @click="openSignatureHistory">
-        <template #icon>
+    <ContextMenu ref="signatureMenu">
+      <template #default="{ subject }">
+        <li @click="openSignatureHistory">
           <i class="fa fa-search text-warning"></i>
-        </template>
-      </ContextMenuItem>
+          Lịch sử ký
+        </li>
+      </template>
     </ContextMenu>
   </div>
 </template>
 
 <script lang="ts">
-import { computed, getCurrentInstance, PropType, ref } from 'vue';
-import { ContextMenu, ContextMenuItem } from '@imengyu/vue3-context-menu';
+import { computed, getCurrentInstance, ref } from 'vue';
+import ContextMenu from '../ContextMenu.vue';
 
 type SignatureItem = {
   Active?: boolean;
@@ -47,16 +48,14 @@ type SignatureHandler = (code: string) => void;
 export default {
   name: 'Signature',
   components: {
-    ContextMenu,
-    ContextMenuItem
+    ContextMenu
   },
   props: {
     code: { type: String, default: '' }
   },
   setup(props) {
     const instance = getCurrentInstance();
-    const menuVisible = ref(false);
-    const menuOption = ref({ x: 0, y: 0, minWidth: 140 });
+    const signatureMenu = ref<InstanceType<typeof ContextMenu> | null>(null);
 
     const rootData = computed(() =>
       ((instance?.proxy?.$root as any)?.$data ?? {}) as Record<string, unknown>
@@ -97,9 +96,8 @@ export default {
     };
 
     const openContextMenu = (event: MouseEvent) => {
-      menuOption.value.x = event.clientX;
-      menuOption.value.y = event.clientY;
-      menuVisible.value = true;
+      event.preventDefault();
+      signatureMenu.value?.showFromEvent?.(event, signatureCode.value);
     };
 
     return {
@@ -107,9 +105,8 @@ export default {
       codeLine,
       openSignatureHistory,
       handleSign,
-      menuVisible,
-      menuOption,
-      openContextMenu
+      openContextMenu,
+      signatureMenu
     };
   }
 };

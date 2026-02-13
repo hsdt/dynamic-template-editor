@@ -24,6 +24,18 @@ export default {
         <div><b>InputOTP</b></div>
         <InputOTP v-model="data.age" :mask-length="[1,1,1]" pad-start="0" />
 
+        <div><b>Context menu (directive v-context-menu)</b></div>
+        <div v-for="item in contextItems" :key="item.id" v-context-menu:ctxMenu="item" style="padding:8px;border:1px dashed #aaa;margin-bottom:6px">
+          Chuột phải vào: {{ item.label }}
+        </div>
+        <ContextMenu ref="ctxMenu">
+          <template #default="{ subject }">
+            <li @click="log(subject)">Sửa</li>
+            <li @click="log(subject)">Xóa</li>
+            <li @click="log(subject)">Nhân bản</li>
+          </template>
+        </ContextMenu>
+
         <div><b>Select one</b></div>
         <Select v-model="data.category" label="Danh mục:" placeholder="Chọn danh mục"
           bind-label="name" bind-value="id" :items="categoryList" />
@@ -73,6 +85,7 @@ export default {
       </PageA4>
       `,
       context: {
+        log: console.log,
         data: {
           name: "duynnz",
           age: "18",
@@ -95,6 +108,11 @@ export default {
           { value: 'typescript', label: 'TypeScript' },
           { value: 'tailwind', label: 'Tailwind' },
           { value: 'react', label: 'React' }
+        ],
+        contextItems: [
+          { id: 1, label: 'Hàng số 1' },
+          { id: 2, label: 'Hàng số 2' },
+          { id: 3, label: 'Hàng số 3' }
         ],
 
         // required functions, data for Signature component

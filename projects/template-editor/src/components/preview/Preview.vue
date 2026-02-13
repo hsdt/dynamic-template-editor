@@ -1,7 +1,7 @@
 <template>
   <div class="preview-editor">
     <!-- Context Menu Component -->
-    <ContextMenu v-model:show="ContextMenuVisible" @update:show="unHighlightElement" :options="contextMenuOption">
+    <ImContextMenu v-model:show="ContextMenuVisible" @update:show="unHighlightElement" :options="contextMenuOption">
       <context-menu-group label="Insert">
         <template #icon>
           <i class="fa-solid fa-plus"></i>
@@ -58,10 +58,10 @@
           <i class="fa-solid fa-trash"></i>
         </template>
       </context-menu-item>
-    </ContextMenu>
+    </ImContextMenu>
 
     <!-- Insert Template Menu -->
-    <ContextMenu v-model:show="insertMenuVisible" :options="insertMenuOption">
+    <ImContextMenu v-model:show="insertMenuVisible" :options="insertMenuOption">
       <context-menu-group 
         v-for="(category, categoryIndex) in templateCategories" 
         :key="categoryIndex"
@@ -78,7 +78,7 @@
           </template>
         </context-menu-item>
       </context-menu-group>
-    </ContextMenu>
+    </ImContextMenu>
 
     <!-- Overlay -->
     <div v-if="selectedNode" class="editor-overlay" @click="closeEditPanel"></div>
@@ -103,8 +103,8 @@ import Signature from '../forms/Signature.vue';
 import { VirtualHTMLParser, VirtualNode } from 'shared/utils';
 import EditElementPanel from '../EditElementPanel.vue';
 import { handlePrint, printElement } from 'shared/helpers';
-import { ContextMenu } from '@imengyu/vue3-context-menu';
-import { ContextMenuItem } from '@imengyu/vue3-context-menu';
+import { ContextMenu as ImContextMenu } from '@imengyu/vue3-context-menu';
+import { ContextMenuItem as ImContextMenuItem } from '@imengyu/vue3-context-menu';
 import { templateCategories } from 'shared/constants';
 import { App, ComponentPublicInstance } from 'vue';
 import { TemplateItem } from 'shared/types';
@@ -113,11 +113,15 @@ import Checkbox from '../forms/Checkbox.vue';
 import DatePicker from '../forms/DatePicker.vue';
 import { installMaskDirective } from '../../directives/mask-datetime';
 import Paint from '../forms/Paint.vue';
+import SimpleContextMenu from '../ContextMenu.vue';
+import { installContextMenuDirective } from '../../directives/context-menu';
 
 export default {
   name: 'Preview',
   components: {
-    EditElementPanel
+    EditElementPanel,
+    ImContextMenu,
+    ImContextMenuItem
   },
   props: {
     template: {
@@ -209,6 +213,7 @@ export default {
         this.app.config.compilerOptions.isCustomElement = (tag) => tag === 'Root';
 
         installMaskDirective(this.app);
+        installContextMenuDirective(this.app);
 
         this.app
           .component('PageA4', PageA4)
@@ -219,7 +224,10 @@ export default {
           .component('Select', Select)
           .component('Checkbox', Checkbox)
           .component('DatePicker', DatePicker)
-          .component('Paint', Paint);
+          .component('Paint', Paint)
+          .component('ContextMenu', SimpleContextMenu)
+          .component('ImContextMenu', ImContextMenu)
+          .component('ImContextMenuItem', ImContextMenuItem);
 
         this.vm = this.app.mount(contentEl);
 

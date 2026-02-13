@@ -1,10 +1,13 @@
 import { createApp } from "vue";
 import App from "./App.vue";
 import { InstallCodeMirror } from "codemirror-editor-vue3";
-import ContextMenu from "@imengyu/vue3-context-menu";
+import ContextMenuPlugin from "@imengyu/vue3-context-menu";
+import { installContextMenuDirective } from "./directives/context-menu";
 import "./assets/main.css";
 
-createApp(App)
+const app = createApp(App);
+installContextMenuDirective(app);
+app
   .use(InstallCodeMirror)
-  .use(ContextMenu)
+  .use(ContextMenuPlugin)
   .mount("#app");
