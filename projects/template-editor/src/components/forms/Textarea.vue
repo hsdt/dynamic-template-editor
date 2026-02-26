@@ -14,7 +14,7 @@
       class="textarea-line no-print"
       :class="{ 'textarea-line-none': !line }"
       v-model="input"
-      :style="[textareaStyleNormalized, { textIndent: labelSpanWidth + 'px' }]"
+      :style="[textareaStyleNormalized, { textIndent: labelSpanWidth + 'px', minHeight: input ? undefined : textareaHeight + 'px' }]"
       :placeholder="placeholder"
       :disabled="disabled"
       :readonly="readonly"
@@ -47,13 +47,14 @@
 </template>
 
 <script lang="ts">
-import { ref, computed, watch, nextTick, onMounted, PropType } from 'vue'
-import { useTextareaAutosize } from '@vueuse/core'
+import { ref, computed, watch, nextTick, onMounted, onUnmounted, PropType } from 'vue'
+// @ts-ignore
+import autosize from 'autosize'
 
 export default {
   name: 'HsTextarea',
   props: {
-    modelValue: { type: String, default: '' },
+    modelValue: { type: String as PropType<string | null>, default: null },
     type: { type: String as PropType<'text' | 'number'>, default: 'text' },
     label: { type: String, default: '' },
     placeholder: { type: String, default: '' },
@@ -72,9 +73,9 @@ export default {
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
-    // --- Reactive binding
-    const input = ref(props.modelValue)
-    const { textarea } = useTextareaAutosize({ input })
+    // --- Reactive binding (keep internal ref non-nullable for helpers)
+    const input = ref<string>(props.modelValue ?? '')
+    const textarea = ref<HTMLTextAreaElement | null>(null)
 
     // --- Elements
     const labelSpan = ref<HTMLElement>()
@@ -105,9 +106,10 @@ export default {
     // --- Init
     onMounted(() => {
       padEnd.value = computePad()
-      input.value = ensurePad(normalizeValue(props.modelValue))
+      input.value = ensurePad(normalizeValue(props.modelValue ?? ''))
       nextTick(() => {
         textareaHeight.value = textarea.value?.offsetHeight ?? 20
+        if (textarea.value) autosize(textarea.value)
       })
     })
 
@@ -134,7 +136,7 @@ export default {
 
     // --- Watch: internal -> emit
     watch(input, newVal => {
-      const padded = ensurePad(normalizeValue(stripPad(newVal)))
+      const padded = ensurePad(normalizeValue(stripPad(newVal ?? '')))
       if (padded !== newVal) {
         input.value = padded
         nextTick(() => setCaretPosition())
@@ -143,7 +145,12 @@ export default {
       emit('update:modelValue', stripPad(padded))
       nextTick(() => {
         textareaHeight.value = textarea.value?.offsetHeight ?? textareaHeight.value
+        if (textarea.value) autosize.update(textarea.value)
       })
+    })
+
+    onUnmounted(() => {
+      if (textarea.value) autosize.destroy(textarea.value)
     })
 
     // --- Caret control
@@ -197,6 +204,7 @@ export default {
   background: white;
   line-height: 1;
   bottom: calc(100% - 20px);
+  left: 0;
 }
 .textarea-line {
   outline: none;
