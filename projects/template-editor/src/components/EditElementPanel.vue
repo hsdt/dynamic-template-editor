@@ -135,7 +135,7 @@ const attributeSuggestionMap: Record<string, string[]> = {
   InputOTP: ['v-model', 'type', 'readonly', 'disabled', 'mask-length', 'pad-char', 'pad-start', 'style', 'class'],
   Select: ['v-model', 'items', 'bind-label', 'bind-value', 'placeholder', 'multiple', 'disabled', 'readonly', 'label'],
   Checkbox: ['v-model', 'value', 'before-text', 'after-text', 'size', 'disabled', 'readonly'],
-  DatePicker: ['v-model', 'placeholder', 'format', 'disabled', 'readonly', 'mode', 'minute-step'],
+  DatePicker: ['v-model', 'placeholder', 'format', 'disabled', 'readonly', 'minute-step'],
   Paint: ['v-model', 'line-width', 'color', 'src', 'class', 'style'],
   Signature: ['code', 'class', 'style']
 };
@@ -144,7 +144,6 @@ type AttributeValueSuggestion = string[] | Record<string, string[]>;
 
 const attributeValueSuggestionMap: Record<string, Record<string, AttributeValueSuggestion>> = {
   DatePicker: {
-    mode: ['date', 'datetime'],
     format: {
       date: [
         'DD [tháng] MM [năm] YYYY',
@@ -211,11 +210,6 @@ export default {
 
       if (Array.isArray(suggestions)) return suggestions;
 
-      if (key === 'format' && suggestions) {
-        const mode = (this.currentAttributes?.mode as string) || 'date';
-        return suggestions[mode] || suggestions['date'] || [];
-      }
-
       return [];
     }
   },
@@ -254,11 +248,6 @@ export default {
       const suggestions = perTag[key];
 
       if (Array.isArray(suggestions)) return suggestions;
-
-      if (key === 'format' && suggestions) {
-        const mode = (this.currentAttributes?.mode as string) || 'date';
-        return suggestions[mode] || suggestions['date'] || [];
-      }
 
       return [];
     },

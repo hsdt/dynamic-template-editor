@@ -58,7 +58,7 @@ export default {
         <div style="color:#0066cc">Giá trị: <b>{{ data.birthdayText }}</b></div>
 
         <div><b>DatePicker (datetime) - Giờ hẹn</b></div>
-        <DatePicker v-model="data.appointment" mode="datetime" placeholder="Chọn ngày giờ"
+        <DatePicker v-model="data.appointment" placeholder="Chọn ngày giờ"
           format="HH:mm DD/MM/YYYY" :minute-step="15"
         />
         <div style="color:#0066cc">Ngày giờ đã chọn: <b>{{ data.appointment }}</b></div>

@@ -31,7 +31,6 @@ export default {
     placeholder: { type: String, default: 'Chọn ngày' },
     disabled: { type: Boolean, default: false },
     readonly: { type: Boolean, default: false },
-    mode: { type: String, default: 'date' }, // 'date' | 'datetime'
     minuteStep: { type: Number, default: 5 }
   },
   emits: ['update:modelValue'],
@@ -39,6 +38,12 @@ export default {
     const wrapperRef = ref<HTMLElement | null>(null);
     const displayValue = ref('');
     const { open, syncValue } = useDatePickerService();
+
+    // Tự động phát hiện mode từ format
+    const detectMode = (format: string): 'date' | 'datetime' => {
+      // Nếu format có chứa H, m, s thì là datetime
+      return /[Hhms]/.test(format) ? 'datetime' : 'date';
+    };
 
     const tokenRegex = /[YyMDHhms]/;
     const literalStrippedFormat = props.format.replace(/\[[^\]]*]/g, '');
@@ -84,7 +89,7 @@ export default {
         anchor: wrapperRef.value,
         value: displayValue.value,
         format: props.format,
-        mode: props.mode as 'date' | 'datetime',
+        mode: detectMode(props.format),
         minuteStep: props.minuteStep,
         onSelect: (val: string) => {
           const parsed = moment(val, props.format, true).isValid()
