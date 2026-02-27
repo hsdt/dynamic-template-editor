@@ -144,17 +144,13 @@ type AttributeValueSuggestion = string[] | Record<string, string[]>;
 
 const attributeValueSuggestionMap: Record<string, Record<string, AttributeValueSuggestion>> = {
   DatePicker: {
-    format: {
-      date: [
-        'DD [tháng] MM [năm] YYYY',
-        'DD/MM/YYYY'
-      ],
-      datetime: [
-        'HH [giờ] mm [phút,] [ngày] DD [tháng] MM [năm] YYYY',
-        'HH[h]mm [ngày] DD [tháng] MM [năm] YYYY',
-        'HH:mm DD/MM/YYYY'
-      ]
-    }
+    format: [
+      'DD/MM/YYYY',
+      'DD [tháng] MM [năm] YYYY',
+      'HH [giờ] mm [phút,] [ngày] DD [tháng] MM [năm] YYYY',
+      'HH[h]mm [ngày] DD [tháng] MM [năm] YYYY',
+      'HH:mm DD/MM/YYYY'
+    ]
   },
   Checkbox: {
     size: ['sm', 'md', 'lg', 'xl']
