@@ -4,15 +4,21 @@
     ref="wrapperRef"
     :class="{ disabled, readonly }"
   >
+    <!-- Slot cho nhãn hoặc dùng prop label -->
     <span
+      v-if="$slots['label'] || label"
       class="hs-label-span"
       ref="labelSpan"
-      v-html="label ? label + '&nbsp;' : ''"
-    ></span>
+    >
+      <template v-if="$slots['label']">
+        <slot name="label"></slot>
+      </template>
+      <template v-else>{{ label }}&nbsp;</template>
+    </span>
 
     <!-- Input + tags -->
     <div class="input-container" @click="focusInput">
-      <span class="tag" :style="{ width: labelSpanWidth + 'px' }"></span>
+      <span class="tag" :style="{ width: ($slots['label'] || label) ? labelSpanWidth + 'px' : undefined }"></span>
       <span
         v-for="(item, i) in selectedItems"
         :key="i"
@@ -76,7 +82,7 @@ export default {
     multiple: Boolean,
     disabled: Boolean,
     readonly: Boolean,
-    label: String,
+    label: { type: String, default: '' },
   },
   emits: ['update:modelValue', 'search'],
   setup(props, { emit }) {

@@ -1,5 +1,16 @@
 <template>
   <div class="datepicker-wrapper" ref="wrapperRef">
+    <!-- Slot cho nhãn -->
+    <span
+      v-if="$slots['label'] || label"
+      class="hs-label-span"
+      ref="labelSpan"
+    >
+      <template v-if="$slots['label']">
+        <slot name="label"></slot>
+      </template>
+      <template v-else>{{ label }}&nbsp;</template>
+    </span>
     <input
       type="text"
       class="datepicker-input"
@@ -12,6 +23,7 @@
       :disabled="disabled"
       :readonly="readonly"
       autocomplete="off"
+      :style="{ textIndent: ($slots['label'] || label) ? labelSpanWidth + 'px' : undefined }"
     />
   </div>
 </template>
@@ -28,10 +40,11 @@ export default {
   props: {
     modelValue: { type: String, default: '' },
     format: { type: String, default: 'YYYY-MM-DD' },
-    placeholder: { type: String, default: 'Chọn ngày' },
+    placeholder: { type: String, default: '' },
     disabled: { type: Boolean, default: false },
     readonly: { type: Boolean, default: false },
-    minuteStep: { type: Number, default: 5 }
+    minuteStep: { type: Number, default: 5 },
+    label: { type: String, default: '' },
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
@@ -105,11 +118,24 @@ export default {
       });
     };
 
+    // Tính toán độ rộng label (dùng slot)
+    const labelSpan = ref<HTMLElement>()
+    const labelSpanWidth = ref(0)
+    const updateLabelWidth = () => {
+      labelSpanWidth.value = labelSpan.value?.offsetWidth ?? 0
+    }
+    if (typeof window !== 'undefined') {
+      setTimeout(updateLabelWidth, 0)
+    }
+    // Nếu slot label thay đổi, cần cập nhật lại width (nếu cần, có thể dùng watchEffect hoặc onUpdated)
+
     return {
       wrapperRef,
       displayValue,
       onInput,
-      openPicker
+      openPicker,
+      labelSpan,
+      labelSpanWidth
     };
   }
 };
@@ -121,6 +147,13 @@ export default {
   position: relative;
   display: inline-block;
   width: 200px;
+}
+.hs-label-span {
+  position: absolute;
+  background: white;
+  line-height: 1;
+  bottom: calc(100% - 20px);
+  left: 0;
 }
 .datepicker-input {
   width: 100%;

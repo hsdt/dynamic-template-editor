@@ -1,12 +1,16 @@
 <template>
   <div class="textarea-wrapper" :style="style">
-    <!-- Nhãn -->
+    <!-- Slot cho nhãn hoặc dùng prop label -->
     <span
+      v-if="$slots['label'] || label"
       class="hs-label-span"
-      :style="labelStyle"
       ref="labelSpan"
-      v-html="label ? label + '&nbsp;' : ''"
-    ></span>
+    >
+      <template v-if="$slots['label']">
+        <slot name="label"></slot>
+      </template>
+      <template v-else>{{ label }}&nbsp;</template>
+    </span>
 
     <!-- Textarea nhập -->
     <textarea
@@ -14,7 +18,7 @@
       class="textarea-line no-print"
       :class="{ 'textarea-line-none': !line }"
       v-model="input"
-      :style="[textareaStyleNormalized, { textIndent: labelSpanWidth + 'px', minHeight: input ? undefined : textareaHeight + 'px' }]"
+      :style="[textareaStyleNormalized, { textIndent: ($slots['label'] || label) ? labelSpanWidth + 'px' : undefined, minHeight: input ? undefined : textareaHeight + 'px' }]"
       :placeholder="placeholder"
       :disabled="disabled"
       :readonly="readonly"
@@ -30,7 +34,7 @@
     <template v-if="!input">
       <div
         class="textarea-line yes-print"
-        :style="[textareaStyleNormalized, { textIndent: labelSpanWidth + 'px', height: textareaHeight + 'px' }]"
+        :style="[textareaStyleNormalized, { textIndent: ($slots['label'] || label) ? labelSpanWidth + 'px' : undefined, height: textareaHeight + 'px' }]"
       ></div>
     </template>
     <template v-else>
@@ -38,7 +42,7 @@
         v-for="(lineText, i) in splitString(input)"
         :key="i"
         class="textarea-line yes-print"
-        :style="[textareaStyleNormalized, { textIndent: i === 0 ? labelSpanWidth + 'px' : '0px' }]"
+        :style="[textareaStyleNormalized, { textIndent: ($slots['label'] || label) && i === 0 ? labelSpanWidth + 'px' : '0px' }]"
       >
         {{ lineText }}
       </div>
@@ -68,7 +72,6 @@ export default {
       default: () => ({ length: 0, char: '\u00A0' })
     },
     textareaStyle: { type: [String, Object], default: '' },
-    labelStyle: { type: [String, Object], default: '' },
     style: { type: [String, Object], default: '' }
   },
   emits: ['update:modelValue'],

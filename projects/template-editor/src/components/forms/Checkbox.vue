@@ -1,7 +1,10 @@
 <template>
   <div class="checkbox-wrapper" :class="[`size-${size}`, { disabled, readonly }]">
     <label class="checkbox-container">
-      <span v-if="beforeText" class="before-text">{{ beforeText }}</span>
+        <template v-if="$slots['beforeText']">
+          <slot name="beforeText" />
+        </template>
+        <span v-else-if="beforeText" class="before-text">{{ beforeText }}</span>
       <input
         ref="checkboxInput"
         type="checkbox"
@@ -11,7 +14,11 @@
         @click="handleClick"
       />
       <span class="checkbox-mark"></span>
-      <span v-if="afterText" class="after-text">{{ afterText }}</span>
+      
+      <template v-if="$slots['afterText']">
+        <slot name="afterText" />
+      </template>
+      <span v-else-if="afterText" class="after-text">{{ afterText }}</span>
     </label>
   </div>
 </template>

@@ -88,7 +88,7 @@
 
     <!-- Preview container -->
     <div class="preview-container" ref="container">
-      <div c-name="root" :c-id="rootId" class="content-root" ref="content"></div>
+      <div class="content-root" ref="content"></div>
     </div>
   </div>
 </template>
@@ -145,7 +145,7 @@ export default {
     return {
       app: null as App<any> | null,
       vm: null as ComponentPublicInstance | null,
-      rootId: '123456',
+      rootId,
       rootNode,
       selectedNode: null as VirtualNode | null,
       processedTemplate: '',
@@ -385,6 +385,10 @@ export default {
 </script>
 
 <style scoped>
+:deep([c-id="123456"]) {
+  display: flex;
+  justify-content: center;
+}
 .preview-container {
   width: 100%;
   overflow: hidden;
@@ -393,6 +397,7 @@ export default {
 .preview-editor {
   position: relative;
   height: 100%;
+  width: 100%;
 }
 
 /* Overlay */
