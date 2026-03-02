@@ -253,7 +253,12 @@ export default {
       elements.forEach(el => {
         const cid = el.getAttribute('c-id');
         const fakeElement = this.rootNode.querySelector(`[c-id=${cid}]`);
-        if (this.editMode && fakeElement?.childNodes.length === 0 && !fakeElement.isClosingTag) {
+        if (
+          this.editMode &&
+          fakeElement?.childNodes.length === 0 &&
+          !fakeElement.isClosingTag &&
+          (!el.getAttribute('style') || el.getAttribute('style')?.trim() === '')
+        ) {
           el.classList.add('empty-placeholder');
         }
         el.addEventListener('contextmenu', this.contextMenuHandler as EventListener);

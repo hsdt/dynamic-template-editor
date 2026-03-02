@@ -46,7 +46,7 @@ export default {
         <div><b>Select multiple</b></div>
         <Select v-model="data.tags" label="Tags:" placeholder="Chọn tags"
           bind-label="label" bind-value="value" :items="tagList" multiple />
-        <div style="color:#0066cc">Tags đã chọn {{ data.tags }}</b></div>
+        <div style="color:#0066cc">Tags đã chọn <b>{{ data.tags }}</b></div>
 
         <div><b>DatePicker - Chọn ngày sinh</b></div>
         <DatePicker label="Ngày sinh" v-model="data.birthday" placeholder="Chọn ngày sinh" format="DD/MM/YYYY"/>

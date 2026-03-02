@@ -10,7 +10,8 @@
         type="checkbox"
         class="checkbox-input"
         :checked="modelValue === value"
-        :disabled="disabled || readonly"
+        :disabled="disabled"
+        :readonly="readonly"
         @click="handleClick"
       />
       <span class="checkbox-mark"></span>

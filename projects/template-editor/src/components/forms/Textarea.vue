@@ -15,7 +15,7 @@
     <!-- Textarea nhập -->
     <textarea
       ref="textarea"
-      class="textarea-line no-print"
+      class="textarea-line"
       :class="{ 'textarea-line-none': !line }"
       v-model="input"
       :style="[textareaStyleNormalized, { textIndent: ($slots['label'] || label) ? labelSpanWidth + 'px' : undefined, minHeight: input ? undefined : textareaHeight + 'px' }]"
@@ -29,24 +29,6 @@
       @click="setCaretPosition"
       @select="limitSelection"
     ></textarea>
-
-    <!-- Bản in -->
-    <template v-if="!input">
-      <div
-        class="textarea-line yes-print"
-        :style="[textareaStyleNormalized, { textIndent: ($slots['label'] || label) ? labelSpanWidth + 'px' : undefined, height: textareaHeight + 'px' }]"
-      ></div>
-    </template>
-    <template v-else>
-      <div
-        v-for="(lineText, i) in splitString(input)"
-        :key="i"
-        class="textarea-line yes-print"
-        :style="[textareaStyleNormalized, { textIndent: ($slots['label'] || label) && i === 0 ? labelSpanWidth + 'px' : '0px' }]"
-      >
-        {{ lineText }}
-      </div>
-    </template>
   </div>
 </template>
 
@@ -221,18 +203,5 @@ export default {
   resize: none;
   display: block;
   overflow: hidden;
-}
-.textarea-line.yes-print {
-  white-space: pre-wrap;
-  padding: 2px;
-  display: none;
-}
-@media print {
-  .no-print {
-    display: none !important;
-  }
-  .yes-print {
-    display: block !important;
-  }
 }
 </style>
