@@ -257,7 +257,8 @@ export default {
           this.editMode &&
           fakeElement?.childNodes.length === 0 &&
           !fakeElement.isClosingTag &&
-          (!el.getAttribute('style') || el.getAttribute('style')?.trim() === '')
+          (!el.getAttribute('style') || el.getAttribute('style')?.trim() === '') &&
+          fakeElement?.getAttribute('c-name') === 'div'
         ) {
           el.classList.add('empty-placeholder');
         }

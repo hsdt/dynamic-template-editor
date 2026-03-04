@@ -9,6 +9,7 @@ import Preview from './Preview.vue';
 import "codemirror/mode/htmlmixed/htmlmixed.js"
 import '@imengyu/vue3-context-menu/lib/vue3-context-menu.css'
 import DatePickerPortal from '../forms/DatePickerPortal.vue';
+import moment from 'moment';
 
 export default {
   name: 'PreviewWrapper',
@@ -41,7 +42,7 @@ export default {
 
         <div><b>Select one</b></div>
         <Select v-model="data.category" label="Danh mục:" placeholder="Chọn danh mục"
-          bind-label="name" bind-value="id" :items="categoryList" />
+          bind-label="name" bind-value="id" :items="categoryList" :search-by-keys="['name', 'id']"/>
 
         <div><b>Select multiple</b></div>
         <Select v-model="data.tags" label="Tags:" placeholder="Chọn tags"
@@ -88,9 +89,13 @@ export default {
 
         <div><b>Signature - Ký</b></div>
         <Signature code="BacSi" />
+        {{hsBenhAn.NguyenNhanTuVong}}
+        <Checkbox
+          size="md" v-model="hsBenhAn.NguyenNhanTuVong" value="DO_BENH" />
       </PageA4>
       `,
       context: {
+        moment: moment,
         log: console.log,
         config: {
           TenBenhVien: "BV ĐK H. PHÚ XUYÊN",
@@ -593,7 +598,19 @@ export default {
               "Id": "f074d6af-71e3-4c4c-8221-5361751459ec",
             }
           ]
-        }
+        },
+        hsTongKetBenhAn: {
+          NoiDungChiTietObj: {}
+        },
+        hsThongTinBenhAn: {
+          NoiDungChiTietObj: {}
+        },
+        dmNgheNghiep: [],
+        dmDanToc: [],
+        dmQuocGia: [],
+        dmXaPhuong: [],
+        dmQuanHuyen: [],
+        dmTinhThanh: []
       }
     }
   }

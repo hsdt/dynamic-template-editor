@@ -23,13 +23,14 @@
       :disabled="disabled"
       :readonly="readonly"
       autocomplete="off"
-      :style="{ textIndent: ($slots['label'] || label) ? labelSpanWidth + 'px' : undefined }"
+      :style="[{ textIndent: ($slots['label'] || label) ? labelSpanWidth + 'px' : undefined }, inputStyle]"
     />
   </div>
 </template>
 
 <script lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, type PropType } from 'vue';
+import type { StyleValue } from 'vue';
 import moment from 'moment';
 import mask from '../../directives/mask-datetime';
 import { useDatePickerService } from '../../services/datePickerService';
@@ -45,6 +46,7 @@ export default {
     readonly: { type: Boolean, default: false },
     minuteStep: { type: Number, default: 5 },
     label: { type: String, default: '' },
+    inputStyle: { type: [Object, String, Array] as PropType<StyleValue>, default: null },
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
@@ -54,8 +56,9 @@ export default {
 
     // Tự động phát hiện mode từ format
     const detectMode = (format: string): 'date' | 'datetime' => {
-      // Nếu format có chứa H, m, s thì là datetime
-      return /[Hhms]/.test(format) ? 'datetime' : 'date';
+      // Strip literal text (nội dung trong []) trước khi kiểm tra token H/h/m/s
+      const stripped = format.replace(/\[[^\]]*]/g, '');
+      return /[Hhms]/.test(stripped) ? 'datetime' : 'date';
     };
 
     const tokenRegex = /[YyMDHhms]/;
@@ -145,8 +148,6 @@ export default {
 <style scoped>
 .datepicker-wrapper {
   position: relative;
-  display: inline-block;
-  width: 200px;
 }
 .hs-label-span {
   position: absolute;

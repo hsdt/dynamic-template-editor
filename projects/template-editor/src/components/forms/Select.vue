@@ -23,6 +23,7 @@
         v-for="(item, i) in selectedItems"
         :key="i"
         class="tag"
+        v-show="multiple || !search.length"
       >
         {{ getItemLabel(item) }}
         <span
@@ -31,11 +32,14 @@
           @click.stop="removeItem(item)"
         >❌</span>
       </span>
+      <span class="tag" style="visibility: hidden;">|</span>
 
       <input
         ref="inputRef"
         v-model="search"
         class="input"
+        :class="{ 'input-absolute': !multiple && ($slots['label'] || label) }"
+        :style="!multiple && ($slots['label'] || label) ? { left: labelSpanWidth + 'px' } : undefined"
         :placeholder="placeholderText"
         :disabled="disabled || readonly"
         @focus="open"
@@ -83,11 +87,13 @@ export default {
     disabled: Boolean,
     readonly: Boolean,
     label: { type: String, default: '' },
+    searchByKeys: { type: Array as PropType<string[]>, default: () => [] },
   },
   emits: ['update:modelValue', 'search'],
   setup(props, { emit }) {
     const isOpen = ref(false);
     const search = ref('');
+    const suppressSearchEmit = ref(false);
     const selectedItems = ref<any[]>([]);
 
     const wrapperRef = ref<HTMLElement | null>(null);
@@ -128,14 +134,28 @@ export default {
     const filteredItems = computed(() => {
       if (!search.value.trim()) return props.items;
       const q = search.value.toLowerCase();
-      return props.items.filter(i =>
-        getItemLabel(i).toLowerCase().includes(q)
-      );
+      
+      return props.items.filter(i => {
+        // If searchByKeys is provided and not empty, search by those keys
+        if (props.searchByKeys && props.searchByKeys.length > 0) {
+          if (typeof i === 'object' && i !== null) {
+            return props.searchByKeys.some(key => {
+              const value = i[key];
+              return value != null && String(value).toLowerCase().includes(q);
+            });
+          }
+          // If item is not an object, fall back to label search
+          return getItemLabel(i).toLowerCase().includes(q);
+        }
+        
+        // Default: search by label
+        return getItemLabel(i).toLowerCase().includes(q);
+      });
     });
 
     const placeholderText = computed(() =>
       selectedItems.value.length === 0
-        ? props.placeholder || 'Chọn...'
+        ? props.placeholder
         : ''
     );
 
@@ -166,8 +186,12 @@ export default {
         isOpen.value = false;
       }
 
+      suppressSearchEmit.value = true;
+      search.value = '';
       syncModel();
-      nextTick(() => inputRef.value?.focus());
+      if (props.multiple) {
+        nextTick(() => inputRef.value?.focus());
+      }
     };
 
     const removeItem = (item: any) => {
@@ -216,6 +240,10 @@ export default {
     watch(() => props.modelValue, initSelected);
     watch(() => props.items, initSelected);
     watch(search, (value) => {
+      if (suppressSearchEmit.value) {
+        suppressSearchEmit.value = false;
+        return;
+      }
       emit('search', {
         term: value,
         items: filteredItems.value
@@ -267,6 +295,7 @@ export default {
   align-items: center;
   flex-wrap: wrap;
   cursor: text;
+  position: relative;
 }
 
 .hs-label-span {
@@ -320,6 +349,16 @@ export default {
   background-color: transparent;
   transform: translateY(-2px);
   line-height: 19px;
+  color: inherit;
+  font-size: inherit;
+}
+
+.input-absolute {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  transform: translateY(-2px);
 }
 
 .dropdown {

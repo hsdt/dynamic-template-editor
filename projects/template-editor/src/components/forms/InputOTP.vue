@@ -26,7 +26,7 @@ import { ref, watch, computed, nextTick, onMounted, onBeforeUnmount } from 'vue'
 export default {
   name: 'InputOTP',
   props: {
-    modelValue: { type: String, default: '' },
+    modelValue: { type: [String, Number], default: '' },
     type: { type: String as () => 'text' | 'number', default: 'text' },
     readonly: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
@@ -170,7 +170,7 @@ export default {
     watch(
       () => props.modelValue,
       (newVal) => {
-        updateValueArray(newVal || '');
+        updateValueArray(String(newVal || ''));
       },
       { immediate: true }
     );
@@ -180,11 +180,11 @@ export default {
         arrayLength.value = Array(totalLength.value || 0).fill('');
 
         // --- Khởi tạo giá trị hiển thị với padStart / padChar ---
-        const initialValue = props.modelValue || '';
+        const initialValue = String(props.modelValue || '');
         valueArray.value = maskLength.value.map((len, idx) => {
-            let val = initialValue.substr(
+            let val = initialValue.substring(
             maskLength.value.slice(0, idx).reduce((a, b) => a + b, 0),
-            len
+            maskLength.value.slice(0, idx).reduce((a, b) => a + b, 0) + len
             );
             // Pad từng phần theo padChar nếu chưa đủ độ dài
             if (val.length < len) val = val.padStart(len, props.padChar);
@@ -196,7 +196,7 @@ export default {
             const fullPadded = String(initialValue).padStart(totalLength.value, props.padStart);
             let currentIndex = 0;
             valueArray.value = maskLength.value.map((len) => {
-            const val = fullPadded.substr(currentIndex, len);
+            const val = fullPadded.substring(currentIndex, currentIndex + len);
             currentIndex += len;
             return val;
             });

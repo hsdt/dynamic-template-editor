@@ -1,26 +1,23 @@
 <template>
-  <div class="checkbox-wrapper" :class="[`size-${size}`, { disabled, readonly }]">
-    <label class="checkbox-container">
-        <template v-if="$slots['beforeText']">
-          <slot name="beforeText" />
-        </template>
-        <span v-else-if="beforeText" class="before-text">{{ beforeText }}</span>
-      <input
-        ref="checkboxInput"
-        type="checkbox"
-        class="checkbox-input"
-        :checked="modelValue === value"
-        :disabled="disabled"
-        :readonly="readonly"
-        @click="handleClick"
-      />
-      <span class="checkbox-mark"></span>
-      
-      <template v-if="$slots['afterText']">
-        <slot name="afterText" />
-      </template>
-      <span v-else-if="afterText" class="after-text">{{ afterText }}</span>
-    </label>
+  <div class="checkbox-wrapper" :class="[`size-${size}`, { disabled, readonly }]" @click="handleClick">
+    <template v-if="$slots['beforeText']">
+      <slot name="beforeText" />
+    </template>
+    <span v-else-if="beforeText" class="before-text">{{ beforeText }}</span>
+    <input
+      ref="checkboxInput"
+      type="checkbox"
+      class="checkbox-input"
+      :checked="native ? !!modelValue : modelValue === value"
+      :disabled="disabled"
+      :readonly="readonly"
+    />
+    <span class="checkbox-mark"></span>
+    
+    <template v-if="$slots['afterText']">
+      <slot name="afterText" />
+    </template>
+    <span v-else-if="afterText" class="after-text">{{ afterText }}</span>
   </div>
 </template>
 
@@ -36,7 +33,7 @@ export default {
     },
     value: {
       type: [String, Number, Boolean],
-      required: true
+      default: undefined
     },
     disabled: {
       type: Boolean,
@@ -58,6 +55,10 @@ export default {
       type: String,
       default: 'sm',
       validator: (value: string) => ['sm', 'md', 'lg', 'xl'].includes(value)
+    },
+    native: {
+      type: Boolean,
+      default: false
     }
   },
   emits: ['update:modelValue', 'change'],
@@ -66,14 +67,21 @@ export default {
 
     const handleClick = (e: MouseEvent) => {
       if (props.disabled || props.readonly) return
-      if (props.modelValue === props.value) {
-        // Uncheck: set to null
-        emit('update:modelValue', null)
-        emit('change', null)
+      if (props.native) {
+        // Native mode: toggle boolean
+        const next = !props.modelValue
+        emit('update:modelValue', next)
+        emit('change', next)
       } else {
-        // Check: set to value
-        emit('update:modelValue', props.value)
-        emit('change', props.value)
+        if (props.modelValue === props.value) {
+          // Uncheck: set to null
+          emit('update:modelValue', null)
+          emit('change', null)
+        } else {
+          // Check: set to value
+          emit('update:modelValue', props.value)
+          emit('change', props.value)
+        }
       }
     }
 
@@ -90,11 +98,7 @@ export default {
 .checkbox-wrapper {
   display: inline-flex;
   align-items: center;
-}
-
-.checkbox-container {
-  display: flex;
-  align-items: center;
+  cursor: pointer;
 }
 
 .checkbox-input {
