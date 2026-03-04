@@ -1,14 +1,10 @@
 <script setup lang="ts">
+import PreviewWrapper from './components/preview/PreviewWrapper.vue';
 </script>
 
 <template>
-  <div style="height: 100vh; display: flex; justify-content: center; align-items: center;">
-    <a href="https://vite.dev" target="_blank">
-      <img src="./assets/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
+  <div style="background: #f0f0f0; height: 100vh; overflow: auto; padding: 20px; display: flex; justify-content: center;">
+    <PreviewWrapper />
   </div>
 </template>
 

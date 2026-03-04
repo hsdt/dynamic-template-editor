@@ -28,7 +28,14 @@
               :value="value"
               @input="updateAttributeValue(String(key), ($event.target as HTMLInputElement).value)"
               placeholder="Attribute value"
+              :list="getValueSuggestions(String(key)).length ? `attr-value-${String(key)}` : undefined"
             />
+            <datalist
+              v-if="getValueSuggestions(String(key)).length"
+              :id="`attr-value-${String(key)}`"
+            >
+              <option v-for="val in getValueSuggestions(String(key))" :key="val" :value="val" />
+            </datalist>
             <button @click="removeAttribute(String(key))" class="remove-btn">×</button>
           </div>
         </template>
@@ -77,8 +84,12 @@
               type="text"
               v-model="newAttribute.key"
               placeholder="Enter attribute name"
+              list="attribute-suggestions"
               ref="attributeNameInput"
             />
+            <datalist id="attribute-suggestions">
+              <option v-for="attr in availableAttributeSuggestions" :key="attr" :value="attr" />
+            </datalist>
           </div>
           <div class="form-group">
             <label>Attribute Value</label>
@@ -86,8 +97,13 @@
               type="text"
               v-model="newAttribute.value"
               placeholder="Enter attribute value"
+              :list="currentValueSuggestions.length ? 'attribute-value-suggestions' : undefined"
             />
+            <datalist v-if="currentValueSuggestions.length" id="attribute-value-suggestions">
+              <option v-for="val in currentValueSuggestions" :key="val" :value="val" />
+            </datalist>
           </div>
+          <div v-if="availableAttributeSuggestions.length" class="suggestion-row"></div>
         </div>
         <div class="modal-footer">
           <button @click="showAttributeModal = false" class="cancel-btn">
@@ -102,6 +118,50 @@
 
 <script lang="ts">
 import { VirtualNode } from 'shared/utils';
+
+const attributeSuggestionMap: Record<string, string[]> = {
+  div: ['class', 'style', 'id'],
+  p: ['class', 'style'],
+  button: ['type', 'class', 'style', 'disabled'],
+  input: ['type', 'name', 'placeholder', 'value', 'disabled', 'readonly', 'required', 'min', 'max', 'step', 'pattern'],
+  textarea: ['v-model', 'name', 'placeholder', 'rows', 'cols', 'maxlength', 'disabled', 'readonly', 'required'],
+  img: ['src', 'alt', 'width', 'height', 'style', 'class'],
+  a: ['href', 'target', 'rel', 'title'],
+  select: ['name', 'multiple', 'disabled', 'required'],
+  option: ['value', 'selected', 'label'],
+  PageA4: ['style', 'class'],
+  PageA5: ['style', 'class'],
+  Textarea: ['v-model', 'type', 'label', 'line', 'suffix', 'placeholder', 'rows', 'maxlength', 'disabled', 'readonly', 'textarea-style', 'label-style', 'style', 'class'],
+  InputOTP: ['v-model', 'type', 'readonly', 'disabled', 'mask-length', 'pad-char', 'pad-start', 'style', 'class'],
+  Select: ['v-model', 'items', 'bind-label', 'bind-value', 'placeholder', 'multiple', 'disabled', 'readonly', 'label'],
+  Checkbox: ['v-model', 'value', 'before-text', 'after-text', 'size', 'disabled', 'readonly'],
+  DatePicker: ['v-model', 'placeholder', 'format', 'disabled', 'readonly', 'minute-step'],
+  Paint: ['v-model', 'line-width', 'color', 'src', 'class', 'style'],
+  Signature: ['code', 'class', 'style']
+};
+
+type AttributeValueSuggestion = string[] | Record<string, string[]>;
+
+const attributeValueSuggestionMap: Record<string, Record<string, AttributeValueSuggestion>> = {
+  DatePicker: {
+    format: [
+      'DD/MM/YYYY',
+      'DD [tháng] MM [năm] YYYY',
+      'HH [giờ] mm [phút,] [ngày] DD [tháng] MM [năm] YYYY',
+      'HH[h]mm [ngày] DD [tháng] MM [năm] YYYY',
+      'HH:mm DD/MM/YYYY'
+    ]
+  },
+  Checkbox: {
+    size: ['sm', 'md', 'lg', 'xl']
+  },
+  Textarea: {
+    type: ['text', 'number']
+  },
+  InputOTP: {
+    type: ['text', 'number']
+  }
+};
 
 export default {
   name: "EditElementPanel",
@@ -121,6 +181,8 @@ export default {
         key: "",
         value: "",
       },
+      attributeSuggestionMap,
+      attributeValueSuggestionMap,
       cmOptions: {
         mode: "text/html",
         theme: "default",
@@ -128,6 +190,24 @@ export default {
       },
       innerHTML: ""
     };
+  },
+  computed: {
+    availableAttributeSuggestions(): string[] {
+      const tag = this.selectedNode?.tagName ?? '';
+      const specific = this.attributeSuggestionMap[tag] || this.attributeSuggestionMap[tag.toLowerCase()] || [];
+      const used = new Set(Object.keys(this.currentAttributes || {}));
+      return Array.from(new Set(specific)).filter((k) => k !== 'c-id' && k !== 'c-name' && !used.has(k));
+    },
+    currentValueSuggestions(): string[] {
+      const tag = this.selectedNode?.tagName ?? '';
+      const key = this.newAttribute.key;
+      const perTag = this.attributeValueSuggestionMap[tag] || this.attributeValueSuggestionMap[tag.toLowerCase()] || {};
+      const suggestions = perTag[key];
+
+      if (Array.isArray(suggestions)) return suggestions;
+
+      return [];
+    }
   },
   watch: {
     selectedNode: {
@@ -158,6 +238,16 @@ export default {
       this.currentAttributes = newAttributes;
     },
 
+    getValueSuggestions(key: string): string[] {
+      const tag = this.selectedNode?.tagName ?? '';
+      const perTag = this.attributeValueSuggestionMap[tag] || this.attributeValueSuggestionMap[tag.toLowerCase()] || {};
+      const suggestions = perTag[key];
+
+      if (Array.isArray(suggestions)) return suggestions;
+
+      return [];
+    },
+
     confirmAddAttribute() {
       if (this.newAttribute.key.trim()) {
         this.currentAttributes = {
@@ -167,6 +257,14 @@ export default {
         this.showAttributeModal = false;
         this.newAttribute = { key: "", value: "" };
       }
+    },
+
+    applySuggestedAttribute(attr: string) {
+      this.newAttribute = { ...this.newAttribute, key: attr };
+      this.$nextTick(() => {
+        const input = this.$refs['attributeNameInput'] as HTMLInputElement | undefined;
+        input?.focus();
+      });
     },
 
     updateTextContent(text: string) {
@@ -416,10 +514,38 @@ export default {
 }
 
 .modal-body input {
-  width: 100%;
+  width: 95%;
   padding: 8px;
   border: 1px solid #ddd;
   border-radius: 4px;
   margin-bottom: 10px;
+}
+.suggestion-row {
+  margin-top: 8px;
+}
+.suggestion-label {
+  display: inline-block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: #555;
+}
+.suggestion-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.suggestion-chip {
+  padding: 4px 10px;
+  border-radius: 12px;
+  border: 1px solid #d7e2f0;
+  background: #f4f7fb;
+  font-size: 12px;
+  cursor: pointer;
+  color: #2c3e50;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.suggestion-chip:hover {
+  background: #e7eef9;
+  border-color: #c3d4f0;
 }
 </style>

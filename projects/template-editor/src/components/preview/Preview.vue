@@ -1,7 +1,7 @@
 <template>
   <div class="preview-editor">
     <!-- Context Menu Component -->
-    <ContextMenu v-model:show="ContextMenuVisible" @update:show="unHighlightElement" :options="contextMenuOption">
+    <ImContextMenu v-model:show="ContextMenuVisible" @update:show="unHighlightElement" :options="contextMenuOption">
       <context-menu-group label="Insert">
         <template #icon>
           <i class="fa-solid fa-plus"></i>
@@ -58,10 +58,10 @@
           <i class="fa-solid fa-trash"></i>
         </template>
       </context-menu-item>
-    </ContextMenu>
+    </ImContextMenu>
 
     <!-- Insert Template Menu -->
-    <ContextMenu v-model:show="insertMenuVisible" :options="insertMenuOption">
+    <ImContextMenu v-model:show="insertMenuVisible" :options="insertMenuOption">
       <context-menu-group 
         v-for="(category, categoryIndex) in templateCategories" 
         :key="categoryIndex"
@@ -78,7 +78,7 @@
           </template>
         </context-menu-item>
       </context-menu-group>
-    </ContextMenu>
+    </ImContextMenu>
 
     <!-- Overlay -->
     <div v-if="selectedNode" class="editor-overlay" @click="closeEditPanel"></div>
@@ -88,13 +88,7 @@
 
     <!-- Preview container -->
     <div class="preview-container" ref="container">
-      <div class="preview-header">
-        Preview
-        <button @click="printPreview" class="print-btn">Print</button>
-      </div>
-      <div class="preview">
-        <div c-name="root" :c-id="rootId" class="content-root" ref="content"></div>
-      </div>
+      <div class="content-root" ref="content"></div>
     </div>
   </div>
 </template>
@@ -105,31 +99,45 @@ import PageA4 from '../layouts/PageA4.vue';
 import PageA5 from '../layouts/PageA5.vue';
 import Textarea from '../forms/Textarea.vue';
 import InputOTP from '../forms/InputOTP.vue';
+import Signature from '../forms/Signature.vue';
 import { VirtualHTMLParser, VirtualNode } from 'shared/utils';
 import EditElementPanel from '../EditElementPanel.vue';
 import { handlePrint, printElement } from 'shared/helpers';
-import { ContextMenu } from '@imengyu/vue3-context-menu';
-import { ContextMenuItem } from '@imengyu/vue3-context-menu';
+import { ContextMenu as ImContextMenu } from '@imengyu/vue3-context-menu';
+import { ContextMenuItem as ImContextMenuItem } from '@imengyu/vue3-context-menu';
 import { templateCategories } from 'shared/constants';
 import { App, ComponentPublicInstance } from 'vue';
 import { TemplateItem } from 'shared/types';
+import Select from '../forms/Select.vue';
+import Checkbox from '../forms/Checkbox.vue';
+import DatePicker from '../forms/DatePicker.vue';
+import { installMaskDirective } from '../../directives/mask-datetime';
+import Paint from '../forms/Paint.vue';
+import SimpleContextMenu from '../ContextMenu.vue';
+import { installContextMenuDirective } from '../../directives/context-menu';
 
 export default {
   name: 'Preview',
   components: {
-    EditElementPanel
+    EditElementPanel,
+    ImContextMenu,
+    ImContextMenuItem
   },
   props: {
     template: {
       type: String,
       required: true
     },
-    data: {
+    context: {
       type: Object,
       default: () => ({})
+    },
+    editMode: {
+      type: Boolean,
+      default: true
     }
   },
-  emits: ['update:template'],
+  emits: ['update:template', 'update:editMode'],
   data() {
     const rootId = '123456'
     let rootNode = VirtualHTMLParser.parseToTree(this.template, 'Root', { 'c-id': rootId });
@@ -137,7 +145,7 @@ export default {
     return {
       app: null as App<any> | null,
       vm: null as ComponentPublicInstance | null,
-      rootId: '123456',
+      rootId,
       rootNode,
       selectedNode: null as VirtualNode | null,
       processedTemplate: '',
@@ -164,6 +172,11 @@ export default {
       handler() {
         this.processTemplate();
       }
+    },
+    context: {
+      handler() {
+        this.renderPreview();
+      }
     }
   },
   mounted() {
@@ -178,11 +191,12 @@ export default {
       this.rootNode.innerHTML = this.template;
       this.rootNode.genComponentId();
       this.rootNode.setAttribute('c-id', this.rootId);
-      this.processedTemplate = this.rootNode.innerHTML;
+      // Use outerHTML to keep the Root wrapper for single root element requirement
+      this.processedTemplate = this.rootNode.outerHTML;
       this.renderPreview();
     },
 
-    renderPreview() {
+    renderPreview() {      
       const contentEl = this.$refs['content'] as HTMLElement;
       if (!contentEl) return;
 
@@ -191,15 +205,29 @@ export default {
       try {
         const DynamicComponent = {
           template: this.processedTemplate,
-          data: () => ({ data: this.data })
+          data: () => (this.context)
         };
 
         contentEl.innerHTML = '';
-        this.app = createApp(DynamicComponent)
+        this.app = createApp(DynamicComponent);
+        this.app.config.compilerOptions.isCustomElement = (tag) => tag === 'Root';
+
+        installMaskDirective(this.app);
+        installContextMenuDirective(this.app);
+
+        this.app
           .component('PageA4', PageA4)
           .component('PageA5', PageA5)
           .component('Textarea', Textarea)
-          .component('InputOTP', InputOTP);
+          .component('InputOTP', InputOTP)
+          .component('Signature', Signature)
+          .component('Select', Select)
+          .component('Checkbox', Checkbox)
+          .component('DatePicker', DatePicker)
+          .component('Paint', Paint)
+          .component('ContextMenu', SimpleContextMenu)
+          .component('ImContextMenu', ImContextMenu)
+          .component('ImContextMenuItem', ImContextMenuItem);
 
         this.vm = this.app.mount(contentEl);
 
@@ -225,7 +253,13 @@ export default {
       elements.forEach(el => {
         const cid = el.getAttribute('c-id');
         const fakeElement = this.rootNode.querySelector(`[c-id=${cid}]`);
-        if (fakeElement?.childNodes.length === 0 && !fakeElement.isClosingTag) {
+        if (
+          this.editMode &&
+          fakeElement?.childNodes.length === 0 &&
+          !fakeElement.isClosingTag &&
+          (!el.getAttribute('style') || el.getAttribute('style')?.trim() === '') &&
+          fakeElement?.getAttribute('c-name') === 'div'
+        ) {
           el.classList.add('empty-placeholder');
         }
         el.addEventListener('contextmenu', this.contextMenuHandler as EventListener);
@@ -233,6 +267,7 @@ export default {
     },
 
     contextMenuHandler(e: MouseEvent) {
+      if (!this.editMode) return;
       e.preventDefault();
       e.stopPropagation();
 
@@ -333,7 +368,7 @@ export default {
 
     updateTemplate() {
       const newHTML = this.rootNode.innerHTML;
-      this.processedTemplate = newHTML;
+      this.processedTemplate = this.rootNode.outerHTML;
       this.$emit('update:template', newHTML);
       this.renderPreview();
     },
@@ -356,36 +391,19 @@ export default {
 </script>
 
 <style scoped>
+:deep([c-id="123456"]) {
+  display: flex;
+  justify-content: center;
+}
 .preview-container {
   width: 100%;
-  border: 1px solid #ccc;
-  border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.preview-header {
-  background-color: #2c3e50;
-  color: white;
-  padding: 10px 15px;
-  font-weight: bold;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: 20px;
-}
-
-.preview {
-  height: 800px;
-  overflow: auto;
-  border: 1px solid;
-  scrollbar-width: thin;
-  scrollbar-color: #2c3e50 #f0f0f0;
 }
 
 .preview-editor {
   position: relative;
   height: 100%;
+  width: 100%;
 }
 
 /* Overlay */
@@ -401,29 +419,13 @@ export default {
 }
 
 .content-root {
-  background: #ecf0f1;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   min-height: 148mm;
-  padding: 10px;
 }
 
 @media print {
   .content-root {
     padding: 0;
   }
-}
-
-.print-btn {
-  padding: 8px 16px;
-  background: #3498db;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.print-btn:hover {
-  background: #2980b9;
 }
 </style>

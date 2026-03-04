@@ -1,6 +1,7 @@
 import { Component, Input, OnInit, OnDestroy, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
 import { VueLoader } from '../../services/vue-loader';
 import { FormsModule } from '@angular/forms';
+import { App, ComponentPublicInstance } from 'vue';
 
 @Component({
   selector: 'template-editor',
@@ -9,33 +10,45 @@ import { FormsModule } from '@angular/forms';
   template: `<div id="template-editor"></div>`,
 })
 export class TemplateEditor implements OnInit, OnChanges, OnDestroy {
-  app: any = null;
-  vm: any = null;
+  app: App | null = null;
+  vm: ComponentPublicInstance | null = null;
   
   @Input('template') template = '';
   @Output() templateChange = new EventEmitter<string>();
   
-  @Input('data') data = {};
-  @Output() dataChange = new EventEmitter<any>();
+  @Input('context') context = {};
+  @Output() contextChange = new EventEmitter<any>();
+
+  @Input('editMode') editMode = true;
+  @Output() editModeChange = new EventEmitter<boolean>();
 
   constructor(private vueLoader: VueLoader) {}
 
   async ngOnInit() {
     this.app = await this.vueLoader.createPreview();
+    if (!this.app) return console.error('Failed to load Vue preview component.');
     this.vm = this.app.mount('#template-editor');
-    this.vm.data = this.data;
-    this.vm.template = this.template;
-    this.dataChange.emit(this.vm.data);
+    const data = this.vm.$data as any;
+    data.template = this.template;
+    data.context = this.context;
+    this.contextChange.emit(data.context);
+    data.editMode = true;
     this.vm.$watch('template', (newVal: any) => {
       this.templateChange.emit(newVal);
     });
-    
+    this.vm.$watch('editMode', (newVal: any) => {
+      this.editModeChange.emit(newVal);
+    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (!this.vm) return;
+    const data = this.vm.$data as any;
     if (changes['template']) {
-      this.vm.template = this.template;
+      data.template = this.template;
+    }
+    if (changes['editMode']) {
+      data.editMode = this.editMode;
     }
   }
 

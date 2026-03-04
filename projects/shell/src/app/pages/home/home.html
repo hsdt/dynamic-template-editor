@@ -1,3 +1,4 @@
-<!-- <textarea [(ngModel)]="data.name"></textarea> {{data.name}} -->
+<!-- <textarea [(ngModel)]="context.data.name"></textarea> {{context.data.name}} -->
 <!-- <textarea [(ngModel)]="template"></textarea> -->
-<template-editor [(template)]="template" [(data)]="data"></template-editor>
+<!-- <input type="checkbox" [(ngModel)]="editMode"/> Edit Mode -->
+<template-editor [(template)]="template" [(context)]="context" [(editMode)]="editMode"></template-editor>

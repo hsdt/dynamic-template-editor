@@ -122,7 +122,7 @@ export class VirtualHTMLParser {
     const attrs: Record<string, string> = {};
     if (!attributeString.trim()) return attrs;
 
-    const attrRegex = /([a-zA-Z-:@]+)(?:\s*=\s*"([^"]*)"|\s*=\s*'([^']*)')?/g;
+    const attrRegex = /([#a-zA-Z-:@]+)(?:\s*=\s*"([^"]*)"|\s*=\s*'([^']*)')?/g;
     let match;
     let lastIndex = 0;
 

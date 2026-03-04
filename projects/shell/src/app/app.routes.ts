@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { loadRemoteModule } from '@angular-architects/module-federation';
 import { Home } from './pages/home/home';
 import { createVueWrapperComponent } from '../helpers';
-import { VueModule } from 'shared/types';
+import { ComponentFactory } from 'shared/types';
 
 export const routes: Routes = [
   {
@@ -16,11 +16,11 @@ export const routes: Routes = [
       //   // remoteEntry: 'http://localhost:4202/assets/remoteEntry.js',
       //   remoteName: 'templateEditor',
       //   exposedModule: './component-factory',
-      // }).then((m: VueModule) =>
+      // }).then((m: ComponentFactory) =>
       //   createVueWrapperComponent(m.createApp)
       // ),
-      loadRemoteModule('templateEditor', './component-factory').then((m: VueModule) =>
-        createVueWrapperComponent(m.createApp)
+      loadRemoteModule('templateEditor', './component-factory').then((m: ComponentFactory) =>
+        createVueWrapperComponent(m.createRoot)
       ),
   },
   { path: '**', component: Home },
