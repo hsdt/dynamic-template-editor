@@ -49,8 +49,9 @@ export default {
 
     const specialKeys = ['Backspace', 'Tab', 'End', 'Home', 'ArrowLeft', 'ArrowRight', 'Delete', ' '];
 
-    let maskLength = ref<number[]>(props.maskLength && props.maskLength.length ? props.maskLength : [1, 1, 1, 1]);
-    const totalLength = computed(() => maskLength.value.length);
+    const maskLength = computed<number[]>(() => (props.maskLength && props.maskLength.length ? props.maskLength : [1, 1, 1, 1]));
+    const segmentCount = computed(() => maskLength.value.length);
+    const totalMaskChars = computed(() => maskLength.value.reduce((sum, length) => sum + length, 0));
 
     const splitStringByPattern = (input: string, pattern: number[]) => {
       const result: string[] = [];
@@ -70,6 +71,13 @@ export default {
       valueArray.value = splitStringByPattern(value, maskLength.value);
     };
 
+    const getNormalizedSegmentValue = (index: number) => {
+      const currentValue = valueArray.value[index] ?? '';
+      const emptyMaskedValue = props.padChar.repeat(maskLength.value[index]);
+
+      return currentValue === emptyMaskedValue ? '' : currentValue;
+    };
+
     const padValuesToMatchMask = () => {
       valueArray.value.forEach((val, index) => {
         if (val.length > 0 && val.length < maskLength.value[index]) {
@@ -78,7 +86,7 @@ export default {
       });
       let newValue = valueArray.value.join('');
       if (props.padStart !== null && props.padStart !== undefined && newValue != null) {
-        newValue = String(newValue).padStart(totalLength.value, props.padStart);
+        newValue = String(newValue).padStart(totalMaskChars.value, props.padStart);
       }
       updateValueArray(newValue);
       emit('update:modelValue', newValue);
@@ -131,33 +139,32 @@ export default {
 
         if (!/^[0-9]*$/.test(keyValue) && !specialKeys.includes(keyValue) && props.type === 'number') return;
 
-        valueArray.value[idx] ||= '';
-
-        if (keyValue.length === 1) {
-          valueArray.value[idx] = keyValue.toUpperCase().trim();
-
-        // Chuyển focus nếu ô đã đầy
-        if (valueArray.value[idx].length >= maskLength.value[idx]) {
-            setFocusIndex(Math.min(idx + 1, totalLength.value - 1));
-        }
-
-          emit('update:modelValue', valueArray.value.join(''));
-          onFieldChange?.(props.path, valueArray.value.join(''));
-        } else if (keyValue === 'Backspace') {
+        if (keyValue === 'Backspace') {
           if (valueArray.value[idx] === '') {
             setFocusIndex(Math.max(idx - 1, 0));
           } else {
-            valueArray.value[idx] = valueArray.value[idx].slice(0, -1);
+            valueArray.value[idx] = getNormalizedSegmentValue(idx).slice(0, -1);
           }
           emit('update:modelValue', valueArray.value.join(''));
           onFieldChange?.(props.path, valueArray.value.join(''));
         } else if (keyValue === 'ArrowLeft') {
           setFocusIndex(Math.max(idx - 1, 0));
         } else if (keyValue === 'ArrowRight') {
-          setFocusIndex(Math.min(idx + 1, totalLength.value - 1));
+          setFocusIndex(Math.min(idx + 1, segmentCount.value - 1));
         } else if (keyValue === ' ') {
           padValuesToMatchMask();
-          setFocusIndex(Math.min(idx + 1, totalLength.value - 1));
+          setFocusIndex(Math.min(idx + 1, segmentCount.value - 1));
+        } else if (keyValue.length === 1) {
+          const nextValue = `${getNormalizedSegmentValue(idx)}${keyValue.toUpperCase().trim()}`.slice(0, maskLength.value[idx]);
+
+          valueArray.value[idx] = nextValue;
+
+          if (nextValue.length >= maskLength.value[idx]) {
+            setFocusIndex(Math.min(idx + 1, segmentCount.value - 1));
+          }
+
+          emit('update:modelValue', valueArray.value.join(''));
+          onFieldChange?.(props.path, valueArray.value.join(''));
         }
       }
     };
@@ -182,7 +189,7 @@ export default {
 
     onMounted(() => {
         // Khởi tạo arrayLength để v-for render đúng số ô
-        arrayLength.value = Array(totalLength.value || 0).fill('');
+        arrayLength.value = Array(segmentCount.value || 0).fill('');
 
         // --- Khởi tạo giá trị hiển thị với padStart / padChar ---
         const initialValue = String(props.modelValue || '');
@@ -198,7 +205,7 @@ export default {
 
         // Nếu props.padStart có giá trị, pad toàn bộ string, rồi chia theo maskLength
         if (props.padStart != null) {
-            const fullPadded = String(initialValue).padStart(totalLength.value, props.padStart);
+            const fullPadded = String(initialValue).padStart(totalMaskChars.value, props.padStart);
             let currentIndex = 0;
             valueArray.value = maskLength.value.map((len) => {
             const val = fullPadded.substring(currentIndex, currentIndex + len);
