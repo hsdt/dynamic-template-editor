@@ -93,6 +93,7 @@ export default {
   emits: ['update:modelValue', 'search', 'change'],
   setup(props, { emit }) {
     const onFieldChange = inject<((path: string, value: any) => void) | null>('onFieldChange', null);
+    const onSelectSearch = inject<((path: string, payload: { term: string; items: any[] }) => void) | null>('onSelectSearch', null);
     const isOpen = ref(false);
     const search = ref('');
     const suppressSearchEmit = ref(false);
@@ -246,10 +247,12 @@ export default {
         suppressSearchEmit.value = false;
         return;
       }
-      emit('search', {
+      const payload = {
         term: value,
         items: filteredItems.value
-      });
+      };
+      emit('search', payload);
+      onSelectSearch?.(props.path, payload);
     });
 
     onMounted(() => {

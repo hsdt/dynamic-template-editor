@@ -215,6 +215,7 @@ export default {
         this.app.config.compilerOptions.isCustomElement = (tag) => tag === 'Root';
         const logFn = (key: string) => (...args: any[]) => console.warn(`[Preview] context.${key} chưa được cung cấp`, ...args);
         this.app.provide('onFieldChange', this.context['onFieldChange'] ?? logFn('onFieldChange'));
+        this.app.provide('onSelectSearch', this.context['onSelectSearch'] ?? logFn('onSelectSearch'));
         this.app.provide('signature', this.context['signature'] ?? null);
         this.app.provide('MauHoSo', this.context['MauHoSo'] ?? null);
         this.app.provide('openSignatureHistory', this.context['openSignatureHistory'] ?? logFn('openSignatureHistory'));
