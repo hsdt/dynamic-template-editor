@@ -34,7 +34,7 @@
 </template>
 
 <script lang="ts">
-import { computed, getCurrentInstance, ref } from 'vue';
+import { computed, inject, ref } from 'vue';
 import ContextMenu from '../ContextMenu.vue';
 
 type SignatureItem = {
@@ -54,15 +54,14 @@ export default {
     code: { type: String, default: '' }
   },
   setup(props) {
-    const instance = getCurrentInstance();
+    const signatureData = inject<Record<string, any> | null>('signature', null);
+    const MauHoSo = inject<string | null>('MauHoSo', null);
+    const openSignatureHistoryFn = inject<((code: string) => void) | null>('openSignatureHistory', null);
+    const handleSignFn = inject<((code: string) => void) | null>('handleSign', null);
     const signatureMenu = ref<InstanceType<typeof ContextMenu> | null>(null);
 
-    const rootData = computed(() =>
-      ((instance?.proxy?.$root as any)?.$data ?? {}) as Record<string, unknown>
-    );
-
     const history = computed<SignatureItem[]>(() => {
-      const source = (rootData.value as any)?.signature ?? {};
+      const source = signatureData ?? {};
       const groups = Object.values(source).filter(Array.isArray) as SignatureItem[][];
       const flat = groups.flat();
       if (!props.code) return flat;
@@ -80,19 +79,16 @@ export default {
     const signatureCode = computed(() => props.code || signatureForCode.value?.ViTri || '');
 
     const codeLine = computed(() => {
-      const mauHoSo = (rootData.value as any)?.MauHoSo || '';
-      const parts = [mauHoSo, signatureCode.value].filter(Boolean);
+      const parts = [MauHoSo, signatureCode.value].filter(Boolean);
       return parts.join('_');
     });
 
     const openSignatureHistory = () => {
-      const handler = (rootData.value as any)?.openSignatureHistory as SignatureHandler | undefined;
-      handler?.(signatureCode.value);
+      openSignatureHistoryFn?.(signatureCode.value);
     };
 
     const handleSign = () => {
-      const handler = (rootData.value as any)?.handleSign as SignatureHandler | undefined;
-      handler?.(signatureCode.value);
+      handleSignFn?.(signatureCode.value);
     };
 
     const openContextMenu = (event: MouseEvent) => {

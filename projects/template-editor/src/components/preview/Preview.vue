@@ -115,6 +115,8 @@ import { installMaskDirective } from '../../directives/mask-datetime';
 import Paint from '../forms/Paint.vue';
 import SimpleContextMenu from '../ContextMenu.vue';
 import { installContextMenuDirective } from '../../directives/context-menu';
+import IcdGroupItem from '../forms/IcdGroupItem.vue';
+import IcdList from '../forms/IcdList.vue';
 
 export default {
   name: 'Preview',
@@ -211,6 +213,15 @@ export default {
         contentEl.innerHTML = '';
         this.app = createApp(DynamicComponent);
         this.app.config.compilerOptions.isCustomElement = (tag) => tag === 'Root';
+        const logFn = (key: string) => (...args: any[]) => console.warn(`[Preview] context.${key} chưa được cung cấp`, ...args);
+        this.app.provide('onFieldChange', this.context['onFieldChange'] ?? logFn('onFieldChange'));
+        this.app.provide('signature', this.context['signature'] ?? null);
+        this.app.provide('MauHoSo', this.context['MauHoSo'] ?? null);
+        this.app.provide('openSignatureHistory', this.context['openSignatureHistory'] ?? logFn('openSignatureHistory'));
+        this.app.provide('handleSign', this.context['handleSign'] ?? logFn('handleSign'));
+        this.app.provide('insertICD', this.context['insertICD'] ?? logFn('insertICD'));
+        this.app.provide('editICD', this.context['editICD'] ?? logFn('editICD'));
+        this.app.provide('removeICD', this.context['removeICD'] ?? logFn('removeICD'));
 
         installMaskDirective(this.app);
         installContextMenuDirective(this.app);
@@ -227,7 +238,9 @@ export default {
           .component('Paint', Paint)
           .component('ContextMenu', SimpleContextMenu)
           .component('ImContextMenu', ImContextMenu)
-          .component('ImContextMenuItem', ImContextMenuItem);
+          .component('ImContextMenuItem', ImContextMenuItem)
+          .component('IcdGroupItem', IcdGroupItem)
+          .component('IcdList', IcdList);
 
         this.vm = this.app.mount(contentEl);
 

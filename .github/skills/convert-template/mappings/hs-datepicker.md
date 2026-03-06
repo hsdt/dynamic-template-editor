@@ -25,7 +25,7 @@ Trong ngx-dynamic-hooks:
 ```
 
 ## Lưu ý format
-
+- Không được xuống dòng chuỗi format
 - Angular format pipe: `dd/MM/yyyy` → Moment format: `DD/MM/YYYY`
 - Angular format pipe: `yyyy-MM-dd` → Moment format: `YYYY-MM-DD`
 - Angular format pipe: `dd/MM/yyyy HH:mm` → Moment format: `DD/MM/YYYY HH:mm`
@@ -36,3 +36,5 @@ Trong ngx-dynamic-hooks:
 - Angular format pipe: HH 'giờ' mm 'phút,' 'ngày' dd 'tháng' MM 'năm' yyyy → Moment format: HH [giờ] mm [phút,] [ngày] DD [tháng] MM [năm] YYYY
 
 - Angular format pipe: HH'h'mm 'ngày' dd 'tháng' MM 'năm' yyyy → Moment format: HH[h]mm [ngày] DD [tháng] MM [năm] YYYY
+
+- Angular format pipe: HH 'giờ' mm 'phút, ngày' dd/MM/yyyy → Moment format: HH [giờ] mm [phút, ngày] DD/MM/YYYY

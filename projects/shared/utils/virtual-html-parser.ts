@@ -35,7 +35,7 @@ export class VirtualHTMLParser {
       .replace(/\r/g, '\n')
       .trim();
 
-    const tokenRegex = /<(\/?)([a-zA-Z][a-zA-Z0-9]*)([^>]*)\/?>|([^<]+)/g;
+    const tokenRegex = /<(\/?)([a-zA-Z][a-zA-Z0-9]*)([^"'<>]*(?:"[^"]*"[^"'<>]*|'[^']*'[^"'<>]*)*)\/?>|([^<]+)/g;
     let match;
 
     while ((match = tokenRegex.exec(normalizedHtml)) !== null) {
@@ -64,6 +64,12 @@ export class VirtualHTMLParser {
 
         node.setAttribute('c-name', node.tagName);
         node.setAttribute('c-id', Math.random().toString(36).substring(2, 9));
+
+        const pathValue = attrs['v-model'] || attrs[':modelValue'] || attrs['modelValue'];
+        if (pathValue && typeof pathValue === 'string') {
+          node.setAttribute('path', pathValue);
+        }
+
         currentParent.appendChild(node);
 
         if (!node.isClosingTag) {

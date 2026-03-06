@@ -21,7 +21,7 @@
 </template>
 
 <script lang="ts">
-import { ref, watch, computed, nextTick, onMounted, onBeforeUnmount } from 'vue';
+import { ref, watch, computed, nextTick, onMounted, onBeforeUnmount, inject } from 'vue';
 
 export default {
   name: 'InputOTP',
@@ -35,9 +35,11 @@ export default {
     padStart: { type: String },
     style: { type: String, default: '' },
     class: { type: String, default: '' },
+    path: { type: String, default: '' },
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
+    const onFieldChange = inject<((path: string, value: any) => void) | null>('onFieldChange', null);
     const inputGroup = ref<HTMLElement | null>(null);
     const elementRefs = ref<HTMLElement[]>([]);
     const valueArray = ref<string[]>([]);
@@ -80,6 +82,7 @@ export default {
       }
       updateValueArray(newValue);
       emit('update:modelValue', newValue);
+      onFieldChange?.(props.path, newValue);
     };
 
     const setFocusIndex = (index: number) => {
@@ -139,6 +142,7 @@ export default {
         }
 
           emit('update:modelValue', valueArray.value.join(''));
+          onFieldChange?.(props.path, valueArray.value.join(''));
         } else if (keyValue === 'Backspace') {
           if (valueArray.value[idx] === '') {
             setFocusIndex(Math.max(idx - 1, 0));
@@ -146,6 +150,7 @@ export default {
             valueArray.value[idx] = valueArray.value[idx].slice(0, -1);
           }
           emit('update:modelValue', valueArray.value.join(''));
+          onFieldChange?.(props.path, valueArray.value.join(''));
         } else if (keyValue === 'ArrowLeft') {
           setFocusIndex(Math.max(idx - 1, 0));
         } else if (keyValue === 'ArrowRight') {

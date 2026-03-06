@@ -97,6 +97,9 @@ export default {
       context: {
         moment: moment,
         log: console.log,
+        onFieldChange: (path: string, value: any) => {
+          console.log('Field changed:', path, value);
+        },
         config: {
           TenBenhVien: "BV ĐK H. PHÚ XUYÊN",
         },
