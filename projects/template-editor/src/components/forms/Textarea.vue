@@ -33,7 +33,7 @@
 </template>
 
 <script lang="ts">
-import { ref, computed, watch, nextTick, onMounted, onUnmounted, PropType } from 'vue'
+import { ref, computed, watch, nextTick, onMounted, onUnmounted, PropType, inject } from 'vue'
 // @ts-ignore
 import autosize from 'autosize'
 
@@ -54,10 +54,12 @@ export default {
       default: () => ({ length: 0, char: '\u00A0' })
     },
     textareaStyle: { type: [String, Object], default: '' },
-    style: { type: [String, Object], default: '' }
+    style: { type: [String, Object], default: '' },
+    path: { type: String, default: '' },
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
+    const onFieldChange = inject<((path: string, value: any) => void) | null>('onFieldChange', null);
     // --- Reactive binding (keep internal ref non-nullable for helpers)
     const input = ref<string>(props.modelValue ?? '')
     const textarea = ref<HTMLTextAreaElement | null>(null)
@@ -128,6 +130,7 @@ export default {
         return
       }
       emit('update:modelValue', stripPad(padded))
+      onFieldChange?.(props.path, stripPad(padded))
       nextTick(() => {
         textareaHeight.value = textarea.value?.offsetHeight ?? textareaHeight.value
         if (textarea.value) autosize.update(textarea.value)

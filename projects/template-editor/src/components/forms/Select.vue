@@ -32,14 +32,14 @@
           @click.stop="removeItem(item)"
         >❌</span>
       </span>
-      <span class="tag" style="visibility: hidden;">|</span>
+      <span class="tag" style="visibility: hidden; width: 0;">|</span>
 
       <input
         ref="inputRef"
         v-model="search"
         class="input"
-        :class="{ 'input-absolute': !multiple && ($slots['label'] || label) }"
-        :style="!multiple && ($slots['label'] || label) ? { left: labelSpanWidth + 'px' } : undefined"
+        :class="{ 'input-absolute': !multiple }"
+        :style="!multiple ? { paddingLeft: (($slots['label'] || label) ? labelSpanWidth : 0) + 'px' } : undefined"
         :placeholder="placeholderText"
         :disabled="disabled || readonly"
         @focus="open"
@@ -73,7 +73,7 @@
 
 
 <script lang="ts">
-import { ref, computed, watch, onMounted, onBeforeUnmount, PropType, nextTick } from 'vue';
+import { ref, computed, watch, onMounted, onBeforeUnmount, PropType, nextTick, inject } from 'vue';
 
 export default {
   name: 'Select',
@@ -88,9 +88,12 @@ export default {
     readonly: Boolean,
     label: { type: String, default: '' },
     searchByKeys: { type: Array as PropType<string[]>, default: () => [] },
+    path: { type: String, default: '' },
   },
-  emits: ['update:modelValue', 'search'],
+  emits: ['update:modelValue', 'search', 'change'],
   setup(props, { emit }) {
+    const onFieldChange = inject<((path: string, value: any) => void) | null>('onFieldChange', null);
+    const onSelectSearch = inject<((path: string, payload: { term: string; items: any[] }) => void) | null>('onSelectSearch', null);
     const isOpen = ref(false);
     const search = ref('');
     const suppressSearchEmit = ref(false);
@@ -202,12 +205,12 @@ export default {
     };
 
     const syncModel = () => {
-      emit(
-        'update:modelValue',
-        props.multiple
-          ? selectedItems.value.map(getItemValue)
-          : getItemValue(selectedItems.value[0] || '')
-      );
+      const value = props.multiple
+        ? selectedItems.value.map(getItemValue)
+        : getItemValue(selectedItems.value[0] || '');
+      emit('update:modelValue', value);
+      onFieldChange?.(props.path, value);
+      emit('change', props.multiple ? selectedItems.value : selectedItems.value[0]);
     };
 
     /* ---------------- outside click ---------------- */
@@ -244,10 +247,12 @@ export default {
         suppressSearchEmit.value = false;
         return;
       }
-      emit('search', {
+      const payload = {
         term: value,
         items: filteredItems.value
-      });
+      };
+      emit('search', payload);
+      onSelectSearch?.(props.path, payload);
     });
 
     onMounted(() => {
@@ -345,7 +350,6 @@ export default {
   border: none;
   outline: none;
   flex: 1;
-  min-width: 100px;
   background-color: transparent;
   transform: translateY(-2px);
   line-height: 19px;
@@ -357,6 +361,7 @@ export default {
   position: absolute;
   top: 0;
   bottom: 0;
+  left: 0;
   right: 0;
   transform: translateY(-2px);
 }

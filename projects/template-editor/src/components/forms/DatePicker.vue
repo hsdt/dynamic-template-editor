@@ -29,7 +29,7 @@
 </template>
 
 <script lang="ts">
-import { ref, watch, type PropType } from 'vue';
+import { ref, watch, inject, type PropType } from 'vue';
 import type { StyleValue } from 'vue';
 import moment from 'moment';
 import mask from '../../directives/mask-datetime';
@@ -40,16 +40,18 @@ export default {
   directives: { mask, 'mask-datetime': mask },
   props: {
     modelValue: { type: String, default: '' },
-    format: { type: String, default: 'YYYY-MM-DD' },
+    format: { type: String, default: 'DD/MM/YYYY' },
     placeholder: { type: String, default: '' },
     disabled: { type: Boolean, default: false },
     readonly: { type: Boolean, default: false },
     minuteStep: { type: Number, default: 5 },
     label: { type: String, default: '' },
     inputStyle: { type: [Object, String, Array] as PropType<StyleValue>, default: null },
+    path: { type: String, default: '' },
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
+    const onFieldChange = inject<((path: string, value: any) => void) | null>('onFieldChange', null);
     const wrapperRef = ref<HTMLElement | null>(null);
     const displayValue = ref('');
     const { open, syncValue } = useDatePickerService();
@@ -77,6 +79,7 @@ export default {
         const display = m.format(props.format);
         displayValue.value = display;
         emit('update:modelValue', m.format());
+        onFieldChange?.(props.path, m.format());
         syncValue(display, wrapperRef.value);
       }
     };
@@ -115,6 +118,7 @@ export default {
             const display = parsed.format(props.format);
             displayValue.value = display;
             emit('update:modelValue', parsed.format());
+            onFieldChange?.(props.path, parsed.format());
             syncValue(display, wrapperRef.value);
           }
         }

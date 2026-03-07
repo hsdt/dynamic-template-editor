@@ -1,6 +1,6 @@
 ---
-name: Convert Old Components to New (Auto)
-description: Chuyển đổi các component cũ (Angular) sang component mới (Vue)
+name: convert-template
+description: Convert template khi người dùng nhập nội dung về convert template
 ---
 
 # Skill Map: Convert Old Components to New (Auto)
@@ -11,6 +11,7 @@ description: Chuyển đổi các component cũ (Angular) sang component mới (
 - Chỉ trả về template string Vue (không kèm script, style, hoặc logic JS/TS)
 - Nếu không có component tương ứng, ghi chú TODO để xử lý thủ công
 - Props binding Angular `[prop]` chuyển sang Vue `:prop`
+- Không tạo file tool để convert, không chạy lệnh batch, không run pư
 ---
 
 ## Component Mappings
@@ -48,58 +49,27 @@ description: Chuyển đổi các component cũ (Angular) sang component mới (
 
 ---
 
-## Bước cuối cùng: Tối ưu hóa Context Path
+## Tối ưu hóa Context Path
 
-### 1. Xử lý `context.tempData`
+- Áp dụng theo thứ tự:
+1. `context.tempData.xxx.yyy` → `xxx.yyy`
+2. `context.value` → `data.value`
+3. `context.xxx` (1 cấp, không qua `tempData`) → `data.xxx`
 
-Nếu gặp `context.tempData.xxx.yyy`
-
-👉 Bỏ `context.tempData.`
-
-👉 Giữ lại `xxx.yyy`
-
-**Ví dụ:**
+**Ví dụ nhanh:**
 ```
-context.tempData.hsBenhAn.HoTen
-→ hsBenhAn.HoTen
-```
-
-### 2. Xử lý `context.value`
-
-Nếu là `context.value` (chỉ 1 cấp)
-
-👉 Đổi thành `data.value`
-
-**Ví dụ:**
-```
-context.value
-→ data.value
-```
-
-### 3. Xử lý `context.xxx`
-
-Nếu là `context.xxx` (không qua tempData, chỉ 1 cấp)
-
-👉 Đổi thành `data.xxx`
-
-**Ví dụ:**
-```
-context.hoTen
-→ data.hoTen
+context.tempData.hsBenhAn.HoTen -> hsBenhAn.HoTen
+context.value -> data.value
+context.hoTen -> data.hoTen
 ```
 
 ---
 
 ## Xử lý Binding Expressions
 
-### Không dùng `concatWith()` - Dùng phép cộng chuỗi trực tiếp
+### Không dùng `concatWith()`, dùng nối chuỗi trực tiếp
 
-**Old:**
-```
-hsBenhAn.MaKhoaBanDau?.concatWith(' - ')?.concatWith(hsBenhAn.TenKhoaBanDau)
-```
-
-**New:**
+**Đúng:**
 ```vue
 {{hsBenhAn.MaKhoaBanDau + ' - ' + hsBenhAn.TenKhoaBanDau}}
 ```
@@ -109,3 +79,5 @@ Hoặc trong prop binding:
 :modelValue="hsBenhAn.MaKhoaBanDau + ' - ' + hsBenhAn.TenKhoaBanDau"
 ```
 
+## Convert sau khi đã convert xong toàn bộ template
+- Sử dụng skill [Rescan Business Template (Fixed Rules)](../rescan-convert-template/SKILL.md)

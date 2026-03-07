@@ -14,6 +14,7 @@ Checkbox cho phép chọn hoặc bỏ chọn một giá trị. Hỗ trợ trạn
 ### Props
 - `modelValue`: Giá trị hiện tại của checkbox (String, Number, Boolean, null)
 - `value`: Giá trị của checkbox khi được chọn (String, Number, Boolean) **(bắt buộc)**
+- `native`: Bật chế độ checkbox native, `modelValue` sẽ toggle kiểu Boolean (Boolean)
 - `disabled`: Vô hiệu hóa checkbox (Boolean)
 - `readonly`: Chỉ đọc, không cho phép thay đổi (Boolean)
 - `beforeText`: Text hiển thị trước checkbox (String) hoặc slot `#beforeText`
@@ -25,6 +26,7 @@ Checkbox cho phép chọn hoặc bỏ chọn một giá trị. Hỗ trợ trạn
 <Checkbox v-model="checked" value="yes" size="md" beforeText="Chọn" afterText="Xong" />
 <Checkbox v-model="checked" value="1" disabled />
 <Checkbox v-model="checked" value="A" readonly size="xl" />
+<Checkbox v-model="checked" native />
 ```
 
 ---
@@ -84,6 +86,66 @@ Nhập mã OTP hoặc chuỗi ký tự theo pattern, hỗ trợ mask, pad, kiể
 <InputOTP v-model="otp" :maskLength="[1,1,1,1]" type="number" />
 <InputOTP v-model="otp" :maskLength="[2,2]" padChar="*" padStart="0" />
 <InputOTP v-model="otp" disabled />
+```
+
+---
+
+## IcdGroupItem
+
+### Mô tả
+Hiển thị một dòng chọn/chỉnh sửa mã ICD, gồm tên bệnh và mã bệnh. Component hỗ trợ mở form chọn ICD bằng double click hoặc context menu.
+
+### Props
+- `path`: Đường dẫn dữ liệu dùng cho thao tác thêm, sửa, xóa ICD **(bắt buộc)**
+- `type`: Loại ICD, mặc định `'YHHD'` (String)
+- `index`: Vị trí phần tử trong danh sách ICD, dùng khi edit/remove trong list (Number | null)
+- `label`: Nhãn hiển thị cho trường tên bệnh (String)
+- `ten`: Tên bệnh ICD, dùng với `v-model:ten` (String)
+- `ma`: Mã ICD, dùng với `v-model:ma` (String)
+
+### Ví dụ
+```vue
+<IcdGroupItem
+  label="+ Bệnh chính:"
+  path="hsBenhAn.BenhAnChiTietObj.IcdRaVienBenhChinh"
+  v-model:ten="hsBenhAn.BenhAnChiTietObj.IcdRaVienBenhChinhTen"
+  v-model:ma="hsBenhAn.BenhAnChiTietObj.IcdRaVienBenhChinhMa"
+/>
+
+<IcdGroupItem
+  path="hsBenhAn.BenhAnChiTietObj.IcdYHCT"
+  type="YHCT"
+  v-model:ten="hsBenhAn.BenhAnChiTietObj.IcdYHCTTen"
+  v-model:ma="hsBenhAn.BenhAnChiTietObj.IcdYHCTMa"
+/>
+```
+
+---
+
+## IcdList
+
+### Mô tả
+Hiển thị danh sách ICD. Khi danh sách rỗng, component vẫn render sẵn một `IcdGroupItem` để người dùng có thể mở form thêm mã bệnh.
+
+### Props
+- `path`: Đường dẫn dữ liệu của danh sách ICD **(bắt buộc)**
+- `type`: Loại ICD cho các phần tử trong danh sách, mặc định `'YHHD'` (String)
+- `items`: Mảng ICD, mỗi phần tử thường có `TenVN` và `Ma` (Array)
+
+### Ví dụ
+```vue
+<div>+ Bệnh kèm theo:</div>
+<IcdList
+  path="hsBenhAn.BenhAnChiTietObj.ListIcdRaVienBenhKemTheo"
+  :items="hsBenhAn.BenhAnChiTietObj.ListIcdRaVienBenhKemTheo"
+/>
+
+<div>+ ICD YHCT:</div>
+<IcdList
+  path="hsBenhAn.BenhAnChiTietObj.ListIcdYHCT"
+  type="YHCT"
+  :items="hsBenhAn.BenhAnChiTietObj.ListIcdYHCT"
+/>
 ```
 
 ---
