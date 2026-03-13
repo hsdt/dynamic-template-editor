@@ -6,7 +6,6 @@
       <div class="signature-preview">
         <img
           :src="activeSignature.AnhChuKy"
-          alt="signature"
           @click="openSignatureHistory"
         />
       </div>
@@ -92,6 +91,7 @@ export default {
     };
 
     const openContextMenu = (event: MouseEvent) => {
+      event.stopPropagation();
       event.preventDefault();
       signatureMenu.value?.showFromEvent?.(event, signatureCode.value);
     };

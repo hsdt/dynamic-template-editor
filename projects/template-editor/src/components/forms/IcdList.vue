@@ -2,7 +2,7 @@
   <div>
     <IcdGroupItem
       v-if="!items?.length"
-      :path="path"
+      :path="pathItems"
       :type="type"
       :index="0"
       ten=""
@@ -11,7 +11,7 @@
     <IcdGroupItem
       v-for="(item, index) in items"
       :key="index"
-      :path="path"
+      :path="pathItems"
       :type="type"
       :index="index"
       v-model:ten="item.TenVN"
@@ -28,9 +28,9 @@ type IcdItem = { TenVN?: string; Ma?: string; [key: string]: any };
 export default {
   name: 'IcdList',
   props: {
-    path: { type: String, required: true },
     type: { type: String, default: 'YHHD' },
     items: { type: Array as PropType<IcdItem[]>, default: () => [] },
+    pathItems: { type: String, default: '' },
   },
 };
 </script>

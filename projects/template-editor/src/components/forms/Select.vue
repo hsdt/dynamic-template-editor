@@ -17,33 +17,70 @@
     </span>
 
     <!-- Input + tags -->
-    <div class="input-container" @click="focusInput">
-      <span class="tag" :style="{ width: ($slots['label'] || label) ? labelSpanWidth + 'px' : undefined }"></span>
-      <span
-        v-for="(item, i) in selectedItems"
-        :key="i"
-        class="tag"
-        v-show="multiple || !search.length"
-      >
-        {{ getItemLabel(item) }}
+    <div
+      class="input-container"
+      :tabindex="containerTabIndex"
+      @click="focusInput"
+      @focus="focusInput"
+      @focusout="onContainerFocusOut"
+    >
+      <template v-if="multiple">
         <span
-          v-if="!readonly && !disabled"
-          class="remove"
-          @click.stop="removeItem(item)"
-        >❌</span>
-      </span>
-      <span class="tag" style="visibility: hidden; width: 0;">|</span>
+          v-if="hasLabel"
+          class="label-spacer"
+          :style="multipleLabelSpacerStyle"
+        ></span>
 
-      <input
-        ref="inputRef"
-        v-model="search"
-        class="input"
-        :class="{ 'input-absolute': !multiple }"
-        :style="!multiple ? { paddingLeft: (($slots['label'] || label) ? labelSpanWidth : 0) + 'px' } : undefined"
-        :placeholder="placeholderText"
-        :disabled="disabled || readonly"
-        @focus="open"
-      />
+        <span
+          v-for="(item, i) in selectedItems"
+          :key="i"
+          class="tag"
+        >
+          {{ getItemLabel(item) }}
+          <span
+            v-if="!readonly && !disabled"
+            class="remove"
+            @click.stop="removeItem(item)"
+          >❌</span>
+        </span>
+
+        <input
+          ref="inputRef"
+          v-model="search"
+          class="input"
+          :placeholder="placeholderText"
+          :disabled="disabled || readonly"
+          @focus="open"
+        />
+      </template>
+
+      <template v-else>
+        <div
+          v-for="(item, i) in selectedItems"
+          :key="i"
+          class="tag"
+          :style="singleSelectedTagStyle"
+          v-show="!showSingleInput && !search.length"
+        >
+          {{ getItemLabel(item) }}
+          <span
+            v-if="!readonly && !disabled"
+            class="remove"
+            @click.stop="removeItem(item)"
+          >❌</span>
+        </div>
+
+        <input
+          v-if="showSingleInput"
+          ref="inputRef"
+          v-model="search"
+          class="input"
+          :style="singleInputStyle"
+          :placeholder="placeholderText"
+          :disabled="disabled || readonly"
+          @focus="open"
+        />
+      </template>
     </div>
 
     <!-- Dropdown -->
@@ -53,13 +90,14 @@
         :key="i"
         class="option"
         :class="{ selected: isSelected(item) }"
-        @click="select(item)"
+        style="line-height: 20px;"
+        @mousedown.prevent="select(item)"
       >
         <input
           v-if="multiple"
           type="checkbox"
           :checked="isSelected(item)"
-          @click.stop
+          @mousedown.stop
         />
         {{ getItemLabel(item) }}
       </div>
@@ -91,10 +129,11 @@ export default {
     path: { type: String, default: '' },
   },
   emits: ['update:modelValue', 'search', 'change'],
-  setup(props, { emit }) {
+  setup(props, { emit, slots }) {
     const onFieldChange = inject<((path: string, value: any) => void) | null>('onFieldChange', null);
     const onSelectSearch = inject<((path: string, payload: { term: string; items: any[] }) => void) | null>('onSelectSearch', null);
     const isOpen = ref(false);
+    const isSingleInputActive = ref(false);
     const search = ref('');
     const suppressSearchEmit = ref(false);
     const selectedItems = ref<any[]>([]);
@@ -102,7 +141,21 @@ export default {
     const wrapperRef = ref<HTMLElement | null>(null);
     const inputRef = ref<HTMLInputElement | null>(null);
     const labelSpan = ref<HTMLElement | null>(null);
+    const hasLabel = computed(() => Boolean(slots['label'] || props.label));
     const labelSpanWidth = computed(() => labelSpan.value?.offsetWidth ?? 0);
+    const multipleLabelSpacerStyle = computed(() => ({
+      width: labelSpanWidth.value + 'px',
+      flex: `0 0 ${labelSpanWidth.value}px`,
+    }));
+    const singleSelectedTagStyle = computed(() => ({
+      textIndent: (hasLabel.value ? labelSpanWidth.value : 0) + 'px',
+    }));
+    const singleInputStyle = computed(() => ({
+      paddingLeft: (hasLabel.value ? labelSpanWidth.value : 0) + 'px',
+    }));
+    const containerTabIndex = computed(() =>
+      props.disabled || props.readonly ? -1 : 0
+    );
 
     /* ---------------- helpers ---------------- */
 
@@ -161,6 +214,7 @@ export default {
         ? props.placeholder
         : ''
     );
+    const showSingleInput = computed(() => isSingleInputActive.value);
 
     /* ---------------- actions ---------------- */
 
@@ -169,28 +223,57 @@ export default {
     };
 
     const focusInput = () => {
+      if (props.disabled || props.readonly) return;
+
       open();
+
+      if (!props.multiple) {
+        isSingleInputActive.value = true;
+        nextTick(() => inputRef.value?.focus());
+        return;
+      }
+
       inputRef.value?.focus();
+    };
+
+    const deactivateSingleInput = () => {
+      if (props.multiple) return;
+
+      isOpen.value = false;
+      isSingleInputActive.value = false;
+      clearSearch();
+    };
+
+    const clearSearch = () => {
+      suppressSearchEmit.value = true;
+      search.value = '';
+    };
+
+    const selectMultipleItem = (item: any) => {
+      if (isSelected(item)) {
+        selectedItems.value = selectedItems.value.filter(
+          s => !isEqual(s, item)
+        );
+      } else {
+        selectedItems.value = [...selectedItems.value, item];
+      }
+    };
+
+    const selectSingleItem = (item: any) => {
+      selectedItems.value = [item];
+      deactivateSingleInput();
     };
 
     const select = (item: any) => {
       if (props.disabled || props.readonly) return;
 
       if (props.multiple) {
-        if (isSelected(item)) {
-          selectedItems.value = selectedItems.value.filter(
-            s => !isEqual(s, item)
-          );
-        } else {
-          selectedItems.value.push(item);
-        }
+        selectMultipleItem(item);
       } else {
-        selectedItems.value = [item];
-        isOpen.value = false;
+        selectSingleItem(item);
       }
 
-      suppressSearchEmit.value = true;
-      search.value = '';
+      clearSearch();
       syncModel();
       if (props.multiple) {
         nextTick(() => inputRef.value?.focus());
@@ -208,6 +291,7 @@ export default {
       const value = props.multiple
         ? selectedItems.value.map(getItemValue)
         : getItemValue(selectedItems.value[0] || '');
+
       emit('update:modelValue', value);
       onFieldChange?.(props.path, value);
       emit('change', props.multiple ? selectedItems.value : selectedItems.value[0]);
@@ -218,26 +302,55 @@ export default {
     const onClickOutside = (e: MouseEvent) => {
       if (!wrapperRef.value?.contains(e.target as Node)) {
         isOpen.value = false;
+        deactivateSingleInput();
       }
+    };
+
+    const onContainerFocusOut = (e: FocusEvent) => {
+      if (props.multiple) return;
+
+      const nextTarget = e.relatedTarget as Node | null;
+      if (nextTarget && wrapperRef.value?.contains(nextTarget)) {
+        return;
+      }
+
+      deactivateSingleInput();
     };
 
     /* ---------------- sync from v-model ---------------- */
 
+    const initMultipleSelected = () => {
+      if (!Array.isArray(props.modelValue)) {
+        selectedItems.value = [];
+        return;
+      }
+
+      selectedItems.value = props.items.filter(i =>
+        props.modelValue.some((v: any) => isEqual(i, v))
+      );
+    };
+
+    const initSingleSelected = () => {
+      if (props.modelValue == null) {
+        selectedItems.value = [];
+        return;
+      }
+
+      const found = props.items.find(
+        i => isEqual(i, props.modelValue)
+      );
+      selectedItems.value = found ? [found] : [];
+    };
+
     const initSelected = () => {
       selectedItems.value = [];
 
-      if (props.multiple && Array.isArray(props.modelValue)) {
-        selectedItems.value = props.items.filter(i =>
-          props.modelValue.some((v: any) => isEqual(i, v))
-        );
+      if (props.multiple) {
+        initMultipleSelected();
+        return;
       }
 
-      if (!props.multiple && props.modelValue != null) {
-        const found = props.items.find(
-          i => isEqual(i, props.modelValue)
-        );
-        if (found) selectedItems.value = [found];
-      }
+      initSingleSelected();
     };
 
     watch(() => props.modelValue, initSelected);
@@ -266,19 +379,26 @@ export default {
 
     return {
       isOpen,
+      showSingleInput,
       search,
       selectedItems,
       filteredItems,
       wrapperRef,
       inputRef,
+      containerTabIndex,
+      hasLabel,
       labelSpan,
       labelSpanWidth,
+      multipleLabelSpacerStyle,
+      singleSelectedTagStyle,
+      singleInputStyle,
       getItemLabel,
       getItemValue,
       isSelected,
       select,
       removeItem,
       focusInput,
+      onContainerFocusOut,
       open,
       placeholderText,
     };
@@ -325,11 +445,15 @@ export default {
 }
 
 .tag {
-  display: inline-flex;
   align-items: center;
   padding: 1px;
   border-radius: 2px;
   transform: translateY(-2px);
+}
+
+.label-spacer {
+  display: inline-block;
+  height: 1px;
 }
 
 .remove {
@@ -355,15 +479,6 @@ export default {
   line-height: 19px;
   color: inherit;
   font-size: inherit;
-}
-
-.input-absolute {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  transform: translateY(-2px);
 }
 
 .dropdown {

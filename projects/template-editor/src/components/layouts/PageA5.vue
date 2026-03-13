@@ -1,6 +1,6 @@
 <template>
   <div
-    class="page-a5"
+    class="page-a5 page-content"
     :class="{ 'landscape': landscape }"
     :style="style"
   >

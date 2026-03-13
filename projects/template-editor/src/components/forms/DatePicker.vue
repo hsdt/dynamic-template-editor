@@ -152,6 +152,7 @@ export default {
 <style scoped>
 .datepicker-wrapper {
   position: relative;
+  width: 100%;
 }
 .hs-label-span {
   position: absolute;
