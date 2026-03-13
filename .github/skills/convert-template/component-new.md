@@ -96,7 +96,7 @@ Nhập mã OTP hoặc chuỗi ký tự theo pattern, hỗ trợ mask, pad, kiể
 Hiển thị một dòng chọn/chỉnh sửa mã ICD, gồm tên bệnh và mã bệnh. Component hỗ trợ mở form chọn ICD bằng double click hoặc context menu.
 
 ### Props
-- `path`: Đường dẫn dữ liệu dùng cho thao tác thêm, sửa, xóa ICD **(bắt buộc)**
+- `modelValue`: Đường dẫn dữ liệu dùng cho thao tác thêm, sửa, xóa ICD, dùng với `v-model` **(bắt buộc)**
 - `type`: Loại ICD, mặc định `'YHHD'` (String)
 - `index`: Vị trí phần tử trong danh sách ICD, dùng khi edit/remove trong list (Number | null)
 - `label`: Nhãn hiển thị cho trường tên bệnh (String)
@@ -107,13 +107,13 @@ Hiển thị một dòng chọn/chỉnh sửa mã ICD, gồm tên bệnh và mã
 ```vue
 <IcdGroupItem
   label="+ Bệnh chính:"
-  path="hsBenhAn.BenhAnChiTietObj.IcdRaVienBenhChinh"
+  v-model="hsBenhAn.BenhAnChiTietObj.IcdRaVienBenhChinh"
   v-model:ten="hsBenhAn.BenhAnChiTietObj.IcdRaVienBenhChinhTen"
   v-model:ma="hsBenhAn.BenhAnChiTietObj.IcdRaVienBenhChinhMa"
 />
 
 <IcdGroupItem
-  path="hsBenhAn.BenhAnChiTietObj.IcdYHCT"
+  v-model="hsBenhAn.BenhAnChiTietObj.IcdYHCT"
   type="YHCT"
   v-model:ten="hsBenhAn.BenhAnChiTietObj.IcdYHCTTen"
   v-model:ma="hsBenhAn.BenhAnChiTietObj.IcdYHCTMa"
@@ -128,21 +128,16 @@ Hiển thị một dòng chọn/chỉnh sửa mã ICD, gồm tên bệnh và mã
 Hiển thị danh sách ICD. Khi danh sách rỗng, component vẫn render sẵn một `IcdGroupItem` để người dùng có thể mở form thêm mã bệnh.
 
 ### Props
-- `path`: Đường dẫn dữ liệu của danh sách ICD **(bắt buộc)**
 - `type`: Loại ICD cho các phần tử trong danh sách, mặc định `'YHHD'` (String)
 - `items`: Mảng ICD, mỗi phần tử thường có `TenVN` và `Ma` (Array)
 
 ### Ví dụ
 ```vue
 <div>+ Bệnh kèm theo:</div>
-<IcdList
-  path="hsBenhAn.BenhAnChiTietObj.ListIcdRaVienBenhKemTheo"
-  :items="hsBenhAn.BenhAnChiTietObj.ListIcdRaVienBenhKemTheo"
-/>
+<IcdList :items="hsBenhAn.BenhAnChiTietObj.ListIcdRaVienBenhKemTheo" />
 
 <div>+ ICD YHCT:</div>
 <IcdList
-  path="hsBenhAn.BenhAnChiTietObj.ListIcdYHCT"
   type="YHCT"
   :items="hsBenhAn.BenhAnChiTietObj.ListIcdYHCT"
 />
