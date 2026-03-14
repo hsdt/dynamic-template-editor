@@ -188,6 +188,7 @@ export default {
   background: none !important;
 }
 .hs-label-span {
+  z-index: 1;
   position: absolute;
   background: white;
   line-height: 1;

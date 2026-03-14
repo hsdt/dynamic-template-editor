@@ -40,7 +40,7 @@
           <span
             v-if="!readonly && !disabled"
             class="remove"
-            @click.stop="removeItem(item)"
+            @mousedown.prevent.stop="removeItem(item)"
           >❌</span>
         </span>
 
@@ -66,7 +66,7 @@
           <span
             v-if="!readonly && !disabled"
             class="remove"
-            @click.stop="removeItem(item)"
+            @mousedown.prevent.stop="removeItem(item)"
           >❌</span>
         </div>
 
@@ -90,7 +90,6 @@
         :key="i"
         class="option"
         :class="{ selected: isSelected(item) }"
-        style="line-height: 20px;"
         @mousedown.prevent="select(item)"
       >
         <input
@@ -149,6 +148,7 @@ export default {
     }));
     const singleSelectedTagStyle = computed(() => ({
       textIndent: (hasLabel.value ? labelSpanWidth.value : 0) + 'px',
+      lineHeight: '20px'
     }));
     const singleInputStyle = computed(() => ({
       paddingLeft: (hasLabel.value ? labelSpanWidth.value : 0) + 'px',
@@ -437,6 +437,7 @@ export default {
   line-height: 18px;
   font-size: 12pt;
   color: #00a;
+  min-height: 24.4px;
 }
 
 .input-container:focus-within {
@@ -475,7 +476,7 @@ export default {
   outline: none;
   flex: 1;
   background-color: transparent;
-  transform: translateY(-2px);
+  transform: translateY(-3px);
   line-height: 19px;
   color: inherit;
   font-size: inherit;
