@@ -55,6 +55,10 @@ export default {
     const wrapperRef = ref<HTMLElement | null>(null);
     const displayValue = ref('');
     const { open, syncValue } = useDatePickerService();
+    const emitFieldChange = (value: any) => {
+      if (!props.path) return;
+      onFieldChange?.(props.path, value);
+    };
 
     // Tự động phát hiện mode từ format
     const detectMode = (format: string): 'date' | 'datetime' => {
@@ -79,7 +83,7 @@ export default {
         const display = m.format(props.format);
         displayValue.value = display;
         emit('update:modelValue', m.format());
-        onFieldChange?.(props.path, m.format());
+        emitFieldChange(m.format());
         syncValue(display, wrapperRef.value);
       }
     };
@@ -118,7 +122,7 @@ export default {
             const display = parsed.format(props.format);
             displayValue.value = display;
             emit('update:modelValue', parsed.format());
-            onFieldChange?.(props.path, parsed.format());
+            emitFieldChange(parsed.format());
             syncValue(display, wrapperRef.value);
           }
         }

@@ -46,6 +46,10 @@ export default {
     const arrayLength = ref<string[]>([]);
     const focusIndex = ref<number>(0);
     const isFocused = ref(false);
+    const emitFieldChange = (value: any) => {
+      if (!props.path) return;
+      onFieldChange?.(props.path, value);
+    };
 
     const specialKeys = ['Backspace', 'Tab', 'End', 'Home', 'ArrowLeft', 'ArrowRight', 'Delete', ' '];
 
@@ -90,7 +94,7 @@ export default {
       }
       updateValueArray(newValue);
       emit('update:modelValue', newValue);
-      onFieldChange?.(props.path, newValue);
+      emitFieldChange(newValue);
     };
 
     const setFocusIndex = (index: number) => {
@@ -146,7 +150,7 @@ export default {
             valueArray.value[idx] = getNormalizedSegmentValue(idx).slice(0, -1);
           }
           emit('update:modelValue', valueArray.value.join(''));
-          onFieldChange?.(props.path, valueArray.value.join(''));
+          emitFieldChange(valueArray.value.join(''));
         } else if (keyValue === 'ArrowLeft') {
           setFocusIndex(Math.max(idx - 1, 0));
         } else if (keyValue === 'ArrowRight') {
@@ -164,7 +168,7 @@ export default {
           }
 
           emit('update:modelValue', valueArray.value.join(''));
-          onFieldChange?.(props.path, valueArray.value.join(''));
+          emitFieldChange(valueArray.value.join(''));
         }
       }
     };
