@@ -47,6 +47,8 @@ export default {
     const arrayLength = ref<string[]>([]);
     const focusIndex = ref<number>(0);
     const isFocused = ref(false);
+    const hasInitialized = ref(false);
+    const isInternalModelSync = ref(false);
     const emitFieldChange = (value: any) => {
       if (!props.path) return;
       onFieldChange?.(props.path, value);
@@ -72,14 +74,28 @@ export default {
       return result;
     };
 
-    const updateValueArray = (value: string) => {
+    const applyPadStartValue = (value: string) => {
+      if (props.padStart === null || props.padStart === undefined || String(value).length === 0) {
+        return value;
+      }
+
+      return String(value).padStart(totalMaskChars.value, props.padStart);
+    };
+
+    const updateValueArray = (value: string, shouldApplyPadStart = false) => {
       let nextValue = value;
 
-      if (props.padStart !== null && props.padStart !== undefined) {
-        nextValue = String(nextValue).padStart(totalMaskChars.value, props.padStart);
+      if (shouldApplyPadStart) {
+        nextValue = applyPadStartValue(nextValue);
       }
 
       valueArray.value = splitStringByPattern(nextValue, maskLength.value);
+    };
+
+    const emitModelValue = (value: string) => {
+      isInternalModelSync.value = true;
+      emit('update:modelValue', value);
+      emitFieldChange(value);
     };
 
     const getNormalizedSegmentValue = (index: number) => {
@@ -150,13 +166,9 @@ export default {
           valueArray.value[index] = val.padStart(maskLength.value[index], props.padChar);
         }
       });
-      let newValue = valueArray.value.join('');
-      if (props.padStart !== null && props.padStart !== undefined && newValue != null) {
-        newValue = String(newValue).padStart(totalMaskChars.value, props.padStart);
-      }
+      const newValue = applyPadStartValue(valueArray.value.join(''));
       updateValueArray(newValue);
-      emit('update:modelValue', newValue);
-      emitFieldChange(newValue);
+      emitModelValue(newValue);
     };
 
     const setFocusIndex = (index: number) => {
@@ -205,8 +217,7 @@ export default {
           } else {
             valueArray.value[idx] = getInputSegmentValue(idx).slice(0, -1);
           }
-          emit('update:modelValue', valueArray.value.join(''));
-          emitFieldChange(valueArray.value.join(''));
+          emitModelValue(valueArray.value.join(''));
         } else if (keyValue === 'ArrowLeft') {
           setFocusIndex(Math.max(idx - 1, 0));
         } else if (keyValue === 'ArrowRight') {
@@ -223,8 +234,7 @@ export default {
             setFocusIndex(Math.min(idx + 1, segmentCount.value - 1));
           }
 
-          emit('update:modelValue', valueArray.value.join(''));
-          emitFieldChange(valueArray.value.join(''));
+          emitModelValue(valueArray.value.join(''));
         }
       }
     };
@@ -243,7 +253,10 @@ export default {
       [() => props.modelValue, () => props.padStart, maskLength],
       ([newVal]) => {
         arrayLength.value = Array(segmentCount.value || 0).fill('');
-        updateValueArray(String(newVal || ''));
+        const shouldApplyPadStart = !hasInitialized.value || !isInternalModelSync.value;
+        updateValueArray(String(newVal || ''), shouldApplyPadStart);
+        hasInitialized.value = true;
+        isInternalModelSync.value = false;
       },
       { immediate: true }
     );
