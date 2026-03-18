@@ -73,7 +73,13 @@ export default {
     };
 
     const updateValueArray = (value: string) => {
-      valueArray.value = splitStringByPattern(value, maskLength.value);
+      let nextValue = value;
+
+      if (props.padStart !== null && props.padStart !== undefined) {
+        nextValue = String(nextValue).padStart(totalMaskChars.value, props.padStart);
+      }
+
+      valueArray.value = splitStringByPattern(nextValue, maskLength.value);
     };
 
     const getNormalizedSegmentValue = (index: number) => {
@@ -234,42 +240,17 @@ export default {
     };
 
     watch(
-      () => props.modelValue,
-      (newVal) => {
+      [() => props.modelValue, () => props.padStart, maskLength],
+      ([newVal]) => {
+        arrayLength.value = Array(segmentCount.value || 0).fill('');
         updateValueArray(String(newVal || ''));
       },
       { immediate: true }
     );
 
     onMounted(() => {
-        // Khởi tạo arrayLength để v-for render đúng số ô
-        arrayLength.value = Array(segmentCount.value || 0).fill('');
-
-        // --- Khởi tạo giá trị hiển thị với padStart / padChar ---
-        const initialValue = String(props.modelValue || '');
-        valueArray.value = maskLength.value.map((len, idx) => {
-            let val = initialValue.substring(
-            maskLength.value.slice(0, idx).reduce((a, b) => a + b, 0),
-            maskLength.value.slice(0, idx).reduce((a, b) => a + b, 0) + len
-            );
-            // Pad từng phần theo padChar nếu chưa đủ độ dài
-            if (val.length < len) val = val.padStart(len, props.padChar);
-            return val;
-        });
-
-        // Nếu props.padStart có giá trị, pad toàn bộ string, rồi chia theo maskLength
-        if (props.padStart != null) {
-            const fullPadded = String(initialValue).padStart(totalMaskChars.value, props.padStart);
-            let currentIndex = 0;
-            valueArray.value = maskLength.value.map((len) => {
-            const val = fullPadded.substring(currentIndex, currentIndex + len);
-            currentIndex += len;
-            return val;
-            });
-        }
-
-        document.addEventListener('mousedown', handleClickOutside);
-        });
+      document.addEventListener('mousedown', handleClickOutside);
+    });
 
 
     onBeforeUnmount(() => {
