@@ -14,8 +14,9 @@
       :class="{ active: focusIndex === i && isFocused, disabled: disabled }"
       @click="setFocusIndex(i)"
     >
-      {{ valueArray[i] }}
+      <span>{{ getDisplayValueBeforeCaret(i) }}</span>
       <div v-if="focusIndex === i && isFocused && !readonly" class="caret"></div>
+      <span>{{ getDisplayValueAfterCaret(i) }}</span>
     </div>
   </div>
 </template>
@@ -46,6 +47,12 @@ export default {
     const arrayLength = ref<string[]>([]);
     const focusIndex = ref<number>(0);
     const isFocused = ref(false);
+    const hasInitialized = ref(false);
+    const isInternalModelSync = ref(false);
+    const emitFieldChange = (value: any) => {
+      if (!props.path) return;
+      onFieldChange?.(props.path, value);
+    };
 
     const specialKeys = ['Backspace', 'Tab', 'End', 'Home', 'ArrowLeft', 'ArrowRight', 'Delete', ' '];
 
@@ -67,15 +74,90 @@ export default {
       return result;
     };
 
-    const updateValueArray = (value: string) => {
-      valueArray.value = splitStringByPattern(value, maskLength.value);
+    const applyPadStartValue = (value: string) => {
+      if (props.padStart === null || props.padStart === undefined || String(value).length === 0) {
+        return value;
+      }
+
+      return String(value).padStart(totalMaskChars.value, props.padStart);
+    };
+
+    const updateValueArray = (value: string, shouldApplyPadStart = false) => {
+      let nextValue = value;
+
+      if (shouldApplyPadStart) {
+        nextValue = applyPadStartValue(nextValue);
+      }
+
+      valueArray.value = splitStringByPattern(nextValue, maskLength.value);
+    };
+
+    const emitModelValue = (value: string) => {
+      isInternalModelSync.value = true;
+      emit('update:modelValue', value);
+      emitFieldChange(value);
     };
 
     const getNormalizedSegmentValue = (index: number) => {
       const currentValue = valueArray.value[index] ?? '';
       const emptyMaskedValue = props.padChar.repeat(maskLength.value[index]);
 
-      return currentValue === emptyMaskedValue ? '' : currentValue;
+      if (!currentValue || currentValue === emptyMaskedValue) {
+        return '';
+      }
+
+      let normalizedValue = currentValue;
+      while (normalizedValue.startsWith(props.padChar) && normalizedValue.length > 0) {
+        normalizedValue = normalizedValue.slice(props.padChar.length);
+      }
+
+      return normalizedValue;
+    };
+
+    const getInputSegmentValue = (index: number) => {
+      const normalizedValue = getNormalizedSegmentValue(index);
+
+      if (!normalizedValue) {
+        return '';
+      }
+
+      return normalizedValue.split(props.padChar).join('');
+    };
+
+    const getSegmentDisplayValue = (index: number) => {
+      const currentValue = valueArray.value[index] ?? '';
+      const currentMaskLength = maskLength.value[index];
+
+      if (currentValue.length === 0) {
+        return props.padChar.repeat(currentMaskLength);
+      }
+
+      if (focusIndex.value === index && isFocused.value) {
+        return currentValue;
+      }
+
+      if (currentValue.length < currentMaskLength) {
+        return currentValue.padStart(currentMaskLength, props.padChar);
+      }
+
+      return currentValue;
+    };
+
+    const getCaretPosition = (index: number) => {
+      const displayValue = getSegmentDisplayValue(index);
+      const normalizedValue = getInputSegmentValue(index);
+
+      return Math.min(normalizedValue.length, displayValue.length);
+    };
+
+    const getDisplayValueBeforeCaret = (index: number) => {
+      const displayValue = getSegmentDisplayValue(index);
+      return displayValue.slice(0, getCaretPosition(index));
+    };
+
+    const getDisplayValueAfterCaret = (index: number) => {
+      const displayValue = getSegmentDisplayValue(index);
+      return displayValue.slice(getCaretPosition(index));
     };
 
     const padValuesToMatchMask = () => {
@@ -84,27 +166,17 @@ export default {
           valueArray.value[index] = val.padStart(maskLength.value[index], props.padChar);
         }
       });
-      let newValue = valueArray.value.join('');
-      if (props.padStart !== null && props.padStart !== undefined && newValue != null) {
-        newValue = String(newValue).padStart(totalMaskChars.value, props.padStart);
-      }
+      const newValue = applyPadStartValue(valueArray.value.join(''));
       updateValueArray(newValue);
-      emit('update:modelValue', newValue);
-      onFieldChange?.(props.path, newValue);
+      emitModelValue(newValue);
     };
 
     const setFocusIndex = (index: number) => {
         if (props.disabled) return;
 
-        // Tìm ô trống đầu tiên
-        const firstEmptyIndex = valueArray.value.findIndex(val => val === '' || val.length === 0);
+      focusIndex.value = index;
 
-        if (firstEmptyIndex !== -1 && index > firstEmptyIndex) {
-            // Nếu click vào ô sau ô trống đầu tiên, tự động focus ô trống đầu tiên
-            focusIndex.value = firstEmptyIndex;
-        } else {
-            focusIndex.value = index;
-        }
+      valueArray.value[focusIndex.value] = getInputSegmentValue(focusIndex.value);
 
         isFocused.value = true;
 
@@ -140,13 +212,12 @@ export default {
         if (!/^[0-9]*$/.test(keyValue) && !specialKeys.includes(keyValue) && props.type === 'number') return;
 
         if (keyValue === 'Backspace') {
-          if (valueArray.value[idx] === '') {
+          if (getInputSegmentValue(idx) === '') {
             setFocusIndex(Math.max(idx - 1, 0));
           } else {
-            valueArray.value[idx] = getNormalizedSegmentValue(idx).slice(0, -1);
+            valueArray.value[idx] = getInputSegmentValue(idx).slice(0, -1);
           }
-          emit('update:modelValue', valueArray.value.join(''));
-          onFieldChange?.(props.path, valueArray.value.join(''));
+          emitModelValue(valueArray.value.join(''));
         } else if (keyValue === 'ArrowLeft') {
           setFocusIndex(Math.max(idx - 1, 0));
         } else if (keyValue === 'ArrowRight') {
@@ -155,7 +226,7 @@ export default {
           padValuesToMatchMask();
           setFocusIndex(Math.min(idx + 1, segmentCount.value - 1));
         } else if (keyValue.length === 1) {
-          const nextValue = `${getNormalizedSegmentValue(idx)}${keyValue.toUpperCase().trim()}`.slice(0, maskLength.value[idx]);
+          const nextValue = `${getInputSegmentValue(idx)}${keyValue.toUpperCase().trim()}`.slice(0, maskLength.value[idx]);
 
           valueArray.value[idx] = nextValue;
 
@@ -163,8 +234,7 @@ export default {
             setFocusIndex(Math.min(idx + 1, segmentCount.value - 1));
           }
 
-          emit('update:modelValue', valueArray.value.join(''));
-          onFieldChange?.(props.path, valueArray.value.join(''));
+          emitModelValue(valueArray.value.join(''));
         }
       }
     };
@@ -180,42 +250,20 @@ export default {
     };
 
     watch(
-      () => props.modelValue,
-      (newVal) => {
-        updateValueArray(String(newVal || ''));
+      [() => props.modelValue, () => props.padStart, maskLength],
+      ([newVal]) => {
+        arrayLength.value = Array(segmentCount.value || 0).fill('');
+        const shouldApplyPadStart = !hasInitialized.value || !isInternalModelSync.value;
+        updateValueArray(String(newVal || ''), shouldApplyPadStart);
+        hasInitialized.value = true;
+        isInternalModelSync.value = false;
       },
       { immediate: true }
     );
 
     onMounted(() => {
-        // Khởi tạo arrayLength để v-for render đúng số ô
-        arrayLength.value = Array(segmentCount.value || 0).fill('');
-
-        // --- Khởi tạo giá trị hiển thị với padStart / padChar ---
-        const initialValue = String(props.modelValue || '');
-        valueArray.value = maskLength.value.map((len, idx) => {
-            let val = initialValue.substring(
-            maskLength.value.slice(0, idx).reduce((a, b) => a + b, 0),
-            maskLength.value.slice(0, idx).reduce((a, b) => a + b, 0) + len
-            );
-            // Pad từng phần theo padChar nếu chưa đủ độ dài
-            if (val.length < len) val = val.padStart(len, props.padChar);
-            return val;
-        });
-
-        // Nếu props.padStart có giá trị, pad toàn bộ string, rồi chia theo maskLength
-        if (props.padStart != null) {
-            const fullPadded = String(initialValue).padStart(totalMaskChars.value, props.padStart);
-            let currentIndex = 0;
-            valueArray.value = maskLength.value.map((len) => {
-            const val = fullPadded.substring(currentIndex, currentIndex + len);
-            currentIndex += len;
-            return val;
-            });
-        }
-
-        document.addEventListener('mousedown', handleClickOutside);
-        });
+      document.addEventListener('mousedown', handleClickOutside);
+    });
 
 
     onBeforeUnmount(() => {
@@ -229,6 +277,8 @@ export default {
       arrayLength,
       focusIndex,
       isFocused,
+      getDisplayValueBeforeCaret,
+      getDisplayValueAfterCaret,
       setFocusIndex,
       onKeydown,
     };

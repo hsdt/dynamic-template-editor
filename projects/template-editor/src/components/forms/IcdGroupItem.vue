@@ -23,7 +23,8 @@ import { computed, inject } from 'vue';
 export default {
   name: 'IcdGroupItem',
   props: {
-    path: { type: String, required: true },
+    modelValue: { type: [String], default: '' },
+    path: { type: String, default: '' },
     type: { type: String, default: 'YHHD' },
     index: { type: Number, default: null },
     label: { type: String, default: '' },

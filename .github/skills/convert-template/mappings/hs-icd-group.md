@@ -4,11 +4,11 @@
 
 - Có `[multiple]="true"` → đổi thành `IcdList`
 - Không có `multiple` hoặc `multiple=false` → đổi thành `IcdGroupItem`
-- `update="tempData.xxx"` hoặc `update="xxx"` → `path="xxx"`
+- `[icdTen]="context.tempData.xxx"` → `v-model"xxx"`
 - `[icdTen]="context.tempData.xxxTen"` → `v-model:ten="xxxTen"`
 - `[icdMa]="context.tempData.xxxMa"` → `v-model:ma="xxxMa"`
 - `label` chỉ gắn trực tiếp cho `IcdGroupItem`; với `IcdList` thì giữ label ở thẻ ngoài như `<div>`
-- Với `IcdList`, dùng `[icd]` làm `:items`
+- Với `IcdList`, dùng `[icd]` làm `:items`; bỏ `update`
 
 ## Công thức ngắn gọn
 
@@ -16,17 +16,14 @@
 <!-- Single ICD -->
 <IcdGroupItem
   label="..."
-  path="data.path"
+  v-model="data.id"
   v-model:ten="data.ten"
   v-model:ma="data.ma"
 />
 
 <!-- Multiple ICD -->
 <div>...</div>
-<IcdList
-  path="data.listPath"
-  :items="data.listPath"
-/>
+<IcdList :items="data.listIcd" />
 ```
 
 ## Business Case chuẩn
@@ -51,13 +48,10 @@
 ```vue
 <IcdGroupItem
   label="+ Bệnh chính:"
-  path="hsBenhAn.BenhAnChiTietObj.IcdRaVienBenhChinh"
+  v-model="hsBenhAn.BenhAnChiTietObj.IcdRaVienBenhChinh"
   v-model:ten="hsBenhAn.BenhAnChiTietObj.IcdRaVienBenhChinhTen"
   v-model:ma="hsBenhAn.BenhAnChiTietObj.IcdRaVienBenhChinhMa"
 />
 <div>+ Bệnh kèm theo:</div>
-<IcdList
-  path="hsBenhAn.BenhAnChiTietObj.ListIcdRaVienBenhKemTheo"
-  :items="hsBenhAn.BenhAnChiTietObj.ListIcdRaVienBenhKemTheo"
-/>
+<IcdList :items="hsBenhAn.BenhAnChiTietObj.ListIcdRaVienBenhKemTheo" />
 ```

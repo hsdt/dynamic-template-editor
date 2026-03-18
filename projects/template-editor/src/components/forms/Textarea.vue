@@ -60,6 +60,10 @@ export default {
   emits: ['update:modelValue'],
   setup(props, { emit }) {
     const onFieldChange = inject<((path: string, value: any) => void) | null>('onFieldChange', null);
+    const emitFieldChange = (value: any) => {
+      if (!props.path) return
+      onFieldChange?.(props.path, value)
+    }
     // --- Reactive binding (keep internal ref non-nullable for helpers)
     const input = ref<string>(props.modelValue ?? '')
     const textarea = ref<HTMLTextAreaElement | null>(null)
@@ -130,7 +134,7 @@ export default {
         return
       }
       emit('update:modelValue', stripPad(padded))
-      onFieldChange?.(props.path, stripPad(padded))
+      emitFieldChange(stripPad(padded))
       nextTick(() => {
         textareaHeight.value = textarea.value?.offsetHeight ?? textareaHeight.value
         if (textarea.value) autosize.update(textarea.value)
@@ -188,6 +192,7 @@ export default {
   background: none !important;
 }
 .hs-label-span {
+  z-index: 1;
   position: absolute;
   background: white;
   line-height: 1;

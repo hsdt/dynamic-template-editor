@@ -5,7 +5,7 @@
 
 ## Props Mapping
 
-- `label` → `label` (hoặc slot)
+- `label` → `label` prop nếu là plain text; dùng slot `#label` nếu label chứa HTML tag
 - `value` + `update` → `v-model` (two-way binding)
 - `placeholder` → `placeholder`
 - `disabled` → `disabled`
@@ -25,7 +25,15 @@ Trong ngx-dynamic-hooks:
 ## Công thức chuyển đổi
 
 ```vue
+<!-- Label plain text → dùng prop -->
 <Textarea v-model="text" label="Ghi chú" rows="3" maxlength="500" :line="true" />
+
+<!-- Label có HTML tag → dùng slot #label -->
+<Textarea v-model="text">
+  <template #label>+ Bệnh kèm theo<i>(nếu có):</i></template>
+</Textarea>
+
+<!-- Label có style → dùng slot #label với thẻ bọc -->
 <Textarea v-model="text">
   <template #label>
     <span style="color:blue">Nội dung</span>

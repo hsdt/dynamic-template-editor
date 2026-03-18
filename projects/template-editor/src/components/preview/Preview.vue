@@ -81,7 +81,7 @@
     </ImContextMenu>
 
     <!-- Overlay -->
-    <div v-if="selectedNode" class="editor-overlay" @click="closeEditPanel"></div>
+    <div v-if="selectedNode" class="editor-overlay" @click="selectedNode =null; unHighlightElement()"></div>
 
     <!-- Panel chỉnh sửa -->
     <EditElementPanel :selectedNode="selectedNode" @close="closeEditPanel" />
@@ -272,6 +272,7 @@ export default {
           fakeElement?.childNodes.length === 0 &&
           !fakeElement.isClosingTag &&
           (!el.getAttribute('style') || el.getAttribute('style')?.trim() === '') &&
+          (!el.getAttribute('class') || el.getAttribute('class')?.trim() === '') &&
           fakeElement?.getAttribute('c-name') === 'div'
         ) {
           el.classList.add('empty-placeholder');
