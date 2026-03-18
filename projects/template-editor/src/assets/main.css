@@ -42,3 +42,9 @@
   pointer-events: none;
   border-radius: inherit;
 }
+
+@media print {
+  .no-print {
+    display: none;
+  }
+}

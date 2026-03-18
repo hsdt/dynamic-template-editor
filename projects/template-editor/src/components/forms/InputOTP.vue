@@ -14,8 +14,9 @@
       :class="{ active: focusIndex === i && isFocused, disabled: disabled }"
       @click="setFocusIndex(i)"
     >
-      {{ valueArray[i] }}
+      <span>{{ getDisplayValueBeforeCaret(i) }}</span>
       <div v-if="focusIndex === i && isFocused && !readonly" class="caret"></div>
+      <span>{{ getDisplayValueAfterCaret(i) }}</span>
     </div>
   </div>
 </template>
@@ -79,7 +80,62 @@ export default {
       const currentValue = valueArray.value[index] ?? '';
       const emptyMaskedValue = props.padChar.repeat(maskLength.value[index]);
 
-      return currentValue === emptyMaskedValue ? '' : currentValue;
+      if (!currentValue || currentValue === emptyMaskedValue) {
+        return '';
+      }
+
+      let normalizedValue = currentValue;
+      while (normalizedValue.startsWith(props.padChar) && normalizedValue.length > 0) {
+        normalizedValue = normalizedValue.slice(props.padChar.length);
+      }
+
+      return normalizedValue;
+    };
+
+    const getInputSegmentValue = (index: number) => {
+      const normalizedValue = getNormalizedSegmentValue(index);
+
+      if (!normalizedValue) {
+        return '';
+      }
+
+      return normalizedValue.split(props.padChar).join('');
+    };
+
+    const getSegmentDisplayValue = (index: number) => {
+      const currentValue = valueArray.value[index] ?? '';
+      const currentMaskLength = maskLength.value[index];
+
+      if (currentValue.length === 0) {
+        return props.padChar.repeat(currentMaskLength);
+      }
+
+      if (focusIndex.value === index && isFocused.value) {
+        return currentValue;
+      }
+
+      if (currentValue.length < currentMaskLength) {
+        return currentValue.padStart(currentMaskLength, props.padChar);
+      }
+
+      return currentValue;
+    };
+
+    const getCaretPosition = (index: number) => {
+      const displayValue = getSegmentDisplayValue(index);
+      const normalizedValue = getInputSegmentValue(index);
+
+      return Math.min(normalizedValue.length, displayValue.length);
+    };
+
+    const getDisplayValueBeforeCaret = (index: number) => {
+      const displayValue = getSegmentDisplayValue(index);
+      return displayValue.slice(0, getCaretPosition(index));
+    };
+
+    const getDisplayValueAfterCaret = (index: number) => {
+      const displayValue = getSegmentDisplayValue(index);
+      return displayValue.slice(getCaretPosition(index));
     };
 
     const padValuesToMatchMask = () => {
@@ -100,15 +156,9 @@ export default {
     const setFocusIndex = (index: number) => {
         if (props.disabled) return;
 
-        // Tìm ô trống đầu tiên
-        const firstEmptyIndex = valueArray.value.findIndex(val => val === '' || val.length === 0);
+      focusIndex.value = index;
 
-        if (firstEmptyIndex !== -1 && index > firstEmptyIndex) {
-            // Nếu click vào ô sau ô trống đầu tiên, tự động focus ô trống đầu tiên
-            focusIndex.value = firstEmptyIndex;
-        } else {
-            focusIndex.value = index;
-        }
+      valueArray.value[focusIndex.value] = getInputSegmentValue(focusIndex.value);
 
         isFocused.value = true;
 
@@ -144,10 +194,10 @@ export default {
         if (!/^[0-9]*$/.test(keyValue) && !specialKeys.includes(keyValue) && props.type === 'number') return;
 
         if (keyValue === 'Backspace') {
-          if (valueArray.value[idx] === '') {
+          if (getInputSegmentValue(idx) === '') {
             setFocusIndex(Math.max(idx - 1, 0));
           } else {
-            valueArray.value[idx] = getNormalizedSegmentValue(idx).slice(0, -1);
+            valueArray.value[idx] = getInputSegmentValue(idx).slice(0, -1);
           }
           emit('update:modelValue', valueArray.value.join(''));
           emitFieldChange(valueArray.value.join(''));
@@ -159,7 +209,7 @@ export default {
           padValuesToMatchMask();
           setFocusIndex(Math.min(idx + 1, segmentCount.value - 1));
         } else if (keyValue.length === 1) {
-          const nextValue = `${getNormalizedSegmentValue(idx)}${keyValue.toUpperCase().trim()}`.slice(0, maskLength.value[idx]);
+          const nextValue = `${getInputSegmentValue(idx)}${keyValue.toUpperCase().trim()}`.slice(0, maskLength.value[idx]);
 
           valueArray.value[idx] = nextValue;
 
@@ -233,6 +283,8 @@ export default {
       arrayLength,
       focusIndex,
       isFocused,
+      getDisplayValueBeforeCaret,
+      getDisplayValueAfterCaret,
       setFocusIndex,
       onKeydown,
     };
