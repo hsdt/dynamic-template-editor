@@ -11,6 +11,7 @@ const __dirname = path.dirname(__filename)
 
 const baseByMode = {
   shell: '/template-editor/',
+  demo: '/dynamic-template-editor/template-editor/',
 }
 
 // https://vite.dev/config/
