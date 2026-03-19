@@ -29,6 +29,11 @@
 								"glob": "**/*",
 								"input": "projects/shell/public",
 								"output": "."
+							},
+							{
+								"glob": "**/*",
+								"input": "dist/template-editor",
+								"output": "template-editor"
 							}
 						],
 						"styles": [
@@ -59,7 +64,7 @@
 						"demo": {
 							"outputHashing": "all",
 							"extraWebpackConfig": "projects/shell/webpack.prod.config.js",
-							"baseHref": "/dynamic-template-editor/shell/",
+							"baseHref": "/dynamic-template-editor/",
 							"fileReplacements": [
 								{
 									"replace": "projects/shell/src/environments/environment.ts",
@@ -109,6 +114,11 @@
 							{
 								"glob": "**/*",
 								"input": "projects/shell/public"
+							},
+							{
+								"glob": "**/*",
+								"input": "dist/template-editor",
+								"output": "template-editor"
 							}
 						],
 						"styles": [
@@ -119,5 +129,8 @@
 				}
 			}
 		}
-	}
+  },
+  "cli": {
+    "analytics": false
+  }
 }
