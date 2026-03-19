@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { loadRemoteModule } from '@angular-architects/module-federation';
 import { Home } from './pages/home/home';
 import { createVueWrapperComponent } from '../helpers';
+import { VUE_REMOTE_ENTRY } from '../constants/vue-remote-entry';
 import { ComponentFactory } from 'shared/types';
 
 export const routes: Routes = [
@@ -12,14 +13,11 @@ export const routes: Routes = [
   {
     path: 'vue-page',
     loadComponent: () =>
-      // loadRemoteModule({
-      //   // remoteEntry: 'http://localhost:4202/assets/remoteEntry.js',
-      //   remoteName: 'templateEditor',
-      //   exposedModule: './component-factory',
-      // }).then((m: ComponentFactory) =>
-      //   createVueWrapperComponent(m.createApp)
-      // ),
-      loadRemoteModule('templateEditor', './component-factory').then((m: ComponentFactory) =>
+      loadRemoteModule({
+        type: 'module',
+        remoteEntry: VUE_REMOTE_ENTRY,
+        exposedModule: './component-factory',
+      }).then((m: ComponentFactory) =>
         createVueWrapperComponent(m.createRoot)
       ),
   },

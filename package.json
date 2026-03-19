@@ -2,15 +2,13 @@
   "name": "dynamic-template-editor",
   "version": "0.0.0",
   "scripts": {
-    "start:shell": "ng s shell",
-    "build:shell": "ng build shell",
-    "serve:shell": "cd dist/shell/browser && npx serve -l 4200 --cors",
+    "start:shell": "npm run build:template-editor && ng s shell",
+    "build:shell": "npm run build:template-editor && ng build shell",
+    "serve:shell": "cd dist/shell && npx serve -l 4200 --cors",
     "start:template-editor": "cd projects/template-editor && vite",
     "build:template-editor": "cd projects/template-editor && vite build",
     "serve:template-editor": "cd dist/template-editor && npx serve -l 4202 --cors",
-    "build:all": "concurrently \"npm run build:shell\" \"npm run build:template-editor\"",
-    "serve:all": "concurrently \"npm run serve:shell\" \"npm run serve:template-editor\"",
-    "build:all:demo": "concurrently \"ng build shell --configuration=demo\" \"cd projects/template-editor && vite build --mode demo\""
+    "build:all:demo": "npm run build:template-editor && ng build shell --configuration=demo"
   },
   "private": true,
   "dependencies": {
