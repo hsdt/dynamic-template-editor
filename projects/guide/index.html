@@ -44,7 +44,11 @@
       autoHeader: false,
       subMaxLevel: 3,
       maxLevel: 4,
-      relativePath: true,
+      alias: {
+        '^/components/components/(.*)$': '/components/$1',
+        '^/patterns/patterns/(.*)$': '/patterns/$1',
+        '^/overview/overview/(.*)$': '/overview/$1'
+      },
       search: {
         namespace: 'emr-template-guide',
         paths: 'auto',
