@@ -56,3 +56,5 @@ export class Home{
 ![Context menu](./assets/menu-edit.png)
 
 🎯 Live Demo: https://hsdt.github.io/dynamic-template-editor/
+
+📘 Guide: https://hsdt.github.io/dynamic-template-editor/guide/
