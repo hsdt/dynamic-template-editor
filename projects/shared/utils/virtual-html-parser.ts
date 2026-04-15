@@ -19,6 +19,7 @@ export class VirtualHTMLParser {
     'wbr',
     'Textarea',
     'InputOTP',
+    'XmlViewer',
   ];
   static parseToTree(
     htmlString: string,

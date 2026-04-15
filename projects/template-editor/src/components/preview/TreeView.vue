@@ -1,75 +1,88 @@
 <template>
   <ul class="tree-view">
-    <template v-for="(value, key) in data">
-      <li v-if="key === '#text'" :key="key + '-text'">
-        <span
-          v-if="typeof value === 'string' && value.length > 80"
-          class="tree-value-block"
-          >{{ value }}</span
-        >
-        <span v-else class="tree-value">{{ value }}</span>
-      </li>
-      <template v-else-if="Array.isArray(value)">
-        <li v-for="(item, idx) in value" :key="key + '-' + idx">
-          <span @click="toggle(key + '-' + idx)" class="tree-key">
-            <span class="arrow" :class="{ open: isOpen(key + '-' + idx) }"
-              >▶</span
-            >
-            &lt;{{ key }}&gt;
-          </span>
-          <template v-if="isOpen(key + '-' + idx)">
-            <TreeView :data="item" />
-            <span class="tree-key tree-close">&lt;/{{ key }}&gt;</span>
+    <template v-if="Array.isArray(data)">
+      <TreeView v-for="(item, idx) in data" :key="idx" :data="item" />
+    </template>
+
+    <template v-else>
+      <template v-for="(value, key) in filteredEntries(data)" :key="key">
+        
+        <!-- COMMENT -->
+        <li v-if="key === '#comment'">
+          <span class="tree-comment">&lt;!-- {{ value }} --&gt;</span>
+        </li>
+
+        <!-- TEXT -->
+        <li v-else-if="key === '#text'">
+          <span class="tree-value">{{ value }}</span>
+        </li>
+
+        <!-- ARRAY -->
+        <li v-else-if="Array.isArray(value)">
+          <div v-for="(item, idx) in value" :key="idx">
+            <span class="tree-key">
+              <span @click="toggle(String(key) + idx)" class="arrow" :class="{ open: isOpen(String(key) + idx) }">▶</span>
+              &lt;{{ key }}{{ formatAttrs(item) }}&gt;
+            </span>
+
+            <template v-if="isOpen(String(key) + idx)">
+              <TreeView :data="item" />
+              <span class="tree-key">&lt;/{{ key }}&gt;</span>
+            </template>
+
+            <template v-else>
+              <div class="tree-key">&lt;/{{ key }}&gt;</div>
+            </template>
+          </div>
+        </li>
+
+        <!-- OBJECT -->
+        <li v-else-if="isObject(value)">
+          <template v-if="Object.keys(value).length === 0">
+            <span class="tree-key">
+              &lt;{{ key }}{{ formatAttrs(value) }}/&gt;
+            </span>
           </template>
+
+          <template v-else-if="value['#text'] && Object.keys(value).length === 1">
+            <span class="tree-key">
+              &lt;{{ key }}{{ formatAttrs(value) }}&gt;
+            </span>
+            <span class="tree-value">{{ value['#text'] }}</span>
+            <span class="tree-key">&lt;/{{ key }}&gt;</span>
+          </template>
+
           <template v-else>
-            <div class="tree-collapsed">
-              ...<br />
-              <span class="tree-key tree-close">&lt;/{{ key }}&gt;</span>
-            </div>
+            <span class="tree-key">
+              <span @click="toggle(key)" class="arrow" :class="{ open: isOpen(key) }">▶</span>
+              &lt;{{ key }}{{ formatAttrs(value) }}&gt;
+            </span>
+
+            <template v-if="isOpen(key)">
+              <TreeView :data="value" />
+              <span class="tree-key">&lt;/{{ key }}&gt;</span>
+            </template>
+
+            <template v-else>
+              <div class="tree-key">&lt;/{{ key }}&gt;</div>
+            </template>
           </template>
         </li>
-      </template>
-      <li v-else-if="isObject(value)" :key="key + '-obj'">
-        <template v-if="Object.keys(value).length === 0">
-          <span class="tree-key">&lt;{{ key }}/&gt;</span>
-        </template>
-        <template v-else-if="Object.keys(value).length === 1 && value['#text']">
+
+        <!-- VALUE -->
+        <li v-else>
           <span class="tree-key">&lt;{{ key }}&gt;</span>
-          <span class="tree-value">{{ value['#text'] }}</span>
-          <span class="tree-key tree-close">&lt;/{{ key }}&gt;</span>
-        </template>
-        <template v-else>
-          <span @click="toggle(key)" class="tree-key">
-            <span class="arrow" :class="{ open: isOpen(key) }">▶</span>
-            &lt;{{ key }}&gt;
-          </span>
-          <template v-if="isOpen(key)">
-            <TreeView :data="value" />
-            <span class="tree-key tree-close">&lt;/{{ key }}&gt;</span>
-          </template>
-          <template v-else>
-            <div class="tree-collapsed">
-              ...<br />
-              <span class="tree-key tree-close">&lt;/{{ key }}&gt;</span>
-            </div>
-          </template>
-        </template>
-      </li>
-      <li v-else :key="key + '-val'">
-        <span class="tree-key">&lt;{{ key }}&gt;:</span>
-        <span
-          v-if="typeof value === 'string' && value.length > 80"
-          class="tree-value-block"
-          >{{ value }}</span
-        >
-        <span v-else class="tree-value">{{ value }}</span>
-      </li>
+          <span class="tree-value">{{ value }}</span>
+          <span class="tree-key">&lt;/{{ key }}&gt;</span>
+        </li>
+
+      </template>
     </template>
   </ul>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, watch, onMounted } from "vue";
 
 export default defineComponent({
   name: "TreeView",
@@ -78,14 +91,65 @@ export default defineComponent({
   },
   setup(props) {
     const openKeys = ref<Record<string, boolean>>({});
+
     const isObject = (val: any) =>
       val && typeof val === "object" && !Array.isArray(val);
+
+    // Recursively collect all keys for open state
+    function collectKeys(obj: any, prefix = ""): string[] {
+      if (!obj || typeof obj !== "object") return [];
+      let keys: string[] = [];
+      for (const [key, value] of Object.entries(obj)) {
+        if (key === "@attributes") continue;
+        if (Array.isArray(value)) {
+          value.forEach((item, idx) => {
+            keys.push(prefix + key + idx);
+            keys = keys.concat(collectKeys(item, prefix + key + idx));
+          });
+        } else if (isObject(value)) {
+          keys.push(prefix + key);
+          keys = keys.concat(collectKeys(value, prefix + key));
+        }
+      }
+      return keys;
+    }
+
+    // Set all keys to open
+    function openAllKeys(data: any) {
+      const allKeys = collectKeys(data);
+      const openObj: Record<string, boolean> = {};
+      allKeys.forEach(k => { openObj[k] = true; });
+      openKeys.value = openObj;
+    }
+
+    // Watch for data changes to open all
+    watch(() => props.data, (val) => {
+      openAllKeys(val);
+    }, { immediate: true, deep: true });
+
     const isOpen = (key: string | number) => openKeys.value[String(key)];
+
     const toggle = (key: string | number) => {
       const k = String(key);
       openKeys.value[k] = !openKeys.value[k];
     };
-    return { isObject, isOpen, toggle };
+
+    const formatAttrs = (obj: any) => {
+      if (!obj || !obj['@attributes']) return '';
+      return ' ' + Object.entries(obj['@attributes'])
+        .map(([k, v]) => `${k}="${v}"`)
+        .join(' ');
+    };
+
+
+    const filteredEntries = (obj: any): Record<string, any> | any[] => {
+      if (!obj || typeof obj !== 'object') return {};
+      return Object.fromEntries(
+        Object.entries(obj).filter(([key]) => key !== '@attributes')
+      );
+    };
+
+    return { isObject, isOpen, toggle, formatAttrs, filteredEntries };
   },
 });
 </script>
@@ -94,49 +158,30 @@ export default defineComponent({
 .tree-view {
   list-style: none;
   padding-left: 18px;
-  font-family: "Fira Mono", "Consolas", "Menlo", "Monaco", monospace;
-  font-size: 16px;
+  font-family: monospace;
 }
+
 .tree-key {
-  cursor: pointer;
   color: #8e24aa;
-  user-select: none;
-  font-weight: 500;
-  transition: color 0.2s;
 }
+
 .tree-value {
   color: #333;
 }
+
 .arrow {
+  cursor: pointer;
+  user-select: none;
   display: inline-block;
   width: 1em;
-  color: #888;
-  transition:
-    transform 0.2s,
-    color 0.2s;
-  vertical-align: middle;
-  margin-right: 2px;
-  font-size: 1em;
+  transition: transform 0.2s;
 }
+
 .arrow.open {
   transform: rotate(90deg);
-  color: #8e24aa;
 }
-.tree-key {
-  display: inline-flex;
-  align-items: center;
-}
-.tree-value-block {
-  display: block;
-  background: #f8f8f8;
-  color: #444;
-  border-radius: 4px;
-  padding: 8px;
-  margin: 4px 0 4px 16px;
-  font-family: inherit;
-  font-size: 15px;
-  white-space: pre-wrap;
-  overflow-x: auto;
-  max-width: 100%;
+
+.tree-comment {
+  color: green;
 }
 </style>
