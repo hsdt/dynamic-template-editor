@@ -61,6 +61,9 @@ export class Home{
       <div>Ảnh đã lưu:</div>
       <img :src="data.signature" alt="signature" style="max-width:200px;border:1px solid #ccc;" />
     </div>
+  </PageA4>
+  <PageA4 style="padding:5mm">
+    <XmlViewer url="https://sample-files.com/downloads/data/xml/international.xml" />
   </PageA4>`;
   editMode = true;
   context = {
