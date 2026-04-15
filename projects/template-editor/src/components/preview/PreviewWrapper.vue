@@ -93,6 +93,9 @@ export default {
         <Checkbox
           size="md" v-model="hsBenhAn.NguyenNhanTuVong" value="DO_BENH" />
       </PageA4>
+      <PageA4 style="padding:5mm">
+        <XmlViewer url="http://localhost:5000/Content/Upload/2026/04/13/BA26000003_du_lieu.xml" />
+      </PageA4>
       `,
       context: {
         moment: moment,
