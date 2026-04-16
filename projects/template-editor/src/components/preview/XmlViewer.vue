@@ -1,14 +1,16 @@
 <template>
-  <div class="xml-viewer-container">
+  <div style="height: 100%;">
+    <div class="xml-viewer">
     <div v-if="loading">Đang tải...</div>
     <template v-else>
       <TreeView v-if="parsedObject" :data="parsedObject" />
     </template>
   </div>
+  </div>
 </template>
 
 <style scoped>
-.xml-viewer-container {
+.xml-viewer {
   overflow-y: auto;
   max-height: 100%;
   border-radius: 6px;
