@@ -43,14 +43,18 @@ jobs:
       working-directory: ./projects/template-editor
       run: npm ci
 
-    - name: Build all projects
-      run: npm run build:all:demo
+    - name: Build template-editor release artifact
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      run: npm run build:template-editor:shell
 
     - name: Archive template-editor build
       if: github.event_name == 'push' && github.ref == 'refs/heads/main'
       run: |
         cd dist
         zip -r "${{ steps.release_metadata.outputs.template_editor_zip_name }}" template-editor
+
+    - name: Build deploy artifacts
+      run: npm run build:all:demo
 
     - name: Copy all built files to deploy folder
       run: |
