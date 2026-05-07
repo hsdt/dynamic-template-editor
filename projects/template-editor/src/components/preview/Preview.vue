@@ -408,10 +408,10 @@ export default {
 </script>
 
 <style scoped>
-:deep([c-id="123456"]) {
+/* :deep([c-id="123456"]) {
   display: flex;
   justify-content: center;
-}
+} */
 .preview-container {
   width: 100%;
   overflow: hidden;
