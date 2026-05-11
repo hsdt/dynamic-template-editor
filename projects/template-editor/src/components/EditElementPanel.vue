@@ -69,15 +69,15 @@
     </div>
 
     <!-- Modal thêm Attribute -->
-    <div v-if="showAttributeModal" class="modal-overlay">
-      <div class="modal">
-        <div class="modal-header">
+    <div v-if="showAttributeModal" class="edit-element-modal-overlay">
+      <div class="edit-element-modal">
+        <div class="edit-element-modal-header">
           <h3>Add New Attribute</h3>
           <button @click="showAttributeModal = false" class="close-btn">
             ×
           </button>
         </div>
-        <div class="modal-body">
+        <div class="edit-element-modal-body">
           <div class="form-group">
             <label>Attribute Name</label>
             <input
@@ -105,7 +105,7 @@
           </div>
           <div v-if="availableAttributeSuggestions.length" class="suggestion-row"></div>
         </div>
-        <div class="modal-footer">
+        <div class="edit-element-modal-footer">
           <button @click="showAttributeModal = false" class="cancel-btn">
             Cancel
           </button>
@@ -449,7 +449,7 @@ export default {
 }
 
 /* Modal Styles */
-.modal-overlay {
+.edit-element-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -462,7 +462,7 @@ export default {
   z-index: 2000;
 }
 
-.modal {
+.edit-element-modal {
   background: white;
   border-radius: 8px;
   width: 400px;
@@ -470,7 +470,7 @@ export default {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
-.modal-header {
+.edit-element-modal-header {
   padding: 15px 20px;
   border-bottom: 1px solid #eee;
   display: flex;
@@ -478,16 +478,16 @@ export default {
   align-items: center;
 }
 
-.modal-header h3 {
+.edit-element-modal-header h3 {
   margin: 0;
   color: #2c3e50;
 }
 
-.modal-body {
+.edit-element-modal-body {
   padding: 20px;
 }
 
-.modal-footer {
+.edit-element-modal-footer {
   padding: 15px 20px;
   border-top: 1px solid #eee;
   display: flex;
@@ -513,7 +513,7 @@ export default {
   cursor: pointer;
 }
 
-.modal-body input {
+.edit-element-modal-body input {
   width: 95%;
   padding: 8px;
   border: 1px solid #ddd;
