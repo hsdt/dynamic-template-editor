@@ -4,58 +4,58 @@
     <ImContextMenu v-model:show="ContextMenuVisible" @update:show="unHighlightElement" :options="contextMenuOption">
       <context-menu-group label="Insert">
         <template #icon>
-          <i class="fa-solid fa-plus"></i>
+          <i class="fa fa-plus"></i>
         </template>
         <context-menu-item v-if="!isClosingTag(selectedCid)" label="Insert inside" @click="openInsertMenu('inside')">
           <template #icon>
-            <i class="fa-solid fa-arrow-turn-down"></i>
+            <i class="fa fa-level-down"></i>
           </template>
         </context-menu-item>
         <context-menu-item v-if="selectedCid != rootId" label="Insert before" @click="openInsertMenu('before')">
           <template #icon>
-            <i class="fa-solid fa-arrow-turn-up"></i>
+            <i class="fa fa-level-up"></i>
           </template>
         </context-menu-item>
         <context-menu-item v-if="selectedCid != rootId" label="Insert after" @click="openInsertMenu('after')">
           <template #icon>
-            <i class="fa-solid fa-arrow-turn-down"></i>
+            <i class="fa fa-level-down"></i>
           </template>
         </context-menu-item>
       </context-menu-group>
       <context-menu-item label="Edit" @click="openEditPanel">
         <template #icon>
-          <i class="fa-solid fa-pen-to-square"></i>
+          <i class="fa fa-pencil-square-o"></i>
         </template>
       </context-menu-item>
       <context-menu-item v-if="selectedCid != rootId" label="Copy" @click="copyElement">
         <template #icon>
-          <i class="fa-solid fa-copy"></i>
+          <i class="fa fa-copy"></i>
         </template>
       </context-menu-item>
       <context-menu-group v-if="elementCopied" label="Paste">
         <template #icon>
-          <i class="fa-solid fa-paste"></i>
+          <i class="fa fa-paste"></i>
         </template>
         <context-menu-item v-if="!isClosingTag(selectedCid)" label="Paste inside" @click="pasteElement('inside')">
           <template #icon>
-            <i class="fa-solid fa-arrow-turn-down"></i>
+            <i class="fa fa-level-down"></i>
           </template>
         </context-menu-item>
         <context-menu-item v-if="selectedCid != rootId" label="Paste before" @click="pasteElement('before')">
           <template #icon>
-            <i class="fa-solid fa-arrow-turn-up"></i>
+            <i class="fa fa-level-up"></i>
           </template>
         </context-menu-item v-if="selectedCid != rootId">
         <context-menu-item label="Paste after" @click="pasteElement('after')">
           <template #icon>
-            <i class="fa-solid fa-arrow-turn-down"></i>
+            <i class="fa fa-level-down"></i>
           </template>
         </context-menu-item>
       </context-menu-group>
 
       <context-menu-item v-if="selectedCid != rootId" label="Delete" @click="removeElement">
         <template #icon>
-          <i class="fa-solid fa-trash"></i>
+          <i class="fa fa-trash"></i>
         </template>
       </context-menu-item>
     </ImContextMenu>
