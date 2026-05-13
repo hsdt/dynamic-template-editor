@@ -21,7 +21,7 @@
       <div class="form-group" v-if="selectedNode.tagName != 'Root'">
         <label>Attributes</label>
         <template v-for="(value, key) in currentAttributes" :key="key">
-          <div class="attribute-row" v-if="String(key) != 'c-id' && String(key) != 'c-name'">
+          <div class="attribute-row" v-if="String(key) != 'c-id' && String(key) != 'c-name' && String(key) != 'path'">
             <span class="attribute-key">{{ key }}</span>
             <input
               type="text"
@@ -196,7 +196,7 @@ export default {
       const tag = this.selectedNode?.tagName ?? '';
       const specific = this.attributeSuggestionMap[tag] || this.attributeSuggestionMap[tag.toLowerCase()] || [];
       const used = new Set(Object.keys(this.currentAttributes || {}));
-      return Array.from(new Set(specific)).filter((k) => k !== 'c-id' && k !== 'c-name' && !used.has(k));
+      return Array.from(new Set(specific)).filter((k) => k !== 'c-id' && k !== 'c-name' && k !== 'path' && !used.has(k));
     },
     currentValueSuggestions(): string[] {
       const tag = this.selectedNode?.tagName ?? '';
@@ -212,7 +212,7 @@ export default {
   watch: {
     selectedNode: {
       handler(newNode) {
-        this.innerHTML = newNode?.innerHTML ?? "";
+        this.innerHTML = this.sanitizeInnerHTML(newNode?.innerHTML ?? "");
         if (newNode) {
           this.loadNodeAttributes(newNode);
         }
@@ -223,6 +223,11 @@ export default {
     loadNodeAttributes(fakeNode: VirtualNode) {
       this.currentAttributes = { ...fakeNode.attributes };
       this.originalAttributes = { ...fakeNode.attributes };
+    },
+    
+    sanitizeInnerHTML(html: string): string {
+      if (!html) return "";
+      return html.replace(/\s+(c-(id|name)|path)(\s*=\s*("[^"]*"|'[^']*'|[^\s>]+))?/gi, "");
     },
 
     updateAttributeValue(key: string, value: string) {
