@@ -18,7 +18,7 @@
       class="textarea-line"
       :class="{ 'textarea-line-none': !line }"
       v-model="input"
-      :style="[textareaStyleNormalized, { textIndent: ($slots['label'] || label) ? labelSpanWidth + 'px' : undefined, minHeight: input ? undefined : textareaHeight + 'px' }]"
+      :style="[textareaStyleNormalized, { textIndent: ($slots['label'] || label) ? labelSpanWidth + 'px' : undefined, minHeight: textareaHeight + 'px' }]"
       :placeholder="placeholder"
       :disabled="disabled"
       :readonly="readonly"
@@ -94,13 +94,26 @@ export default {
       return val.endsWith(pad) ? val.slice(0, -pad.length) : val
     }
 
+    const getSingleLineHeight = (el: HTMLTextAreaElement) => {
+      const style = window.getComputedStyle(el)
+      const lineHeight = parseFloat(style.lineHeight) || 20
+      const paddingTop = parseFloat(style.paddingTop) || 0
+      const paddingBottom = parseFloat(style.paddingBottom) || 0
+      const borderTop = parseFloat(style.borderTopWidth) || 0
+      const borderBottom = parseFloat(style.borderBottomWidth) || 0
+      return Math.max(0, Math.ceil(lineHeight + paddingTop + paddingBottom + borderTop + borderBottom - 4))
+    }
+
     // --- Init
     onMounted(() => {
       padEnd.value = computePad()
       input.value = ensurePad(normalizeValue(props.modelValue ?? ''))
       nextTick(() => {
-        textareaHeight.value = textarea.value?.offsetHeight ?? 20
-        if (textarea.value) autosize(textarea.value)
+        if (textarea.value) {
+          textareaHeight.value = getSingleLineHeight(textarea.value)
+          autosize(textarea.value)
+          autosize.update(textarea.value)
+        }
       })
     })
 
@@ -136,7 +149,6 @@ export default {
       emit('update:modelValue', stripPad(padded))
       emitFieldChange(stripPad(padded))
       nextTick(() => {
-        textareaHeight.value = textarea.value?.offsetHeight ?? textareaHeight.value
         if (textarea.value) autosize.update(textarea.value)
       })
     })
