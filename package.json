@@ -10,7 +10,8 @@
     "build:template-editor:shell": "cd projects/template-editor && vite build --mode shell",
     "build:template-editor:demo": "cd projects/template-editor && vite build --mode demo",
     "serve:template-editor": "cd dist/template-editor && npx serve -l 4202 --cors",
-    "build:all:demo": "npm run build:template-editor:demo && ng build shell --configuration=demo"
+    "build:all:demo": "npm run build:template-editor:demo && ng build shell --configuration=demo",
+    "capture:template": "cd projects/template-editor && node ./scripts/capture-template-artifacts.mjs"
   },
   "private": true,
   "dependencies": {
