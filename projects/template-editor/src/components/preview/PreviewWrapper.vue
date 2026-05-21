@@ -10,6 +10,8 @@ import "codemirror/mode/htmlmixed/htmlmixed.js"
 import '@imengyu/vue3-context-menu/lib/vue3-context-menu.css'
 import DatePickerPortal from '../forms/DatePickerPortal.vue';
 import moment from 'moment';
+// @ts-ignore - import raw HTML template
+import defaultTemplate from './default-template.html?raw';
 
 export default {
   name: 'PreviewWrapper',
@@ -17,86 +19,7 @@ export default {
   data() {
     return {
       editMode: true,
-      template: `
-      <PageA4 style="padding:3mm 15mm">
-        <div><b>Textarea</b></div>
-        <Textarea v-model="data.name" label="Họ và tên:" line :suffix="{ length:1, char:'❤️' }" />
-        <Textarea v-model="data.name" line :suffix="{ length:1, char:'❤️' }">
-          <template #label> Họ và tên: </template>
-        </Textarea>
-
-        <div><b>InputOTP</b></div>
-        <InputOTP v-model="data.age" :mask-length="[1,1,1]" pad-start="0" />
-
-        <div><b>Context menu (directive v-context-menu)</b></div>
-        <div v-for="item in contextItems" :key="item.id" v-context-menu:ctxMenu="item" style="padding:8px;border:1px dashed #aaa;margin-bottom:6px">
-          Chuột phải vào: {{ item.label }}
-        </div>
-        <ContextMenu ref="ctxMenu">
-          <template #default="{ subject }">
-            <li @click="log(subject)">Sửa</li>
-            <li @click="log(subject)">Xóa</li>
-            <li @click="log(subject)">Nhân bản</li>
-          </template>
-        </ContextMenu>
-
-        <div><b>Select one</b></div>
-        <Select v-model="data.category" label="Danh mục:" placeholder="Chọn danh mục"
-          bind-label="name" bind-value="id" :items="categoryList" :search-by-keys="['name', 'id']"/>
-
-        <div><b>Select multiple</b></div>
-        <Select v-model="data.tags" label="Tags:" placeholder="Chọn tags"
-          bind-label="label" bind-value="value" :items="tagList" multiple />
-        <div style="color:#0066cc">Tags đã chọn <b>{{ data.tags }}</b></div>
-
-        <div><b>DatePicker - Chọn ngày sinh</b></div>
-        <DatePicker label="Ngày sinh" v-model="data.birthday" placeholder="Chọn ngày sinh" format="DD/MM/YYYY"/>
-        <DatePicker v-model="data.birthday" placeholder="Chọn ngày sinh" format="DD/MM/YYYY">
-          <template #label> Ngày sinh </template>
-        </DatePicker>
-        <div style="color:#0066cc">Ngày sinh đã chọn: <b>{{ data.birthday }}</b></div>
-
-        <div><b>DatePicker - Định dạng chữ</b></div>
-        <DatePicker
-          v-model="data.birthdayText"
-          placeholder="DD tháng MM năm YYYY"
-          format="DD [tháng] MM [năm] YYYY"
-        />
-        <div style="color:#0066cc">Giá trị: <b>{{ data.birthdayText }}</b></div>
-
-        <div><b>DatePicker (datetime) - Giờ hẹn</b></div>
-        <DatePicker v-model="data.appointment" placeholder="Chọn ngày giờ"
-          format="HH:mm DD/MM/YYYY" :minute-step="15"
-        />
-        <div style="color:#0066cc">Ngày giờ đã chọn: <b>{{ data.appointment }}</b></div>
-
-        <div><b>Checkbox - Size</b></div>
-        <Checkbox v-model="data.sizeTest" value="small"  beforeText="[sm]" afterText="Small" size="sm" />
-        <Checkbox v-model="data.sizeTest" value="medium" beforeText="[md]" afterText="Medium" size="md" />
-        <Checkbox v-model="data.sizeTest" value="large"  beforeText="[lg]" afterText="Large" size="lg" />
-        <Checkbox v-model="data.sizeTest" value="xlarge" beforeText="[xl]" afterText="X-Large" size="xl" />
-
-        <div style="color:#0066cc">Giá trị: <b>{{ data.sizeTest }}</b></div>
-
-        <div><b>Paint - Chữ ký</b></div>
-        <Paint style="width:400px; height:150px;" v-model="data.signature"
-          src="https://fastly.picsum.photos/id/237/250/250.jpg?hmac=tNmO3YWXALG9JM81cghI9nflo3dWc3e5vlNsf_jmKWw"
-        />
-        <div v-if="data.signature">
-          <div>Ảnh đã lưu:</div>
-          <img :src="data.signature" alt="signature" style="max-width:200px;border:1px solid #ccc;" />
-        </div>
-
-        <div><b>Signature - Ký</b></div>
-        <Signature code="BacSi" />
-        {{hsBenhAn.NguyenNhanTuVong}}
-        <Checkbox
-          size="md" v-model="hsBenhAn.NguyenNhanTuVong" value="DO_BENH" />
-      </PageA4>
-      <PageA4 style="padding:5mm">
-        <XmlViewer url="https://sample-files.com/downloads/data/xml/international.xml" />
-      </PageA4>
-      `,
+      template: defaultTemplate,
       context: {
         moment: moment,
         log: console.log,
@@ -596,7 +519,7 @@ export default {
               "FileXML": "\\Content\\HSDT\\2025\\3\\BA25000131\\20250414020807_BA25000131_HSThongTinBenhAn_1.xml",
               "LanKySo": 1,
               "IsChuKyNhay": false,
-              "Active": true,
+              "Active": false,
               "IsChuKySo": false,
               "IsChuKyVietTay": false,
               "IdDiKemViTriKy": "0f4d0816-49f5-4d9b-b75d-374586fe44fc",

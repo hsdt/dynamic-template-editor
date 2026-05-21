@@ -1,6 +1,6 @@
 <template>
   <div class="icd-group" v-context-menu:ctxMenu="{ path, type, index }" @dblclick="onDblclick">
-    <Textarea :label="label" v-model="tenModel" :suffix="{ length: 23 }" />
+    <Textarea :label="label" v-model="tenModel" :suffix="{ length: 13 }" />
     <div class="icd-otp-wrapper">
       <InputOTP v-model="maModel" readonly />
     </div>
@@ -57,6 +57,8 @@ export default {
 </script>
 <style scoped>
 .icd-group {
+  font-family: Times New Roman, Times, serif;
+  font-size: 12pt;
   position: relative;
 }
 
