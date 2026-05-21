@@ -18,7 +18,7 @@ export class VirtualNode {
 
   get innerHTML(): string {
     if (this.tagName === '#text') {
-      return VirtualHTMLParser.vueBeautify(this.textContent);
+      return this.textContent;
     }
     return VirtualHTMLParser.vueBeautify(
       this.childNodes.map((child) => child.outerHTML).join('')
@@ -42,7 +42,7 @@ export class VirtualNode {
 
   get outerHTML() {
     if (this.tagName === '#text') {
-      return VirtualHTMLParser.vueBeautify(this.textContent);
+      return this.textContent;
     }
 
     let attrs = '';
