@@ -306,6 +306,7 @@ export default {
   background: white;
   outline: none;
   display: flex;
+  gap: 1px;
 }
 
 .active {
