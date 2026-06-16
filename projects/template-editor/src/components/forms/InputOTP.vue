@@ -10,7 +10,7 @@
       v-for="(item, i) in arrayLength"
       :key="i"
       ref="elementRefs"
-      class="input-border"
+      class="input-otp-item"
       :class="{ active: focusIndex === i && isFocused, disabled: disabled }"
       @click="setFocusIndex(i)"
     >
@@ -287,7 +287,7 @@ export default {
 </script>
 
 <style scoped>
-.input-border {
+.input-otp-item {
   height: 20px;
   padding: 0 2px;
   min-width: 22px;

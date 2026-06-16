@@ -20,23 +20,23 @@
       <!-- Thuộc tính -->
       <div class="form-group" v-if="selectedNode.tagName != 'Root'">
         <label>Attributes</label>
-        <template v-for="(value, key) in currentAttributes" :key="key">
-          <div class="attribute-row" v-if="!isInternalAttribute(String(key))">
-            <span class="attribute-key">{{ key }}</span>
+        <template v-for="attr in orderedAttributes" :key="attr.key">
+          <div class="attribute-row" v-if="!isInternalAttribute(String(attr.key))">
+            <span class="attribute-key">{{ attr.key }}</span>
             <input
               type="text"
-              :value="value"
-              @input="updateAttributeValue(String(key), ($event.target as HTMLInputElement).value)"
+              :value="attr.value"
+              @input="updateAttributeValue(String(attr.key), ($event.target as HTMLInputElement).value)"
               placeholder="Attribute value"
-              :list="getValueSuggestions(String(key)).length ? `attr-value-${String(key)}` : undefined"
+              :list="getValueSuggestions(String(attr.key)).length ? `attr-value-${String(attr.key)}` : undefined"
             />
             <datalist
-              v-if="getValueSuggestions(String(key)).length"
-              :id="`attr-value-${String(key)}`"
+              v-if="getValueSuggestions(String(attr.key)).length"
+              :id="`attr-value-${String(attr.key)}`"
             >
-              <option v-for="val in getValueSuggestions(String(key))" :key="val" :value="val" />
+              <option v-for="val in getValueSuggestions(String(attr.key))" :key="val" :value="val" />
             </datalist>
-            <button @click="removeAttribute(String(key))" class="remove-btn">×</button>
+            <button @click="removeAttribute(String(attr.key))" class="remove-btn">×</button>
           </div>
         </template>
 
@@ -120,24 +120,26 @@
 import { VirtualNode } from 'shared/utils';
 
 const attributeSuggestionMap: Record<string, string[]> = {
-  div: ['class', 'style', 'id'],
-  p: ['class', 'style'],
-  button: ['type', 'class', 'style', 'disabled'],
-  input: ['type', 'name', 'placeholder', 'value', 'disabled', 'readonly', 'required', 'min', 'max', 'step', 'pattern'],
-  textarea: ['v-model', 'name', 'placeholder', 'rows', 'cols', 'maxlength', 'disabled', 'readonly', 'required'],
-  img: ['src', 'alt', 'width', 'height', 'style', 'class'],
-  a: ['href', 'target', 'rel', 'title'],
-  select: ['name', 'multiple', 'disabled', 'required'],
-  option: ['value', 'selected', 'label'],
-  PageA4: ['style', 'class'],
-  PageA5: ['style', 'class'],
-  Textarea: ['v-model', 'type', 'label', 'line', 'suffix', 'placeholder', 'rows', 'maxlength', 'disabled', 'readonly', 'textarea-style', 'label-style', 'style', 'class'],
-  InputOTP: ['v-model', 'type', 'readonly', 'disabled', 'mask-length', 'pad-char', 'pad-start', 'style', 'class'],
-  Select: ['v-model', 'items', 'bind-label', 'bind-value', 'placeholder', 'multiple', 'disabled', 'readonly', 'label'],
-  Checkbox: ['v-model', 'value', 'before-text', 'after-text', 'size', 'disabled', 'readonly'],
-  DatePicker: ['v-model', 'placeholder', 'format', 'disabled', 'readonly', 'minute-step'],
-  Paint: ['v-model', 'line-width', 'color', 'src', 'class', 'style'],
-  Signature: ['code', 'class', 'style']
+  div: ['style', 'class', 'id'],
+  p: ['style', 'class'],
+  button: ['style', 'class', 'type', 'disabled'],
+  input: ['style', 'class', 'type', 'name', 'placeholder', 'value', 'disabled', 'readonly', 'required', 'min', 'max', 'step', 'pattern'],
+  textarea: ['style', 'class', 'v-model', 'name', 'placeholder', 'rows', 'cols', 'maxlength', 'disabled', 'readonly', 'required'],
+  img: ['style', 'class', 'src', 'alt', 'width', 'height'],
+  a: ['style', 'class', 'href', 'target', 'rel', 'title'],
+  select: ['style', 'class', 'name', 'multiple', 'disabled', 'required'],
+  option: ['style', 'class', 'value', 'selected', 'label'],
+  PageA4: ['style', 'class', 'landscape'],
+  PageA5: ['style', 'class', 'landscape'],
+  Textarea: ['style', 'class', 'v-model', 'type', 'label', 'line', 'suffix', 'placeholder', 'rows', 'maxlength', 'disabled', 'readonly', 'textarea-style'],
+  InputOTP: ['style', 'class', 'v-model', 'type', 'readonly', 'disabled', 'mask-length', 'pad-char', 'pad-start'],
+  Select: ['style', 'class', 'v-model', 'items', 'bind-label', 'bind-value', 'placeholder', 'multiple', 'disabled', 'readonly', 'label', 'search-by-keys'],
+  Checkbox: ['style', 'class', 'v-model', 'value', 'native', 'before-text', 'after-text', 'size', 'disabled', 'readonly'],
+  DatePicker: ['style', 'class', 'v-model', 'placeholder', 'format', 'disabled', 'readonly', 'minute-step', 'label', 'input-style'],
+  Paint: ['style', 'class', 'v-model', 'line-width', 'color', 'src'],
+  Signature: ['style', 'class', 'code'],
+  IcdGroupItem: ['style', 'class', 'v-model', 'type', 'index', 'label', 'v-model:ten', 'v-model:ma'],
+  IcdList: ['style', 'class', 'items', 'type']
 };
 
 type AttributeValueSuggestion = string[] | Record<string, string[]>;
@@ -192,6 +194,29 @@ export default {
     };
   },
   computed: {
+    orderedAttributes(): { key: string; value: any }[] {
+      if (!this.currentAttributes) return [];
+      const keys = Object.keys(this.currentAttributes);
+      const firstKeys: string[] = [];
+      const otherKeys: string[] = [];
+      
+      const hasStyle = keys.find(k => k.toLowerCase() === 'style');
+      const hasClass = keys.find(k => k.toLowerCase() === 'class');
+      
+      if (hasStyle) firstKeys.push(hasStyle);
+      if (hasClass) firstKeys.push(hasClass);
+      
+      for (const k of keys) {
+        if (k.toLowerCase() !== 'style' && k.toLowerCase() !== 'class') {
+          otherKeys.push(k);
+        }
+      }
+      
+      return [...firstKeys, ...otherKeys].map(key => ({
+        key,
+        value: this.currentAttributes[key]
+      }));
+    },
     availableAttributeSuggestions(): string[] {
       const tag = this.selectedNode?.tagName ?? '';
       const specific = this.attributeSuggestionMap[tag] || this.attributeSuggestionMap[tag.toLowerCase()] || [];
