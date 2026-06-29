@@ -163,6 +163,11 @@ export class VirtualHTMLParser {
         } else if (singleQuotedValue !== undefined) {
           value = singleQuotedValue;
         }
+
+        if (typeof value === 'string' && (cleanKey === 'v-model' || cleanKey.startsWith(':') || cleanKey.startsWith('v-model:'))) {
+          value = value.replace(/\?\./g, '.');
+        }
+
         attrs[cleanKey] = value;
       }
 
