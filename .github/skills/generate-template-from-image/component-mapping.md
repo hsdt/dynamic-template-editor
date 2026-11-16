@@ -1,7 +1,3 @@
----
-name: Component usage skill
----
-
 # Component Usage Skill
 
 Tài liệu này cung cấp ví dụ sử dụng và mô tả props cho các component trong thư mục `forms` và `layouts`.
@@ -13,20 +9,20 @@ Checkbox cho phép chọn hoặc bỏ chọn một giá trị. Hỗ trợ trạn
 
 ### Props
 - `modelValue`: Giá trị hiện tại của checkbox (String, Number, Boolean, null)
-- `value`: Giá trị của checkbox khi được chọn (String, Number, Boolean) **(bắt buộc)**
+- `value`: Giá trị của checkbox khi được chọn (String, Number, Boolean)
 - `native`: Bật chế độ checkbox native, `modelValue` sẽ toggle kiểu Boolean (Boolean)
 - `disabled`: Vô hiệu hóa checkbox (Boolean)
 - `readonly`: Chỉ đọc, không cho phép thay đổi (Boolean)
-- `beforeText`: Text hiển thị trước checkbox (String) hoặc slot `#beforeText`
-- `afterText`: Text hiển thị sau checkbox (String) hoặc slot `#afterText`
+- `before-text`: Text hiển thị trước checkbox (String) hoặc slot `#beforeText`
+- `after-text`: Text hiển thị sau checkbox (String) hoặc slot `#afterText`
 - `size`: Kích thước: 'sm', 'md', 'lg', 'xl' (String)
 
 ### Ví dụ
 ```vue
-<Checkbox v-model="checked" value="yes" size="md" beforeText="Chọn" afterText="Xong" />
+<Checkbox v-model="checked" value="yes" size="md" before-text="Chọn" after-text="Xong" />
 <Checkbox v-model="checked" value="1" disabled />
 <Checkbox v-model="checked" value="A" readonly size="xl" />
-<Checkbox v-model="checked" native />
+<Checkbox v-model="checked" native after-text="Đồng ý" />
 ```
 
 ---
@@ -42,13 +38,13 @@ DatePicker nhập ngày/thời gian với định dạng tùy chỉnh, hỗ tr�
 - `placeholder`: Placeholder hiển thị (String)
 - `disabled`: Vô hiệu hóa (Boolean)
 - `readonly`: Chỉ đọc (Boolean)
-- `minuteStep`: Bước phút khi chọn thời gian (Number)
+- `minute-step`: Bước phút khi chọn thời gian (Number)
 - `label`: Nhãn hiển thị (String)
 
 ### Ví dụ
 ```vue
 <DatePicker v-model="date" format="YYYY-MM-DD" label="Ngày sinh" />
-<DatePicker v-model="date" format="YYYY-MM-DD HH:mm" minuteStep="15">
+<DatePicker v-model="date" format="YYYY-MM-DD HH:mm" :minute-step="15">
   <template #label>
     <b>Ngày/giờ</b>
   </template>
@@ -75,16 +71,16 @@ Nhập mã OTP hoặc chuỗi ký tự theo pattern, hỗ trợ mask, pad, kiể
 - `type`: Kiểu nhập ('text' | 'number')
 - `readonly`: Chỉ đọc (Boolean)
 - `disabled`: Vô hiệu hóa (Boolean)
-- `maskLength`: Mảng độ dài từng ô (Array)
-- `padChar`: Ký tự pad cho từng ô (String)
-- `padStart`: Ký tự pad đầu chuỗi (String)
+- `mask-length`: Mảng độ dài từng ô (Array)
+- `pad-char`: Ký tự pad cho từng ô (String)
+- `pad-start`: Ký tự pad đầu chuỗi (String)
 - `style`: CSS style cho wrapper (String)
 - `class`: CSS class cho wrapper (String)
 
 ### Ví dụ
 ```vue
-<InputOTP v-model="otp" :maskLength="[1,1,1,1]" type="number" />
-<InputOTP v-model="otp" :maskLength="[2,2]" padChar="*" padStart="0" />
+<InputOTP v-model="otp" :mask-length="[1,1,1,1]" type="number" />
+<InputOTP v-model="otp" :mask-length="[2,2]" pad-char="*" pad-start="0" />
 <InputOTP v-model="otp" disabled />
 ```
 
@@ -96,12 +92,12 @@ Nhập mã OTP hoặc chuỗi ký tự theo pattern, hỗ trợ mask, pad, kiể
 Hiển thị một dòng chọn/chỉnh sửa mã ICD, gồm tên bệnh và mã bệnh. Component hỗ trợ mở form chọn ICD bằng double click hoặc context menu.
 
 ### Props
-- `modelValue`: Đường dẫn dữ liệu dùng cho thao tác thêm, sửa, xóa ICD, dùng với `v-model` **(bắt buộc)**
+- `v-model`: Đường dẫn dữ liệu dùng cho thao tác thêm, sửa, xóa ICD (String) **(bắt buộc)**
 - `type`: Loại ICD, mặc định `'YHHD'` (String)
 - `index`: Vị trí phần tử trong danh sách ICD, dùng khi edit/remove trong list (Number | null)
 - `label`: Nhãn hiển thị cho trường tên bệnh (String)
-- `ten`: Tên bệnh ICD, dùng với `v-model:ten` (String)
-- `ma`: Mã ICD, dùng với `v-model:ma` (String)
+- `v-model:ten`: Tên bệnh ICD (String)
+- `v-model:ma`: Mã ICD (String)
 
 ### Ví dụ
 ```vue
@@ -130,16 +126,18 @@ Hiển thị danh sách ICD. Khi danh sách rỗng, component vẫn render sẵn
 ### Props
 - `type`: Loại ICD cho các phần tử trong danh sách, mặc định `'YHHD'` (String)
 - `items`: Mảng ICD, mỗi phần tử thường có `TenVN` và `Ma` (Array)
+- `path-items`: Đường dẫn dữ liệu nguồn của mảng này, ví dụ `'data.ListIcdRaVienBenhKemTheo'` (String) **(bắt buộc để context menu thêm/xóa hoạt động)**
 
 ### Ví dụ
 ```vue
 <div>+ Bệnh kèm theo:</div>
-<IcdList :items="data.ListIcdRaVienBenhKemTheo" />
+<IcdList :items="data.ListIcdRaVienBenhKemTheo" path-items="data.ListIcdRaVienBenhKemTheo" />
 
 <div>+ ICD YHCT:</div>
 <IcdList
   type="YHCT"
   :items="data.ListIcdYHCT"
+  path-items="data.ListIcdYHCT"
 />
 ```
 

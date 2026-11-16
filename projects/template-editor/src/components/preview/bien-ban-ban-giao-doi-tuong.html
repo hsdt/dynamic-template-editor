@@ -1,0 +1,146 @@
+<PageA4 style="font-size: 12pt; line-height: 1.35; height: auto !important;">
+  <div class="row no-gutters" style="margin-bottom: 12px; font-size: 10.5pt; color: #333;">
+    <div class="col-8 font-italic">
+      QT.10.KHTH.QT Tiếp nhận và ra viện bệnh nhân lang thang
+    </div>
+    <div class="col-4 font-italic text-right" style="text-align: right;">
+      BM 10.KHTH.05
+    </div>
+  </div>
+
+  <div class="text-center" style="margin-bottom: 15px;">
+    <div class="font-weight-bold" style="font-size: 12pt;">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>
+    <div class="font-weight-bold" style="font-size: 12pt; text-decoration: underline;">Độc lập - Tự do - Hạnh phúc</div>
+  </div>
+
+  <div class="text-center font-weight-bold" style="font-size: 13pt; margin-bottom: 15px;">
+    BIÊN BẢN BÀN GIAO ĐỐI TƯỢNG
+  </div>
+
+  <div style="margin-bottom: 6px;">
+    <DatePicker label="Hôm nay: lúc" v-model="data.ThoiGianBanGiao"
+      format="HH [giờ] mm [, ngày] DD [tháng] MM [năm] YYYY"
+      placeholder="............ giờ ........ ngày........ tháng .........năm" />
+  </div>
+  <div style="margin-bottom: 6px;">
+    <Textarea label="Tại:" v-model="data.DiaDiem" line :rows="1" />
+  </div>
+  <div style="margin-top: 6px; margin-bottom: 8px;">Chúng tôi gồm:</div>
+
+  <div style="margin-bottom: 10px;">
+    <div class="font-weight-bold" style="margin-bottom: 4px;">I. Bên giao: Bệnh viện Tâm thần Đà Nẵng</div>
+    <div class="row no-gutters" style="margin-bottom: 4px;">
+      <div class="col-8">
+        <Textarea label="Ông (bà):" v-model="data.BenGiaoOngBa1" line :rows="1" />
+      </div>
+      <div class="col-4">
+        <Textarea label="Chức vụ:" v-model="data.BenGiaoChucVu1" line :rows="1" />
+      </div>
+    </div>
+    <div class="row no-gutters" style="margin-bottom: 4px;">
+      <div class="col-8">
+        <Textarea label="Ông (bà):" v-model="data.BenGiaoOngBa2" line :rows="1" />
+      </div>
+      <div class="col-4">
+        <Textarea label="Chức vụ:" v-model="data.BenGiaoChucVu2" line :rows="1" />
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-bottom: 10px;">
+    <div class="font-weight-bold" style="margin-bottom: 4px;">II. Bên nhận: Đại diện</div>
+    <div style="margin-bottom: 4px;">
+      <Textarea label="Ông (bà):" v-model="data.BenNhanOngBa1" line :rows="1" />
+    </div>
+    <div style="margin-bottom: 4px;">
+      <Textarea label="Ông (bà):" v-model="data.BenNhanOngBa2" line :rows="1" />
+    </div>
+  </div>
+
+  <div style="margin-bottom: 10px;">
+    <div style="margin-bottom: 6px;">Tiến hành lập biên bản bàn giao đối tượng tâm thần lang thang đã được điều trị bệnh ổn định nay bàn giao cho gia đình:</div>
+
+    <div style="margin-bottom: 8px;">
+      <div class="row no-gutters" style="margin-bottom: 4px;">
+        <div class="col-8">
+          <Textarea label="1. Họ và tên:" line :rows="1"
+            :modelValue="hsBenhAn?.BenhNhan?.HoTen || data.HoTen1"
+            @update:modelValue="data.HoTen1 = $event" />
+        </div>
+        <div class="col-4">
+          <Textarea label="; Sinh năm:" line :rows="1"
+            :modelValue="moment(hsBenhAn?.BenhNhan?.NgaySinh).isValid() ? moment(hsBenhAn?.BenhNhan?.NgaySinh).year() : data.NamSinh1"
+            @update:modelValue="data.NamSinh1 = $event" />
+        </div>
+      </div>
+      <Textarea label="Địa chỉ:" v-model="data.DiaChi1" line :rows="1" />
+    </div>
+
+    <div style="margin-bottom: 8px;">
+      <div class="row no-gutters" style="margin-bottom: 4px;">
+        <div class="col-8">
+          <Textarea label="2. Họ và tên:" v-model="data.HoTen2" line :rows="1" />
+        </div>
+        <div class="col-4">
+          <Textarea label="; Sinh năm:" v-model="data.NamSinh2" line :rows="1" />
+        </div>
+      </div>
+      <Textarea label="Địa chỉ:" v-model="data.DiaChi2" line :rows="1" />
+    </div>
+
+    <div style="margin-bottom: 8px;">
+      <div class="row no-gutters" style="margin-bottom: 4px;">
+        <div class="col-8">
+          <Textarea label="3. Họ và tên:" v-model="data.HoTen3" line :rows="1" />
+        </div>
+        <div class="col-4">
+          <Textarea label="; Sinh năm:" v-model="data.NamSinh3" line :rows="1" />
+        </div>
+      </div>
+      <Textarea label="Địa chỉ:" v-model="data.DiaChi3" line :rows="1" />
+    </div>
+
+    <div style="margin-bottom: 8px;">
+      <div class="row no-gutters" style="margin-bottom: 4px;">
+        <div class="col-8">
+          <Textarea label="4. Họ và tên:" v-model="data.HoTen4" line :rows="1" />
+        </div>
+        <div class="col-4">
+          <Textarea label="; Sinh năm:" v-model="data.NamSinh4" line :rows="1" />
+        </div>
+      </div>
+      <Textarea label="Địa chỉ:" v-model="data.DiaChi4" line :rows="1" />
+    </div>
+  </div>
+
+  <div style="margin-bottom: 12px;">
+    <Textarea label="Các giấy tờ liên quan kèm theo:" v-model="data.GiayToKemTheo" line :rows="3" />
+  </div>
+
+  <div style="margin-bottom: 15px;">
+    <div class="d-flex align-items-center" style="margin-bottom: 4px;">
+      <span class="text-nowrap">Biên bản kết thúc lúc&nbsp;</span>
+      <DatePicker v-model="data.ThoiGianKetThuc" format="HH [giờ] mm" placeholder="............ giờ ........."
+        style="width: 100px;" />
+      <span class="text-nowrap">&nbsp;cùng ngày.</span>
+    </div>
+    <div>Biên bản được đọc lại cho những người có liên quan nghe và ký tên dưới đây./.</div>
+  </div>
+
+  <div class="row no-gutters" style="margin-top: 15px; text-align: center;">
+    <div class="col-6">
+      <div class="font-weight-bold" style="font-size: 11pt;">BÊN GIAO</div>
+      <div class="font-italic" style="font-size: 11pt; margin-top: 2px;">(Ký, ghi rõ họ tên)</div>
+      <div style="height: 2.5cm; display: flex; align-items: center; justify-content: center;">
+        <Signature code="BenGiao" />
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="font-weight-bold" style="font-size: 11pt;">BÊN NHẬN</div>
+      <div class="font-italic" style="font-size: 11pt; margin-top: 2px;">(Ký, ghi rõ họ tên)</div>
+      <div style="height: 2.5cm; display: flex; align-items: center; justify-content: center;">
+        <Signature code="BenNhan" />
+      </div>
+    </div>
+  </div>
+</PageA4>

@@ -1,0 +1,632 @@
+<PageA4 style="font-size: 12pt; line-height: 20px;">
+  <div class="row no-gutters" style="line-height: normal;">
+    <div class="col-8">
+      <div class="row no-gutters">
+        <div class="col-5">
+          {{ hsBenhAn.BenhAnChiTietObj.CoSoTrucThuoc }}
+          <span class="input-ehr font-weight-bold text-uppercase">{{ hsBenhAn.BenhAnChiTietObj.TenBenhVien }}</span>
+        </div>
+        <div class="col-7 align-bottom font-weight-bold text-center input-ehr-xl"> BỆNH ÁN&nbsp; <span
+            class="text-uppercase" v-if="hsBenhAn.IsNgoaiTru">NGOẠI TRÚ
+          </span>
+          <span class="text-uppercase">
+            {{ hsBenhAn.LoaiBenhAn.Ten }}
+          </span>
+        </div>
+        <div class="col-11">
+          <div class="input-ehr">
+            <span>KHOA:&nbsp;<b>
+                {{ hsBenhAn.TenKhoaKham }}
+              </b>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-4">
+      <div class="input-ehr">
+        <Textarea label="Số bệnh án:" readonly :modelValue="hsBenhAn.Ma" />
+      </div>
+      <div class="input-ehr">
+        <Textarea label="Số lưu trữ:" readonly :modelValue="hsBenhAn.SoLuuTru" />
+      </div>
+      <div class="input-ehr ">
+        <Textarea label="Mã YT:" readonly :modelValue="hsBenhAn.BenhNhan.MaYTe" />
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="row no-gutters">
+      <div class="col-6">
+        <div class="d-flex" @dblclick="openPopupBuongGiuong('hsBenhAn.SoPhong', 'hsBenhAn.SoGiuong')">
+          <Textarea label="Buồng: " v-model="hsBenhAn.SoPhong" />
+          <Textarea label="Giường: " v-model="hsBenhAn.SoGiuong" />
+        </div>
+      </div>
+      <div class="col-12 d-flex justify-content-between">
+        <span class="font-weight-bold">I. HÀNH
+          CHÍNH
+        </span>
+        <div>
+          <span>Tuổi&nbsp;</span>
+          <span v-if="moment().diff(moment(hsBenhAn.BenhNhan.NgaySinh), 'years') > 0"></span>
+          <span v-else-if="moment().diff(moment(hsBenhAn.BenhNhan.NgaySinh), 'months') > 0">(tháng)</span>
+          <span v-else>(ngày)</span>
+        </div>
+      </div>
+    </div>
+    <div class="row no-gutters">
+      <div class="col-6">
+        <Textarea label="1. Họ và tên:" textareaStyle="font-weight: bold; text-transform: uppercase;"
+          v-model="hsBenhAn.BenhNhan.HoTen" />
+      </div>
+      <div class="col-5">
+        <DatePicker label="2. Sinh ngày:" v-model="hsBenhAn.BenhNhan.NgaySinh" />
+      </div>
+      <div class="col-1">
+        <div style="display: table; margin-right: 0px; margin-left: auto;">
+          <InputOTP
+            :modelValue="moment().diff(moment(hsBenhAn.BenhNhan.NgaySinh), 'years') > 0 ? moment().diff(moment(hsBenhAn.BenhNhan.NgaySinh), 'years') : moment().diff(moment(hsBenhAn.BenhNhan.NgaySinh), 'months') > 0 ? moment().diff(moment(hsBenhAn.BenhNhan.NgaySinh), 'months') : moment().diff(moment(hsBenhAn.BenhNhan.NgaySinh), 'days')"
+            :readonly="true" :maskLength="[1,1]" padStart="0"></InputOTP>
+        </div>
+      </div>
+    </div>
+    <div class="row no-gutters">
+      <div class="col-6">
+        <div class="input-ehr">
+          <span>3. Giới tính:&nbsp;</span>
+          <Checkbox v-model="hsBenhAn.BenhNhan.GioiTinh" :value="true" class="i-checks" afterText="1. Nam" />
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          <Checkbox v-model="hsBenhAn.BenhNhan.GioiTinh" :value="false" class="i-checks" afterText="2. Nữ" />
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="d-flex">
+          <Select label="4. Nghề nghiệp:" style="width: 0; flex: 1" :items="dmNgheNghiep"
+            v-model="hsBenhAn.BenhNhan.IdNgheNghiep" bindLabel="Ten" bindValue="Id"
+            :searchByKeys="['MaTuDien', 'Ten']" />
+          <InputOTP :modelValue="hsBenhAn.BenhNhan.MaNgheNghiep" :maskLength="[1,1]" readonly />
+        </div>
+      </div>
+    </div>
+    <div class="row no-gutters">
+      <div class="col-4">
+        <div class="d-flex">
+          <Select label="5. Dân tộc:" style="width: 0; flex: 1" :items="dmDanToc" v-model="hsBenhAn.BenhNhan.IdDanToc"
+            bindLabel="Ten" bindValue="Id" :searchByKeys="['MaTuDien', 'Ten']" />
+          <InputOTP :modelValue="hsBenhAn.BenhNhan.MaDanToc" :maskLength="[1,1]" readonly />
+        </div>
+      </div>
+      <div class="col-4">
+        <Textarea label="6. Trình độ học vấn:" v-model="hsBenhAn.BenhNhan.TrinhDoHocVan" />
+      </div>
+      <div class="col-4">
+        <div class="d-flex">
+          <Select label="7. Ngoại kiều:" style="width: 0; flex: 1" :items="dmQuocGia"
+            v-model="hsBenhAn.BenhNhan.IdQuocTich" bindLabel="Ten" bindValue="Id" :searchByKeys="['Ma', 'Ten']" />
+          <InputOTP :modelValue="hsBenhAn.BenhNhan.MaQuocTich" :maskLength="[1,1]" readonly />
+        </div>
+      </div>
+      <div class="col-6">
+        <Textarea label="8. Địa chỉ: Số nhà:" v-model="hsBenhAn.BenhNhan.SoNha" />
+      </div>
+      <div class="col-6">
+        <div class="d-flex">
+          <Select label="Xã, phường:" style="width: 0; flex: 1" :items="dmXaPhuong"
+            v-model="hsBenhAn.BenhNhan.IdXaPhuong" bindLabel="Ten" bindValue="Id" :searchByKeys="['Ma', 'Ten']" />
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="d-flex">
+          <Select label="Huyện (Q, TX):" style="width: 0; flex: 1" :items="dmQuanHuyen"
+            v-model="hsBenhAn.BenhNhan.IdQuanHuyen" bindLabel="Ten" bindValue="Id" :searchByKeys="['Ma', 'Ten']" />
+          <InputOTP :modelValue="hsBenhAn.BenhNhan.MaHuyen" :maskLength="[1,1]" readonly />
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="d-flex">
+          <Select label="Tỉnh, thành phố:" style="width: 0; flex: 1" :items="dmTinhThanh"
+            v-model="hsBenhAn.BenhNhan.IdTinhThanh" bindLabel="Ten" bindValue="Id" :searchByKeys="['Ma', 'Ten']" />
+          <InputOTP :modelValue="hsBenhAn.BenhNhan.MaTinh" :maskLength="[1,1,1]" readonly />
+        </div>
+      </div>
+      <div class="col-6">
+        <Textarea label="9. Nơi làm việc:" v-model="hsBenhAn.BenhNhan.NoiLamViec" />
+      </div>
+      <div class="col-6">
+        <span>10. Đối tượng:&nbsp;</span>
+        <span class="font-italic" style="font-size: 8pt;">
+          <Checkbox style="margin-right: 8px" size="md" v-model="hsBenhAn.DoiTuong" value="BHYT" afterText="BHYT" />
+          <Checkbox style="margin-right: 8px" size="md" v-model="hsBenhAn.DoiTuong" value="THU_PHI"
+            afterText="Thu phí" />
+          <Checkbox style="margin-right: 8px" size="md" v-model="hsBenhAn.DoiTuong" value="MIEN_PHI" afterText="Miễn" />
+          <Checkbox style="margin-right: 8px" size="md" v-model="hsBenhAn.DoiTuong" value="KHAC" afterText="Khác" />
+        </span>
+      </div>
+      <div class="col-6">
+        <DatePicker label="11. BHYT giá trị đến ngày:" v-model="hsBenhAn.NgayHetHanBH" />
+      </div>
+      <div class="col-6">
+        <div class="input-ehr">
+          <span>Số thẻ BHYT:&nbsp;</span>
+          <InputOTP v-model="hsBenhAn.SoBHYT" :maskLength="[2,1,2,2,3,5]" />
+        </div>
+      </div>
+    </div>
+    <div class="row no-gutters">
+      <div class="col-12">
+        <Textarea label="12. Họ tên, địa chỉ người nhà khi cần báo tin:" v-model="hsBenhAn.HoTenNguoiNha" />
+      </div>
+    </div>
+    <div class="row no-gutters">
+      <div class="col-8">
+        <Textarea v-model="hsBenhAn.DiaChiNguoiNha" />
+      </div>
+      <div class="col-4">
+        <div class="textarea-line">
+          <span></span>
+          <Textarea label="Điện thoại:" v-model="hsBenhAn.DienThoaiNguoiNha" />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="font-weight-bold">II. QUẢN LÝ NGƯỜI
+    BỆNH
+    :</div>
+  <div class="table-container" style="font-size: 11pt">
+    <div class="table-row">
+      <div class="table-cell" style="flex: 1 1 50%;">
+        <DatePicker label="13. Vào viện:" v-model="hsBenhAn.NgayVaoVien" format="HH [giờ] mm [phút, ngày] DD/MM/YYYY" />
+        <div class="input-ehr">
+          <span>14. Trực tiếp vào:&nbsp;</span>
+          <Checkbox class="font-italic text-nowrap" size="md" v-model="hsBenhAn.LoaiVaoVien" value="CAP_CUU">
+            <template #beforeText>
+              <span style="font-size: 12px;">1. Cấp
+                cứu
+              </span>
+            </template>
+          </Checkbox>
+          <Checkbox class="font-italic text-nowrap" size="md" v-model="hsBenhAn.LoaiVaoVien" value="KKB">
+            <template #beforeText>
+              <span style="font-size: 12px;">2. KKB
+              </span>
+            </template>
+          </Checkbox>
+          <Checkbox class="font-italic text-nowrap" size="md" v-model="hsBenhAn.LoaiVaoVien" value="KHOA_DIEU_TRI">
+            <template #beforeText>
+              <span style="font-size: 12px;">3.
+                Khoa
+                điều
+                trị
+              </span>
+            </template>
+          </Checkbox>
+        </div>
+      </div>
+      <div class="table-cell" style="flex: 1 1 50%;">
+        <div class="input-ehr">
+          <span>15.Nơi giới thiệu:&nbsp;</span>
+          <Checkbox class="font-italic text-nowrap" size="md" v-model="hsBenhAn.NoiGioiThieu" value="CO_QUAN_YTE">
+            <template #beforeText>
+              <span style="font-size: 12px;">1. Cơ
+                quan
+                y
+                tế
+              </span>
+            </template>
+          </Checkbox>
+          <Checkbox class="font-italic text-nowrap" size="md" v-model="hsBenhAn.NoiGioiThieu" value="TU_DEN">
+            <template #beforeText>
+              <span style="font-size: 12px;">2. Tự
+                đến
+              </span>
+            </template>
+          </Checkbox>
+          <Checkbox class="font-italic text-nowrap" size="md" v-model="hsBenhAn.NoiGioiThieu" value="KHAC">
+            <template #beforeText>
+              <span style="font-size: 12px;">3.
+                Khác
+              </span>
+            </template>
+          </Checkbox>
+        </div>
+        <div class="input-ehr">
+          <span>- Vào viện do bệnh này lần thứ:
+          </span>
+          <InputOTP v-model="hsBenhAn.LanVaoVienDoBenhNay" :maskLength="[1]" />
+        </div>
+      </div>
+    </div>
+    <div class="table-row">
+      <div class="table-cell" style="flex: 1 1 50%">
+        <div class="row no-gutters">
+          <div class="col-7"></div>
+          <div class="col-5" style="font-size:11px">
+            Ngày/Tháng/Năm | Số ngày ĐT</div>
+        </div>
+        <div class="row no-gutters">
+          <div class="col-3">
+            <span style="white-space: nowrap;">16.
+              Vào
+              khoa:&nbsp;</span>
+          </div>
+          <div class="col-9">
+            <div class="input-ehr">
+              <div class="d-flex" style="width: 115px;">
+                <Textarea textareaStyle="font-size: 11pt;"
+                  :modelValue="hsBenhAn.MaKhoaBanDau + ' - ' + hsBenhAn.TenKhoaBanDau" disabled />
+              </div>
+              <span style="font-size: 10pt; line-height: 25px; white-space: nowrap;">
+                {{moment(hsBenhAn.NgayVaoKhoa).format('HH:mm DD/MM/YYYY')}}
+              </span>
+              <InputOTP v-model="hsBenhAn.BenhAnChiTietObj.SoNgayDieuTriKhoaDau" :maskLength="[1,1]" />
+            </div>
+          </div>
+        </div>
+        <div class="row no-gutters" style="margin-top: 2px;">
+          <div class="col-3">17. Chuyển khoa</div>
+          <div class="col-9">
+            <template v-for="(item, index) in hsBenhAn.DSChuyenKhoa" :key="index">
+              <div class="input-ehr">
+                <div class="d-flex" style="width: 115px;">
+                  <Textarea textareaStyle="font-size: 11pt;" :modelValue="item.MaKhoa + ' - ' + item.TenKhoaKham"
+                    disabled />
+                </div>
+                <span style="font-size: 10pt; line-height: 25px">
+                  {{moment(item.NgayChuyen).format('HH:mm DD/MM/YYYY')}}
+                </span>
+                <InputOTP v-model="item.SoNgayDieuTri" :maskLength="[1,1]" />
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+      <div class="table-cell" style="flex: 1 1 50%;">
+        <div class="input-ehr">
+          <span>18.Chuyển viện:&nbsp;</span>
+          <Checkbox class="font-italic text-nowrap" size="md" v-model="hsBenhAn.ChuyenVien" value="TUYEN_TREN">
+            <template #beforeText>
+              <span style="font-size: 12px;">1.
+                Tuyến
+                trên
+              </span>
+            </template>
+          </Checkbox>
+          <Checkbox class="font-italic text-nowrap" size="md" v-model="hsBenhAn.ChuyenVien" value="TUYEN_DUOI">
+            <template #beforeText>
+              <span style="font-size: 12px;">2.
+                Tuyến
+                dưới
+              </span>
+            </template>
+          </Checkbox>
+          <Checkbox class="font-italic text-nowrap" size="md" v-model="hsBenhAn.ChuyenVien" value="CK">
+            <template #beforeText>
+              <span style="font-size: 12px;">3. CK
+              </span>
+            </template>
+          </Checkbox>
+        </div>
+        <Textarea label="- Chuyển đến:" v-model="hsBenhAn.TenVienChuyenToi" />
+        <DatePicker label="19. Ra viện" format="HH [giờ] mm [phút, ngày] DD/MM/YYYY" v-model="hsBenhAn.NgayRaVien" />
+        <div class="input-ehr">
+          <Checkbox class="font-italic text-nowrap" size="md" v-model="hsBenhAn.LoaiRaVien" value="RA_VIEN">
+            <template #beforeText>
+              <span style="font-size: 12px;">1. Ra
+                viện
+              </span>
+            </template>
+          </Checkbox>
+          <Checkbox class="font-italic text-nowrap" size="md" v-model="hsBenhAn.LoaiRaVien" value="XIN_VE">
+            <template #beforeText>
+              <span style="font-size: 12px;">2. Xin
+                về
+              </span>
+            </template>
+          </Checkbox>
+          <Checkbox class="font-italic text-nowrap" size="md" v-model="hsBenhAn.LoaiRaVien" value="BO_VE">
+            <template #beforeText>
+              <span style="font-size: 12px;">3. Bỏ
+                về
+              </span>
+            </template>
+          </Checkbox>
+          <Checkbox class="font-italic text-nowrap" size="md" v-model="hsBenhAn.LoaiRaVien" value="DUA_VE">
+            <template #beforeText>
+              <span style="font-size: 12px;">4. Đưa
+                về
+              </span>
+            </template>
+          </Checkbox>
+        </div>
+        <div class="icd-group">
+          <Textarea label="20. Tổng số ngày điều trị:" :modelValue="hsBenhAn.TongSoNgayDieuTri" readonly />
+          <InputOTP :maskLength="[1,1,1]" :modelValue="hsBenhAn.TongSoNgayDieuTri" padStart="0" readonly />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="font-weight-bold">III. CHẨN ĐOÁN :
+  </div>
+  <div class="table-container" style="font-size: 11pt">
+    <div class="table-row">
+      <div class="table-cell" style="flex: 1 1 50%">
+        <IcdGroupItem label="21. Nơi chuyển đến" v-model="hsBenhAn.BenhAnChiTietObj.IcdNoiChuyenDen"
+          v-model:ten="hsBenhAn.BenhAnChiTietObj.IcdNoiChuyenDenTen"
+          v-model:ma="hsBenhAn.BenhAnChiTietObj.IcdNoiChuyenDenMa" />
+        <IcdGroupItem label="22. Cấp cứu, KKB:" v-model="hsBenhAn.BenhAnChiTietObj.IcdKKBCC"
+          v-model:ten="hsBenhAn.BenhAnChiTietObj.IcdKKBCCTen" v-model:ma="hsBenhAn.BenhAnChiTietObj.IcdKKBCCMa" />
+        <IcdGroupItem label="23. Khoa điều trị:" v-model="hsBenhAn.BenhAnChiTietObj.IcdVaoKhoaDieuTri"
+          v-model:ten="hsBenhAn.BenhAnChiTietObj.IcdVaoKhoaDieuTriTen"
+          v-model:ma="hsBenhAn.BenhAnChiTietObj.IcdVaoKhoaDieuTriMa" />
+        <div class="input-ehr">
+          <Checkbox size="md" v-model="hsBenhAn.CoThuThuat" :value="true" beforeText="- Thủ thuật" native />
+          <Checkbox size="md" v-model="hsBenhAn.CoPhauThuat" :value="true" beforeText="- Phẫu thuật" native />
+        </div>
+      </div>
+      <div class="table-cell" style="flex: 1 1 50%">
+        <div>24. Ra viện:</div>
+        <IcdGroupItem label="+ Bệnh chính:" v-model="hsBenhAn.BenhAnChiTietObj.IcdRaVienBenhChinh"
+          v-model:ten="hsBenhAn.BenhAnChiTietObj.IcdRaVienBenhChinhTen"
+          v-model:ma="hsBenhAn.BenhAnChiTietObj.IcdRaVienBenhChinhMa" />
+        <div>+ Bệnh kèm theo:</div>
+        <IcdList :items="hsBenhAn.BenhAnChiTietObj.ListIcdRaVienBenhKemTheo" />
+        <div class="input-ehr">
+          <Checkbox size="md" v-model="hsBenhAn.CoTaiBien" :value="true" beforeText="- Tai biến: " native />
+          <Checkbox size="md" v-model="hsBenhAn.CoBienChung" :value="true" beforeText="- Biến chứng:" native />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="font-weight-bold">IV. TÌNH TRẠNG RA
+    VIỆN
+    :</div>
+  <div class="table-container" style="font-size: 11pt">
+    <div class="table-row">
+      <div class="table-cell" style="flex: 1 1 40%">
+        <div>25.Kết quả điều trị</div>
+        <div class="row no-gutters">
+          <div class="col-6 pr-1">
+            <Checkbox class="font-italic d-flex justify-content-between align-items-start" size="md"
+              v-model="hsBenhAn.KetQuaDieuTri" value="KHOI">
+              <template #beforeText>
+                <span style="font-size: 12px;">1.
+                  Khỏi
+                </span>
+              </template>
+            </Checkbox>
+          </div>
+          <div class="col-6">
+            <Checkbox class="font-italic d-flex justify-content-between align-items-start" size="md"
+              v-model="hsBenhAn.KetQuaDieuTri" value="DO_GIAM">
+              <template #beforeText>
+                <span style="font-size: 12px;">2.
+                  Đỡ
+                  giảm
+                </span>
+              </template>
+            </Checkbox>
+          </div>
+          <div class="col-6 pr-1">
+            <Checkbox class="font-italic d-flex justify-content-between align-items-start" size="md"
+              v-model="hsBenhAn.KetQuaDieuTri" value="KHONG_THAY_DOI">
+              <template #beforeText>
+                <span style="font-size: 12px;">3.
+                  Không
+                  thay
+                  đổi
+                </span>
+              </template>
+            </Checkbox>
+          </div>
+          <div class="col-6">
+            <Checkbox class="font-italic d-flex justify-content-between align-items-start" size="md"
+              v-model="hsBenhAn.KetQuaDieuTri" value="NANG_HON">
+              <template #beforeText>
+                <span style="font-size: 12px;">4.
+                  Nặng
+                  hơn
+                </span>
+              </template>
+            </Checkbox>
+          </div>
+          <div class="col-6 pr-1">
+            <Checkbox class="font-italic d-flex justify-content-between align-items-start" size="md"
+              v-model="hsBenhAn.KetQuaDieuTri" value="TU_VONG">
+              <template #beforeText>
+                <span style="font-size: 12px;">5.
+                  Tử
+                  vong
+                  tại
+                  cơ
+                  sở
+                  KBCB</span>
+              </template>
+            </Checkbox>
+          </div>
+          <div class="col-6">
+            <Checkbox class="font-italic d-flex justify-content-between align-items-start" size="md"
+              v-model="hsBenhAn.KetQuaDieuTri" value="TIEN_LUONG_NANG">
+              <template #beforeText>
+                <span style="font-size: 12px;">6.
+                  Tiên
+                  lượng
+                  nặng
+                  xin về</span>
+              </template>
+            </Checkbox>
+          </div>
+          <div class="col-6 pr-1">
+            <Checkbox class="font-italic d-flex justify-content-between align-items-start" size="md"
+              v-model="hsBenhAn.KetQuaDieuTri" value="CHUA_XAC_DINH">
+              <template #beforeText>
+                <span style="font-size: 12px;">7.
+                  Chưa
+                  xác
+                  định
+                </span>
+              </template>
+            </Checkbox>
+          </div>
+          <div class="col-6">
+            <Checkbox class="font-italic d-flex justify-content-between align-items-start" size="md"
+              v-model="hsBenhAn.KetQuaDieuTri" value="TV_NGOAI_VIEN">
+              <template #beforeText>
+                <span style="font-size: 12px;">8.
+                  Tử
+                  vong
+                  ngoại
+                  viện</span>
+              </template>
+            </Checkbox>
+          </div>
+          <div class="col-12">
+            <div>25. Giải phẫu bệnh (khi có sinh
+              thiết):
+            </div>
+            <div class="row no-gutters">
+              <div class="col-4">
+                <Checkbox class="font-italic d-flex align-items-start" size="md" v-model="hsBenhAn.GiaiPhauBenh"
+                  value="LANH_TINH">
+                  <template #beforeText>
+                    <span style="font-size: 12px;">
+                      1.
+                      Lành
+                      tính
+                    </span>
+                  </template>
+                </Checkbox>
+              </div>
+              <div class="col-4">
+                <Checkbox class="font-italic d-flex align-items-start" size="md" v-model="hsBenhAn.GiaiPhauBenh"
+                  value="NGHI_NGO">
+                  <template #beforeText>
+                    <span style="font-size: 12px;">
+                      2.
+                      Nghi
+                      ngờ
+                    </span>
+                  </template>
+                </Checkbox>
+              </div>
+              <div class="col-4">
+                <Checkbox class="font-italic d-flex align-items-start" size="md" v-model="hsBenhAn.GiaiPhauBenh"
+                  value="AC_TINH">
+                  <template #beforeText>
+                    <span style="font-size: 12px;">
+                      3.
+                      Ác
+                      tính
+                    </span>
+                  </template>
+                </Checkbox>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="table-cell" style="flex: 1 1 60%">
+        <DatePicker label="26. Tình hình tử vong:" v-model="hsBenhAn.GioTuVong"
+          format="HH [giờ] mm [phút, ngày] DD/MM/YYYY" />
+        <div class="row no-gutters">
+          <div class="col-4">
+            <Checkbox class="font-italic d-flex align-items-start justify-content-between" size="md"
+              v-model="hsBenhAn.NguyenNhanTuVong" value="DO_BENH">
+              <template #beforeText>
+                <span style="font-size: 12px;">1.
+                  Do
+                  bệnh
+                </span>
+              </template>
+            </Checkbox>
+          </div>
+          <div class="col-4">
+            <Checkbox class="font-italic d-flex align-items-start justify-content-between" size="md"
+              v-model="hsBenhAn.NguyenNhanTuVong" value="DO_TAI_BIEN_DIEU_TRI">
+              <template #beforeText>
+                <span style="font-size: 12px;">2.
+                  Do
+                  tai
+                  biến
+                  điều
+                  trị</span>
+              </template>
+            </Checkbox>
+          </div>
+          <div class="col-4">
+            <Checkbox class="font-italic d-flex align-items-start justify-content-between" size="md"
+              v-model="hsBenhAn.NguyenNhanTuVong" value="KHAC">
+              <template #beforeText>
+                <span style="font-size: 12px;">3.
+                  Khác
+                </span>
+              </template>
+            </Checkbox>
+          </div>
+        </div>
+        <div class="row no-gutters">
+          <div class="col-4">
+            <Checkbox class="font-italic d-flex align-items-start justify-content-between" size="md"
+              v-model="hsBenhAn.ThoiGianTuVong" value="TRONG_24H">
+              <template #beforeText>
+                <span style="font-size: 12px;">
+                  1.Trong
+                  24
+                  h
+                  vào
+                  viện</span>
+              </template>
+            </Checkbox>
+          </div>
+          <div class="col-4">
+            <Checkbox class="font-italic d-flex align-items-start justify-content-between" size="md"
+              v-model="hsBenhAn.ThoiGianTuVong" value="TRONG_48H">
+              <template #beforeText>
+                <span style="font-size: 12px;">
+                  2.Trong
+                  48
+                  h
+                  vào
+                  viện</span>
+              </template>
+            </Checkbox>
+          </div>
+          <div class="col-4">
+            <Checkbox class="font-italic d-flex align-items-start justify-content-between" size="md"
+              v-model="hsBenhAn.ThoiGianTuVong" value="TRONG_72H">
+              <template #beforeText>
+                <span style="font-size: 12px;">
+                  3.Trong
+                  72
+                  h
+                  vào
+                  viện</span>
+              </template>
+            </Checkbox>
+          </div>
+        </div>
+        <IcdGroupItem label="27. Nguyên nhân chính tử vong:" v-model="hsBenhAn.BenhAnChiTietObj.IcdTuVong"
+          v-model:ten="hsBenhAn.BenhAnChiTietObj.IcdTuVongTen" v-model:ma="hsBenhAn.BenhAnChiTietObj.IcdTuVongMa" />
+        <Checkbox class="d-flex align-items-start" v-model="hsBenhAn.coKhamNghiemTuThi" :value="true"
+          beforeText="28. Khám nghiệm tử thi:" />
+        <IcdGroupItem label="29. Chẩn đoán giải phẫu tử thi:" v-model="hsBenhAn.BenhAnChiTietObj.IcdKhamNghiemTuThi"
+          v-model:ten="hsBenhAn.BenhAnChiTietObj.IcdKhamNghiemTuThiTen"
+          v-model:ma="hsBenhAn.BenhAnChiTietObj.IcdKhamNghiemTuThiMa" />
+      </div>
+    </div>
+  </div>
+  <div class="row no-gutters">
+    <div class="col-6 offset-6">
+      <DatePicker v-model="hsBenhAn.BenhAnChiTietObj.NgayKyTTBA" format="[Ngày] DD [tháng] MM [năm] YYYY"
+        inputStyle="text-align: center" />
+    </div>
+    <div class="col-6">
+      <div class="text-center font-weight-bold" style="font-size: 13.5pt">Giám đốc</div>
+      <Signature code="GiamDoc" />
+    </div>
+    <div class="col-6">
+      <div class="text-center font-weight-bold" style="font-size: 13.5pt">Trưởng khoa</div>
+      <Signature code="TruongKhoa" />
+    </div>
+  </div>
+</PageA4>

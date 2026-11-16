@@ -1,0 +1,505 @@
+<PageA4 style="padding: 10mm 14mm 10mm 16mm; font-size: 10.5pt; line-height: 1.3; height: auto !important;">
+  <!-- Header -->
+  <div class="row no-gutters" style="margin-bottom: 6px;">
+    <div class="col-5 text-center">
+      <div class="font-weight-bold" style="font-size: 10.5pt; line-height: 1.25;">
+        <div>SỞ Y TẾ TP ĐÀ NẴNG</div>
+        <div>BỆNH VIỆN TÂM THẦN ĐÀ NẴNG</div>
+      </div>
+      <div style="margin-top: 4px; text-align: left; padding-left: 8px;">
+        <Textarea label="Khoa:" :modelValue="hsBenhAn.TenKhoaKham" line :rows="1" />
+      </div>
+    </div>
+
+    <div class="col-7 text-center" style="padding: 0 4px;">
+      <div class="font-weight-bold" style="font-size: 12pt; line-height: 1.25;">
+        PHIẾU ĐÁNH GIÁ TÌNH TRẠNG DINH DƯỠNG
+      </div>
+      <div class="font-italic" style="font-size: 10.5pt; margin-top: 2px;">
+        (Dùng cho người bệnh &gt; 18 tuổi, không mang thai)
+      </div>
+      <div style="margin-top: 4px; text-align: left; padding-left: 20px;">
+        <Textarea label="Số phiếu:" v-model="data.SoPhieu" line :rows="1" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Thông tin hành chính -->
+  <div class="row no-gutters" style="margin-bottom: 2px;">
+    <div class="col-5">
+      <Textarea label="Họ tên người bệnh:" :modelValue="hsBenhAn.BenhNhan.HoTen"
+        textareaStyle="font-weight: bold; text-transform: uppercase;" line :rows="1" />
+    </div>
+    <div class="col-3" style="padding-left: 4px;">
+      <Textarea label="Năm sinh:" :modelValue="moment(hsBenhAn.BenhNhan.NgaySinh).year()"
+        textareaStyle="font-weight: bold;" line :rows="1" />
+    </div>
+    <div class="col-2" style="padding-left: 4px;">
+      <Textarea label="Tuổi:" :modelValue="hsBenhAn.Tuoi"
+        textareaStyle="font-weight: bold;" line :rows="1" />
+    </div>
+    <div class="col-2" style="padding-left: 4px;">
+      <Textarea label="Giới tính:" :modelValue="hsBenhAn.BenhNhan.GioiTinh ? 'Nam' : 'Nữ'"
+        textareaStyle="font-weight: bold;" line :rows="1" />
+    </div>
+  </div>
+
+  <div style="margin-bottom: 2px;">
+    <Textarea label="Chẩn đoán:" :modelValue="hsBenhAn.ChanDoan"
+      textareaStyle="font-weight: bold;" line :rows="1" />
+  </div>
+
+  <div class="row no-gutters align-items-center" style="margin-bottom: 6px;">
+    <div class="col-4">
+      <div class="d-flex align-items-center">
+        <span class="text-nowrap">Cân nặng vào viện:&nbsp;</span>
+        <Textarea v-model="hsBenhAn.CanNang" line :rows="1" style="width: 55px;"
+          textareaStyle="text-align: center; font-weight: bold;" />
+        <span class="text-nowrap">&nbsp;kg</span>
+      </div>
+    </div>
+    <div class="col-4">
+      <div class="d-flex align-items-center">
+        <span class="text-nowrap">Chiều cao:&nbsp;</span>
+        <Textarea v-model="hsBenhAn.ChieuCao" line :rows="1" style="width: 55px;"
+          textareaStyle="text-align: center; font-weight: bold;" />
+        <span class="text-nowrap">&nbsp;cm</span>
+      </div>
+    </div>
+    <div class="col-4">
+      <Textarea label="Chỉ số khối cơ thể BMI:"
+        :modelValue="hsBenhAn.CanNang && hsBenhAn.ChieuCao ? (Number(hsBenhAn.CanNang) / Math.pow(Number(hsBenhAn.ChieuCao) / 100, 2)).toFixed(1) : (data.BMI || '')"
+        @update:modelValue="data.BMI = $event"
+        textareaStyle="font-weight: bold;" line :rows="1" />
+    </div>
+  </div>
+
+  <!-- 1. Sàng lọc nguy cơ suy dinh dưỡng -->
+  <div class="font-weight-bold" style="margin-bottom: 3px;">
+    1. Sàng lọc nguy cơ suy dinh dưỡng
+  </div>
+
+  <table class="table table-bordered" style="width: 100%; border: 1px solid #000; border-collapse: collapse; margin-bottom: 6px; font-size: 10pt;">
+    <thead>
+      <tr class="text-center font-weight-bold">
+        <th style="width: 50%; border: 1px solid #000; padding: 2px 6px;">Yếu tố nguy cơ</th>
+        <th style="width: 25%; border: 1px solid #000; padding: 2px 6px;">Có</th>
+        <th style="width: 25%; border: 1px solid #000; padding: 2px 6px;">Không</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="border: 1px solid #000; padding: 2px 8px;">BMI &gt; 20,5 kg/m<sup>2</sup></td>
+        <td style="border: 1px solid #000; padding: 2px 6px; text-align: center;">
+          <div class="d-flex justify-content-center">
+            <Checkbox size="sm" v-model="data.SangLoc_BMI" value="co" />
+          </div>
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 6px; text-align: center;">
+          <div class="d-flex justify-content-center">
+            <Checkbox size="sm" v-model="data.SangLoc_BMI" value="khong" />
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #000; padding: 2px 8px;">Sụt cân trong 1 tháng qua</td>
+        <td style="border: 1px solid #000; padding: 2px 6px; text-align: center;">
+          <div class="d-flex justify-content-center">
+            <Checkbox size="sm" v-model="data.SangLoc_SutCan" value="co" />
+          </div>
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 6px; text-align: center;">
+          <div class="d-flex justify-content-center">
+            <Checkbox size="sm" v-model="data.SangLoc_SutCan" value="khong" />
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #000; padding: 2px 8px;">Lượng ăn sụt giảm trong tuần qua</td>
+        <td style="border: 1px solid #000; padding: 2px 6px; text-align: center;">
+          <div class="d-flex justify-content-center">
+            <Checkbox size="sm" v-model="data.SangLoc_LuongAn" value="co" />
+          </div>
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 6px; text-align: center;">
+          <div class="d-flex justify-content-center">
+            <Checkbox size="sm" v-model="data.SangLoc_LuongAn" value="khong" />
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #000; padding: 2px 8px;">Bệnh nặng hạn chế đi lại</td>
+        <td style="border: 1px solid #000; padding: 2px 6px; text-align: center;">
+          <div class="d-flex justify-content-center">
+            <Checkbox size="sm" v-model="data.SangLoc_BenhNang" value="co" />
+          </div>
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 6px; text-align: center;">
+          <div class="d-flex justify-content-center">
+            <Checkbox size="sm" v-model="data.SangLoc_BenhNang" value="khong" />
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #000; padding: 2px 8px;">
+          <b>Kết luận: Nguy cơ suy dinh dưỡng</b> (Khi có ít nhất &ge; 1 yếu tố nguy cơ)
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 6px; text-align: center;">
+          <div class="d-flex justify-content-center">
+            <Checkbox size="sm" v-model="data.SangLoc_KetLuan" value="co" />
+          </div>
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 6px; text-align: center;">
+          <div class="d-flex justify-content-center">
+            <Checkbox size="sm" v-model="data.SangLoc_KetLuan" value="khong" />
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #000; padding: 2px 8px;">
+          <b>Chỉ định</b>
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 6px; text-align: center;">
+          <div class="d-flex justify-content-center">
+            <Checkbox size="sm" v-model="data.SangLoc_ChiDinh" value="co" />
+          </div>
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 6px; text-align: center;">
+          <div class="d-flex justify-content-center">
+            <Checkbox size="sm" v-model="data.SangLoc_ChiDinh" value="khong" />
+          </div>
+        </td>
+      </tr>
+      <tr class="text-center font-weight-bold">
+        <td style="border: 1px solid #000; padding: 2px 8px;"></td>
+        <td style="border: 1px solid #000; padding: 2px 6px;">Tái sàng lọc sau 1 tuần</td>
+        <td style="border: 1px solid #000; padding: 2px 6px;">Đánh giá tình trạng dinh dưỡng</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 2. Đánh giá tình trạng dinh dưỡng -->
+  <div class="font-weight-bold" style="margin-bottom: 3px;">
+    2. Đánh giá tình trạng dinh dưỡng
+  </div>
+
+  <table class="table table-bordered" style="width: 100%; border: 1px solid #000; border-collapse: collapse; margin-bottom: 6px; font-size: 10pt;">
+    <tbody>
+      <!-- BMI -->
+      <tr>
+        <td rowspan="3" style="width: 22%; border: 1px solid #000; padding: 2px 6px; text-align: center; vertical-align: middle;">
+          Chỉ số khối cơ thể (BMI)
+        </td>
+        <td style="width: 52%; border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          &ge; 20,5 kg/m<sup>2</sup>
+        </td>
+        <td style="width: 26%; border: 1px solid #000; padding: 2px 8px; vertical-align: middle;">
+          <Checkbox size="sm" v-model="data.DanhGia_BMI" value="0">
+            <template #afterText><span style="margin-left: 5px;">0 điểm</span></template>
+          </Checkbox>
+        </td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          15 - 20,4 kg/m<sup>2</sup>
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; vertical-align: middle;">
+          <Checkbox size="sm" v-model="data.DanhGia_BMI" value="1">
+            <template #afterText><span style="margin-left: 5px;">1 điểm</span></template>
+          </Checkbox>
+        </td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          &lt; 15,5 kg/m<sup>2</sup>
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; vertical-align: middle;">
+          <Checkbox size="sm" v-model="data.DanhGia_BMI" value="2">
+            <template #afterText><span style="margin-left: 5px;">2 điểm</span></template>
+          </Checkbox>
+        </td>
+      </tr>
+
+      <!-- Sụt cân -->
+      <tr>
+        <td rowspan="3" style="border: 1px solid #000; padding: 2px 6px; text-align: center; vertical-align: middle;">
+          Sụt cân
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          Không sụt cân
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; vertical-align: middle;">
+          <Checkbox size="sm" v-model="data.DanhGia_SutCan" value="0">
+            <template #afterText><span style="margin-left: 5px;">0 điểm</span></template>
+          </Checkbox>
+        </td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          5,9% - 9,9% trong 1 tháng qua
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; vertical-align: middle;">
+          <Checkbox size="sm" v-model="data.DanhGia_SutCan" value="1">
+            <template #afterText><span style="margin-left: 5px;">1 điểm</span></template>
+          </Checkbox>
+        </td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          &ge; 10% trong 1 tháng qua
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; vertical-align: middle;">
+          <Checkbox size="sm" v-model="data.DanhGia_SutCan" value="2">
+            <template #afterText><span style="margin-left: 5px;">2 điểm</span></template>
+          </Checkbox>
+        </td>
+      </tr>
+
+      <!-- Lượng ăn -->
+      <tr>
+        <td rowspan="3" style="border: 1px solid #000; padding: 2px 6px; text-align: center; vertical-align: middle;">
+          Lượng ăn
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          Không giảm hoặc được giảm nhẹ
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; vertical-align: middle;">
+          <Checkbox size="sm" v-model="data.DanhGia_LuongAn" value="0">
+            <template #afterText><span style="margin-left: 5px;">0 điểm</span></template>
+          </Checkbox>
+        </td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          Giảm &ge; 50% trong tuần qua
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; vertical-align: middle;">
+          <Checkbox size="sm" v-model="data.DanhGia_LuongAn" value="1">
+            <template #afterText><span style="margin-left: 5px;">1 điểm</span></template>
+          </Checkbox>
+        </td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          Giảm &ge; 75% trong tuần qua
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; vertical-align: middle;">
+          <Checkbox size="sm" v-model="data.DanhGia_LuongAn" value="2">
+            <template #afterText><span style="margin-left: 5px;">2 điểm</span></template>
+          </Checkbox>
+        </td>
+      </tr>
+
+      <!-- Bệnh lý -->
+      <tr>
+        <td rowspan="3" style="border: 1px solid #000; padding: 2px 6px; text-align: center; vertical-align: middle;">
+          Bệnh lý
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          Bệnh nhẹ - trung bình
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; vertical-align: middle;">
+          <Checkbox size="sm" v-model="data.DanhGia_BenhLy" value="0">
+            <template #afterText><span style="margin-left: 5px;">0 điểm</span></template>
+          </Checkbox>
+        </td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          Bệnh nặng (phẫu thuật, TBMMN, nhiễm trùng nặng như ung thư,...)
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; vertical-align: middle;">
+          <Checkbox size="sm" v-model="data.DanhGia_BenhLy" value="1">
+            <template #afterText><span style="margin-left: 5px;">1 điểm</span></template>
+          </Checkbox>
+        </td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          Bệnh rất nặng (chấn thương nặng, chăm sóc tích cực...)
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; vertical-align: middle;">
+          <Checkbox size="sm" v-model="data.DanhGia_BenhLy" value="2">
+            <template #afterText><span style="margin-left: 5px;">2 điểm</span></template>
+          </Checkbox>
+        </td>
+      </tr>
+
+      <!-- Kết luận -->
+      <tr class="font-weight-bold">
+        <td rowspan="2" style="border: 1px solid #000; padding: 2px 6px; text-align: center; vertical-align: middle;">
+          Kết luận
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          &lt; 2 điểm
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; vertical-align: middle;">
+          <Checkbox size="sm" v-model="data.KetLuanSDD" value="khong">
+            <template #afterText><span style="margin-left: 5px;">Không SDD</span></template>
+          </Checkbox>
+        </td>
+      </tr>
+      <tr class="font-weight-bold">
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          &ge; 2 điểm
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; vertical-align: middle;">
+          <Checkbox size="sm" v-model="data.KetLuanSDD" value="co">
+            <template #afterText><span style="margin-left: 5px;">Suy dinh dưỡng</span></template>
+          </Checkbox>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 3. Kế hoạch can thiệp -->
+  <div class="font-weight-bold" style="margin-bottom: 3px;">
+    3. Kế hoạch can thiệp
+  </div>
+
+  <table class="table table-bordered" style="width: 100%; border: 1px solid #000; border-collapse: collapse; margin-bottom: 6px; font-size: 10pt;">
+    <tbody>
+      <!-- Chỉ định chế độ ăn -->
+      <tr>
+        <td style="width: 28%; border: 1px solid #000; padding: 2px 6px; text-align: center; vertical-align: middle;">
+          Chỉ định chế độ ăn
+        </td>
+        <td style="width: 52%; border: 1px solid #000; padding: 2px 8px; vertical-align: middle;">
+          <Textarea label="Mã số:" v-model="data.MaSoCheDoAn" :line="false" :rows="1" />
+        </td>
+        <td style="width: 20%; border: 1px solid #000; padding: 2px 6px; vertical-align: middle;">
+          <Textarea v-model="data.ChiDinhCheDoAnGhiChu" :line="false" :rows="1" textareaStyle="text-align: center;" />
+        </td>
+      </tr>
+
+      <!-- Đường nuôi ăn -->
+      <tr>
+        <td rowspan="3" style="border: 1px solid #000; padding: 2px 6px; text-align: center; vertical-align: middle;">
+          Đường nuôi ăn
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          Đường miệng
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 6px; text-align: center; vertical-align: middle;">
+          <div class="d-flex justify-content-center">
+            <Checkbox size="sm" v-model="data.DuongAn" value="mieng" />
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          Ống thông
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 6px; text-align: center; vertical-align: middle;">
+          <div class="d-flex justify-content-center">
+            <Checkbox size="sm" v-model="data.DuongAn" value="ongthong" />
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          Tĩnh mạch
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 6px; text-align: center; vertical-align: middle;">
+          <div class="d-flex justify-content-center">
+            <Checkbox size="sm" v-model="data.DuongAn" value="tm" />
+          </div>
+        </td>
+      </tr>
+
+      <!-- Mời hội chẩn dinh dưỡng -->
+      <tr>
+        <td rowspan="2" style="border: 1px solid #000; padding: 2px 6px; text-align: center; vertical-align: middle;">
+          Mời hội chẩn dinh dưỡng
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          Có
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 6px; text-align: center; vertical-align: middle;">
+          <div class="d-flex justify-content-center">
+            <Checkbox size="sm" v-model="data.HoiChan" value="co" />
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          Không
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 6px; text-align: center; vertical-align: middle;">
+          <div class="d-flex justify-content-center">
+            <Checkbox size="sm" v-model="data.HoiChan" value="khong" />
+          </div>
+        </td>
+      </tr>
+
+      <!-- Tái đánh giá -->
+      <tr class="font-weight-bold">
+        <td rowspan="2" style="border: 1px solid #000; padding: 2px 6px; text-align: center; vertical-align: middle;">
+          Tái đánh giá
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          Sau 7 ngày (ở người bệnh không suy dinh dưỡng)
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 6px; text-align: center; vertical-align: middle;">
+          <div class="d-flex justify-content-center">
+            <Checkbox size="sm" v-model="data.TaiDanhGia" value="sau7ngay" />
+          </div>
+        </td>
+      </tr>
+      <tr class="font-weight-bold">
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          Sau 3 ngày (ở người bệnh suy dinh dưỡng)
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 6px; text-align: center; vertical-align: middle;">
+          <div class="d-flex justify-content-center">
+            <Checkbox size="sm" v-model="data.TaiDanhGia" value="sau3ngay" />
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Công thức BMI & Chữ ký Bác sĩ -->
+  <div class="row no-gutters" style="margin-bottom: 6px;">
+    <div class="col-6" style="padding-top: 12px; font-size: 9.5pt;">
+      <div class="d-flex align-items-center font-italic">
+        <span>BMI (kg/m<sup>2</sup>) =&nbsp;</span>
+        <span style="display: inline-block; text-align: center; vertical-align: middle;">
+          <span style="display: block; border-bottom: 1px solid #000; padding: 0 4px;">Cân nặng (kg)</span>
+          <span style="display: block; padding: 0 4px;">Chiều cao (m) X chiều cao (m)</span>
+        </span>
+      </div>
+    </div>
+    <div class="col-6 text-center">
+      <div>
+        <DatePicker v-model="data.NgayKyBacSi" format="[Ngày] DD [tháng] MM [năm] YYYY"
+          placeholder="Ngày ........ tháng ........ năm 20......"
+          style="text-align: center; width: 260px; margin: 0 auto;"
+          inputStyle="text-align: center;" />
+      </div>
+      <div class="font-weight-bold" style="font-size: 11pt; margin-top: 2px;">BÁC SĨ KHÁM BỆNH</div>
+      <div style="height: 1.5cm; display: flex; align-items: center; justify-content: center;">
+        <Signature code="TruongKhoa" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Phần hướng dẫn cuối trang -->
+  <div style="font-size: 8.5pt; line-height: 1.25;">
+    <div><b>Cán bộ thực hiện:</b> Bác sĩ điều trị</div>
+    <div><b>Đối tượng đánh giá:</b> Tất cả bệnh nhân nhập viện đều cần được sàng lọc và đánh giá TTDD để có kế hoạch can thiệp dinh dưỡng kịp thời</div>
+    <div><b>Thời gian thực hiện:</b> Trong vòng 36 giờ sau nhập viện</div>
+    <div><b>Thời gian đánh giá:</b> Bệnh nhân không SDD: tái đánh giá sau 7 ngày, bệnh nhi SDD: tái đánh giá sau 3 ngày</div>
+    <div><b>Mời hội chẩn dinh dưỡng:</b> Do bác sĩ điều trị quyết định tùy theo từng trường hợp cụ thể</div>
+    <div><b>Một số lưu ý:</b></div>
+    <ul style="margin-top: 0; margin-bottom: 2px; padding-left: 20px;">
+      <li>Nếu người bệnh không rõ sụt cân thì có thể hỏi xem dấu hiệu khác như mặc quần áo rộng hơn, mang nhẫn rộng hơn,...</li>
+      <li>Tỷ lệ sụt cân = (cân nặng thường có - cân nặng hiện tại) x 100 / cân nặng thường có</li>
+      <li>Lượng thức ăn: ước lượng hỏi qua bệnh sử</li>
+    </ul>
+    <div>
+      <b>Các dấu hiệu tăng nguy cơ SDD:</b> Người bệnh cao tuổi (&ge; 70 tuổi); albumin huyết thanh &lt; 35g/L; số lượng tế bào lympho &lt; 1500/mm<sup>3</sup>. Rối loạn chức năng nuốt (khó nhai, khó nuốt, nuốt sặc)
+    </div>
+  </div>
+</PageA4>
+

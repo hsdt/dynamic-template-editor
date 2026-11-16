@@ -1,7 +1,3 @@
----
-name: Component usage skill
----
-
 # Component Usage Skill
 
 Tài liệu này cung cấp ví dụ sử dụng và mô tả props cho các component trong thư mục `forms` và `layouts`.

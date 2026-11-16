@@ -1,0 +1,227 @@
+<PageA4 style="padding: 12mm 15mm 12mm 18mm; font-size: 11pt; line-height: 1.35; height: auto !important;">
+  <!-- Mã biểu mẫu góc trên phải -->
+  <div class="text-right" style="font-size: 9.5pt; color: #666; margin-bottom: 4px; text-align: right;">
+    BM 09
+  </div>
+
+  <!-- Header -->
+  <div class="row no-gutters" style="margin-bottom: 10px;">
+    <div class="col-4 text-center">
+      <div class="font-weight-bold" style="font-size: 10.5pt; line-height: 1.25;">
+        <div>BỆNH VIỆN TÂM THẦN</div>
+        <div>THÀNH PHỐ ĐÀ NẴNG</div>
+      </div>
+      <div style="margin-top: 4px; text-align: left; padding-left: 6px;">
+        <Textarea label="Khoa:" :modelValue="hsBenhAn.TenKhoaKham" line :rows="1" />
+      </div>
+    </div>
+
+    <div class="col-5 text-center" style="padding: 0 6px;">
+      <div class="font-weight-bold" style="font-size: 12.5pt; line-height: 1.3;">
+        PHIẾU THEO DÕI CHẾ ĐỘ DINH DƯỠNG CHO NGƯỜI BỆNH NỘI TRÚ
+      </div>
+    </div>
+
+    <div class="col-3" style="font-size: 9.5pt; padding-left: 8px; line-height: 1.35;">
+      <div>MS: DD-04</div>
+      <div>
+        <Textarea label="Số vào viện:" :modelValue="hsBenhAn.SoVaoVien" line :rows="1" />
+      </div>
+      <div>
+        <Textarea label="Mã người bệnh:" :modelValue="hsBenhAn.BenhNhan.Ma" line :rows="1" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Thông tin hành chính -->
+  <div class="row no-gutters align-items-center" style="margin-bottom: 4px;">
+    <div class="col-6">
+      <Textarea label="Họ và tên người bệnh:" :modelValue="hsBenhAn.BenhNhan.HoTen" line :rows="1" />
+    </div>
+    <div class="col-3" style="padding-left: 6px;">
+      <Textarea label="Tuổi:" :modelValue="hsBenhAn.Tuoi" line :rows="1" />
+    </div>
+    <div class="col-3" style="padding-left: 8px;">
+      <div class="d-flex align-items-center">
+        <Checkbox size="md" :modelValue="hsBenhAn.BenhNhan.GioiTinh" :value="true">
+          <template #afterText><span style="margin-left: 4px; margin-right: 10px;">Nam</span></template>
+        </Checkbox>
+        <Checkbox size="md" :modelValue="hsBenhAn.BenhNhan.GioiTinh" :value="false">
+          <template #afterText><span style="margin-left: 4px;">Nữ</span></template>
+        </Checkbox>
+      </div>
+    </div>
+  </div>
+
+  <div class="row no-gutters" style="margin-bottom: 4px;">
+    <div class="col-5">
+      <Textarea label="Khoa:" :modelValue="hsBenhAn.TenKhoaKham" line :rows="1" />
+    </div>
+    <div class="col-4" style="padding-left: 6px;">
+      <Textarea label="Phòng:" :modelValue="hsBenhAn.SoPhong" line :rows="1" />
+    </div>
+    <div class="col-3" style="padding-left: 6px;">
+      <Textarea label="Giường:" :modelValue="hsBenhAn.SoGiuong" line :rows="1" />
+    </div>
+  </div>
+
+  <div style="margin-bottom: 10px;">
+    <Textarea label="Chẩn đoán:" :modelValue="hsBenhAn.ChanDoan" line :rows="1" />
+  </div>
+
+  <!-- Bảng theo dõi chế độ dinh dưỡng -->
+  <table class="table table-bordered" style="width: 100%; border: 1px solid #000; border-collapse: collapse; margin-bottom: 6px; font-size: 10.5pt;">
+    <thead>
+      <tr>
+        <th style="width: 11%; border: 1px solid #000; padding: 4px 4px; font-weight: normal; text-align: center; vertical-align: top;">
+          Ngày, giờ
+        </th>
+        <th colspan="2" style="width: 63%; border: 1px solid #000; padding: 4px 6px; font-weight: normal; text-align: left; vertical-align: top;">
+          Diễn tiến dinh dưỡng
+        </th>
+        <th style="width: 26%; border: 1px solid #000; padding: 4px 6px; font-weight: normal; text-align: center; vertical-align: top;">
+          Chế độ dinh dưỡng
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Hàng 1 -->
+      <tr>
+        <td style="border: 1px solid #000; padding: 4px; vertical-align: top;">
+          <Textarea v-model="data.NgayGio1" :line="false" :rows="4" />
+        </td>
+        <td style="width: 22%; border: 1px solid #000; padding: 4px 6px; vertical-align: top;">
+          <div class="d-flex align-items-center" style="margin-bottom: 3px;">
+            <span class="text-nowrap">Cân nặng:&nbsp;</span>
+            <Textarea :modelValue="hsBenhAn.CanNang" line :rows="1" style="width: 50px;" textareaStyle="text-align: center;" />
+            <span class="text-nowrap">&nbsp;Kg</span>
+          </div>
+          <div style="margin-bottom: 2px;">Nguy cơ SDD:</div>
+          <div style="padding-left: 28px; margin-bottom: 2px;">
+            <Checkbox size="sm" v-model="data.NguyCoSDD" value="KHONG">
+              <template #afterText><span style="margin-left: 4px;">Không</span></template>
+            </Checkbox>
+          </div>
+          <div style="padding-left: 28px;">
+            <Checkbox size="sm" v-model="data.NguyCoSDD" value="CO">
+              <template #afterText><span style="margin-left: 4px;">Có</span></template>
+            </Checkbox>
+          </div>
+        </td>
+        <td style="width: 41%; border: 1px solid #000; padding: 4px 6px; vertical-align: top;">
+          <Textarea label="Toàn trạng/Cơ:" v-model="data.ToanTrangCo" line :rows="3" />
+        </td>
+        <td rowspan="2" style="border: 1px solid #000; padding: 4px 6px; vertical-align: top;">
+          <div style="margin-bottom: 3px;">
+            <Textarea label="Tên chế độ ăn (ghi mã chế độ ăn hoặc tên cụ thể):" v-model="data.TenCheDoAn" line :rows="2" />
+          </div>
+          <div style="margin-bottom: 3px;">
+            <Textarea label="Số bữa ăn:" v-model="data.SoBuaAn" line :rows="1" />
+          </div>
+          <div style="margin-bottom: 3px;">
+            <Textarea label="Đường nuôi dưỡng:" v-model="data.DuongNuoiDuong" line :rows="1" />
+          </div>
+          <div style="margin-bottom: 3px;">
+            <Textarea label="Thuốc/ dịch truyền dinh dưỡng:" v-model="data.ThuocDichTruyenDD" line :rows="3" />
+          </div>
+          <div>
+            <div>Năng lượng mục tiêu(nếu</div>
+            <div class="d-flex align-items-center">
+              <span class="text-nowrap">cần):&nbsp;</span>
+              <Textarea v-model="data.NangLuongMucTieu" line :rows="1" style="width: 75px;" textareaStyle="text-align: center;" />
+              <span class="text-nowrap">&nbsp;Kcal/ngày</span>
+            </div>
+          </div>
+        </td>
+      </tr>
+
+      <!-- Hàng 2 -->
+      <tr>
+        <td style="border: 1px solid #000; padding: 4px; vertical-align: top;">
+          <Textarea v-model="data.NgayGio2" :line="false" :rows="6" />
+        </td>
+        <td style="border: 1px solid #000; padding: 4px 6px; vertical-align: top;">
+          Khả năng dung nạp/ thu nạp thức ăn
+        </td>
+        <td style="border: 1px solid #000; padding: 4px 6px; vertical-align: top;">
+          <div class="row no-gutters">
+            <div class="col-5" style="padding-right: 4px;">
+              <div style="margin-bottom: 3px;">
+                <Checkbox size="sm" v-model="data.DungNapThucAn" value="AN_HET">
+                  <template #afterText><span style="margin-left: 4px;">Ăn hết suất ăn</span></template>
+                </Checkbox>
+              </div>
+              <div style="margin-bottom: 2px;">
+                <Checkbox size="sm" v-model="data.DungNapThucAn" value="HAN_CHE">
+                  <template #afterText><span style="margin-left: 4px;">Hạn chế /kém;</span></template>
+                </Checkbox>
+              </div>
+              <div class="d-flex align-items-center" style="margin-bottom: 2px;">
+                <span class="text-nowrap">đạt&nbsp;</span>
+                <Textarea v-model="data.PhanTramSuatAn" line :rows="1" style="width: 40px;" textareaStyle="text-align: center;" />
+                <span class="text-nowrap">&nbsp;% suất</span>
+              </div>
+              <div>ăn, là do</div>
+            </div>
+
+            <div class="col-7" style="padding-left: 4px;">
+              <div style="margin-bottom: 3px;">
+                <Checkbox size="sm" native v-model="data.LyDo_ChanAn">
+                  <template #afterText><span style="margin-left: 4px;">Chán ăn</span></template>
+                </Checkbox>
+              </div>
+              <div style="margin-bottom: 3px;">
+                <Checkbox size="sm" native v-model="data.LyDo_BuonNon">
+                  <template #afterText><span style="margin-left: 4px;">Buồn nôn/nôn</span></template>
+                </Checkbox>
+              </div>
+              <div style="margin-bottom: 3px;">
+                <Checkbox size="sm" native v-model="data.LyDo_DauChuongBung">
+                  <template #afterText><span style="margin-left: 4px;">Đau/chướng bụng</span></template>
+                </Checkbox>
+              </div>
+              <div style="margin-bottom: 3px;">
+                <Checkbox size="sm" native v-model="data.LyDo_TieuChay">
+                  <template #afterText><span style="margin-left: 4px;">Tiêu chảy</span></template>
+                </Checkbox>
+              </div>
+              <div style="margin-bottom: 3px;">
+                <Checkbox size="sm" native v-model="data.LyDo_DichTonLuuDaDay">
+                  <template #afterText><span style="margin-left: 4px;">Dịch tồn lưu dạ</span></template>
+                </Checkbox>
+                <div style="padding-left: 16px;">dày(DD qua ống</div>
+                <div class="d-flex align-items-center" style="padding-left: 16px;">
+                  <span class="text-nowrap">thông)&nbsp;</span>
+                  <Textarea v-model="data.DichTonLuuMl" line :rows="1" style="width: 35px;" textareaStyle="text-align: center;" />
+                  <span class="text-nowrap">&nbsp;ml</span>
+                </div>
+              </div>
+              <div style="padding-left: 10px;">
+                <Textarea label="Khác:" v-model="data.LyDo_Khac" line :rows="3" />
+              </div>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Chữ ký Điều dưỡng -->
+  <div class="row no-gutters">
+    <div class="col-5"></div>
+    <div class="col-7 text-center">
+      <div>
+        <DatePicker v-model="data.NgayKyDieuDuong" format="[Đà Nẵng, ngày] DD [tháng] MM [năm] YYYY"
+          placeholder="Đà Nẵng, ngày .....tháng......năm 20....."
+          style="text-align: center; font-style: italic; width: 290px; margin: 0 auto;"
+          inputStyle="text-align: center; font-style: italic;" />
+      </div>
+      <div style="margin-top: 2px;">Điều dưỡng</div>
+      <div>(Ký ghi rõ họ tên)</div>
+      <div style="height: 2cm; display: flex; align-items: center; justify-content: center;">
+        <Signature code="DieuDuong" />
+      </div>
+    </div>
+  </div>
+</PageA4>
+

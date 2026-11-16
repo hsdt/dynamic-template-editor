@@ -1,0 +1,167 @@
+<PageA4 style="font-size: 12pt; line-height: 1.35; height: auto !important;">
+  <div class="row no-gutters" style="margin-bottom: 12px; font-size: 10.5pt; color: #333;">
+    <div class="col-8 font-italic"> QT.10.KHTH.QT
+      Tiếp
+      nhận và ra viện bệnh nhân lang thang</div>
+    <div class="col-4 font-italic text-right" style="text-align: right;"> BM 10.KHTH.03</div>
+  </div>
+  <div class="text-center" style="margin-bottom: 15px;">
+    <div class="font-weight-bold" style="font-size: 12pt;">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>
+    <div class="font-weight-bold" style="font-size: 12pt; text-decoration: underline;">Độc lập - Tự do - Hạnh phúc</div>
+  </div>
+  <div class="text-center font-weight-bold" style="font-size: 13pt; margin-bottom: 15px;">
+    BIÊN BẢN BÀN GIAO TÀI SẢN</div>
+  <div style="margin-bottom: 6px;">
+    <DatePicker label="Hôm nay: lúc" v-model="data.ThoiGianBanGiao"
+      format="HH [giờ] mm [, ngày] DD [tháng] MM [năm] YYYY"
+      placeholder="..........giờ.........., ngày..........tháng..........năm" />
+  </div>
+  <div style="margin-bottom: 6px;">
+    <Textarea label="Tại:" v-model="data.DiaDiem" line :rows="1" />
+  </div>
+  <div style="margin-top: 6px; margin-bottom: 8px;">
+    Chúng tôi gồm:</div>
+  <div style="margin-bottom: 10px;">
+    <div class="font-weight-bold" style="margin-bottom: 4px;">I. Bên giao:</div>
+    <div class="row no-gutters" style="margin-bottom: 4px;">
+      <div class="col-8">
+        <Textarea label="Ông (bà):" v-model="data.BenGiaoOngBa" line :rows="1" />
+      </div>
+      <div class="col-4">
+        <Textarea label="Chức vụ:" v-model="data.BenGiaoChucVu" line :rows="1" />
+      </div>
+    </div>
+    <Textarea v-model="data.BenGiaoChiTiet" line :rows="1" style="margin-bottom: 4px;" />
+  </div>
+  <div style="margin-bottom: 10px;">
+    <div class="font-weight-bold" style="margin-bottom: 4px;">II. Bên nhận:</div>
+    <div class="row no-gutters" style="margin-bottom: 4px;">
+      <div class="col-8">
+        <Textarea label="Ông (bà):" v-model="data.BenNhanOngBa1" line :rows="1" />
+      </div>
+      <div class="col-4">
+        <Textarea label="Chức vụ:" v-model="data.BenNhanChucVu1" line :rows="1" />
+      </div>
+    </div>
+    <Textarea v-model="data.BenNhanChiTiet1" line :rows="1" style="margin-bottom: 4px;" />
+    <div class="row no-gutters" style="margin-bottom: 4px;">
+      <div class="col-8">
+        <Textarea label="Ông (bà):" v-model="data.BenNhanOngBa2" line :rows="1" />
+      </div>
+      <div class="col-4">
+        <Textarea label="Chức vụ:" v-model="data.BenNhanChucVu2" line :rows="1" />
+      </div>
+    </div>
+    <Textarea v-model="data.BenNhanChiTiet2" line :rows="1" style="margin-bottom: 4px;" />
+  </div>
+  <div style="margin-bottom: 12px;">
+    <div class="font-weight-bold" style="margin-bottom: 4px;">III. Nội dung bàn giao</div>
+    <div style="margin-bottom: 8px;">Bên giao tiến
+      hành
+      bàn giao tài sản cho bên nhận theo bảng thống kê sau:</div>
+    <table class="table table-bordered"
+      style="width: 100%; border: 1px solid #000; border-collapse: collapse; margin-bottom: 10px;">
+      <thead>
+        <tr class="text-center font-weight-bold">
+          <th style="width: 8%; border: 1px solid #000; padding: 6px 4px; vertical-align: middle;">STT</th>
+          <th style="width: 47%; border: 1px solid #000; padding: 6px 4px; vertical-align: middle;">Tên tài sản</th>
+          <th style="width: 20%; border: 1px solid #000; padding: 6px 4px; vertical-align: middle;">Số lượng</th>
+          <th style="width: 25%; border: 1px solid #000; padding: 6px 4px; vertical-align: middle;">Ghi chú</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="text-center" style="border: 1px solid #000; padding: 4px; vertical-align: middle;">1</td>
+          <td style="border: 1px solid #000; padding: 4px;">
+            <Textarea v-model="data.TenTaiSan1" :line="false" :rows="1" />
+          </td>
+          <td style="border: 1px solid #000; padding: 4px;">
+            <Textarea v-model="data.SoLuong1" :line="false" :rows="1" textareaStyle="text-align: center;" />
+          </td>
+          <td style="border: 1px solid #000; padding: 4px;">
+            <Textarea v-model="data.GhiChu1" :line="false" :rows="1" />
+          </td>
+        </tr>
+        <tr>
+          <td class="text-center" style="border: 1px solid #000; padding: 4px; vertical-align: middle;">2</td>
+          <td style="border: 1px solid #000; padding: 4px;">
+            <Textarea v-model="data.TenTaiSan2" :line="false" :rows="1" />
+          </td>
+          <td style="border: 1px solid #000; padding: 4px;">
+            <Textarea v-model="data.SoLuong2" :line="false" :rows="1" textareaStyle="text-align: center;" />
+          </td>
+          <td style="border: 1px solid #000; padding: 4px;">
+            <Textarea v-model="data.GhiChu2" :line="false" :rows="1" />
+          </td>
+        </tr>
+        <tr>
+          <td class="text-center" style="border: 1px solid #000; padding: 4px; vertical-align: middle;">3</td>
+          <td style="border: 1px solid #000; padding: 4px;">
+            <Textarea v-model="data.TenTaiSan3" :line="false" :rows="1" />
+          </td>
+          <td style="border: 1px solid #000; padding: 4px;">
+            <Textarea v-model="data.SoLuong3" :line="false" :rows="1" textareaStyle="text-align: center;" />
+          </td>
+          <td style="border: 1px solid #000; padding: 4px;">
+            <Textarea v-model="data.GhiChu3" :line="false" :rows="1" />
+          </td>
+        </tr>
+        <tr>
+          <td class="text-center" style="border: 1px solid #000; padding: 4px; vertical-align: middle;">4</td>
+          <td style="border: 1px solid #000; padding: 4px;">
+            <Textarea v-model="data.TenTaiSan4" :line="false" :rows="1" />
+          </td>
+          <td style="border: 1px solid #000; padding: 4px;">
+            <Textarea v-model="data.SoLuong4" :line="false" :rows="1" textareaStyle="text-align: center;" />
+          </td>
+          <td style="border: 1px solid #000; padding: 4px;">
+            <Textarea v-model="data.GhiChu4" :line="false" :rows="1" />
+          </td>
+        </tr>
+        <tr>
+          <td class="text-center" style="border: 1px solid #000; padding: 4px; vertical-align: middle;">5</td>
+          <td style="border: 1px solid #000; padding: 4px;">
+            <Textarea v-model="data.TenTaiSan5" :line="false" :rows="1" />
+          </td>
+          <td style="border: 1px solid #000; padding: 4px;">
+            <Textarea v-model="data.SoLuong5" :line="false" :rows="1" textareaStyle="text-align: center;" />
+          </td>
+          <td style="border: 1px solid #000; padding: 4px;">
+            <Textarea v-model="data.GhiChu5" :line="false" :rows="1" />
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div style="margin-bottom: 6px;"> Bên giao cam
+    đoan
+    rằng toàn bộ tài sản đã được bàn giao đầy đủ, đúng số lượng.</div>
+  <div style="margin-bottom: 15px;">
+    <div class="d-flex align-items-center" style="margin-bottom: 4px;">
+      <span class="text-nowrap">Biên bản kết thúc
+        lúc&nbsp;</span>
+      <DatePicker v-model="data.ThoiGianKetThuc" format="HH [giờ] mm" placeholder="........giờ........"
+        style="width: 100px;" />
+      <span>&nbsp;cùng ngày. Biên bản được lập
+        thành
+        02
+        bản, mỗi bên giữ một bản./.</span>
+    </div>
+  </div>
+  <div class="row no-gutters" style="margin-top: 15px; text-align: center;">
+    <div class="col-6">
+      <div class="font-weight-bold" style="font-size: 11pt;">BÊN GIAO</div>
+      <div class="font-italic" style="font-size: 11pt; margin-top: 2px;">(Ký, ghi rõ họ tên)</div>
+      <div style="height: 2.5cm; display: flex; align-items: center; justify-content: center;">
+        <Signature code="BenGiao" />
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="font-weight-bold" style="font-size: 11pt;">BÊN NHẬN</div>
+      <div class="font-italic" style="font-size: 11pt; margin-top: 2px;">(Ký, ghi rõ họ tên)</div>
+      <div style="height: 2.5cm; display: flex; align-items: center; justify-content: center;">
+        <Signature code="BenNhan" />
+      </div>
+    </div>
+  </div>
+</PageA4>

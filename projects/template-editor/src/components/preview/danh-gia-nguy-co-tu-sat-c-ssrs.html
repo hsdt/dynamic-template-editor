@@ -1,0 +1,338 @@
+<PageA4 style="padding: 15mm 15mm 12mm 15mm; font-size: 10.5pt; line-height: 1.25;">
+  <!-- Tiêu đề biểu mẫu -->
+  <div class="text-center font-weight-bold" style="font-size: 12.5pt; margin-bottom: 12px; text-transform: uppercase;">
+    BỘ CÔNG CỤ ĐÁNH GIÁ NGUY CƠ TỰ SÁT TẠI KHOA LÂM SÀNG (C-SSRS)
+  </div>
+
+  <!-- Thông tin hành chính -->
+  <div class="row no-gutters" style="margin-bottom: 3px;">
+    <div class="col-8">
+      <Textarea v-model="data.BenhNhanHoTen" line :rows="1">
+        <template #label><strong style="font-weight: bold;">Họ và tên bệnh nhân:&nbsp;</strong></template>
+      </Textarea>
+    </div>
+    <div class="col-4">
+      <Textarea v-model="data.BenhNhanTuoi" line :rows="1">
+        <template #label><strong style="font-weight: bold;">Tuổi:&nbsp;</strong></template>
+      </Textarea>
+    </div>
+  </div>
+
+  <div style="margin-bottom: 3px;">
+    <Textarea v-model="data.ChanDoan" line :rows="1">
+      <template #label><strong style="font-weight: bold;">Chẩn đoán:&nbsp;</strong></template>
+    </Textarea>
+  </div>
+
+  <div style="margin-bottom: 8px;">
+    <Textarea v-model="data.Khoa" line :rows="1">
+      <template #label><strong style="font-weight: bold;">Khoa:&nbsp;</strong></template>
+    </Textarea>
+  </div>
+
+  <!-- Bảng đánh giá C-SSRS -->
+  <table class="table table-bordered" style="width: 100%; border: 1px solid #000; border-collapse: collapse; margin-bottom: 10px; font-size: 10pt;">
+    <thead>
+      <tr class="text-center">
+        <th style="width: 48%; border: 1px solid #000; padding: 4px 6px; vertical-align: middle; text-align: left; font-weight: normal; font-size: 9.5pt;">
+          <div>Câu hỏi 1-5 hỏi về ý tưởng tự sát;</div>
+          <div>Câu 6-7 đánh giá hành vi tự sát (đối với câu 7 đánh giá nỗ lực tự sát trong quá khứ)</div>
+        </th>
+        <th colspan="2" style="width: 26%; border: 1px solid #000; padding: 4px; vertical-align: middle; text-align: center; font-weight: bold; font-size: 10.5pt;">
+          3 tháng qua
+        </th>
+        <th colspan="2" style="width: 26%; border: 1px solid #000; padding: 4px; vertical-align: middle; text-align: center; font-weight: bold; font-size: 10.5pt;">
+          Cả đời
+        </th>
+      </tr>
+      <tr>
+        <th colspan="3" style="border: 1px solid #000; padding: 4px 6px; vertical-align: middle; text-align: center; font-weight: bold; font-size: 9.5pt; background-color: #d9d9d9;">
+          <div>Hỏi 2 câu hỏi đầu tiên, Nếu chọn "Không" cho cả hai câu, hãy chuyển sang</div>
+          <div>câu hỏi 6. Nếu chọn "Có" đến câu 2, hãy hỏi câu 3-7</div>
+        </th>
+        <th colspan="2" style="border: 1px solid #000; background-color: #d9d9d9;"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Câu 1 -->
+      <tr>
+        <td style="border: 1px solid #000; padding: 4px 6px; vertical-align: middle;">
+          <div>1. Ý tưởng tự sát thụ động</div>
+          <div>Ước được chết: Bạn đã bao giờ nghĩ muốn mình chết hoặc nghĩ mình có thể ngủ mà không thức dậy chưa?</div>
+        </td>
+        <td style="width: 13%; border: 1px solid #000; padding: 4px 2px; vertical-align: middle; text-align: center; background-color: #ffff00;">
+          <div class="d-flex justify-content-center align-items-center">
+            <Checkbox size="md" v-model="data.Q1_3Thang" value="CO">
+              <template #afterText><span style="margin-left: 5px;">Có</span></template>
+            </Checkbox>
+          </div>
+        </td>
+        <td style="width: 13%; border: 1px solid #000; padding: 4px 2px; vertical-align: middle; text-align: center; background-color: #ffffff;">
+          <div class="d-flex justify-content-center align-items-center">
+            <Checkbox size="md" v-model="data.Q1_3Thang" value="KHONG">
+              <template #afterText><span style="margin-left: 5px;">Không</span></template>
+            </Checkbox>
+          </div>
+        </td>
+        <!-- Cột Cả đời dạng khối xám liền mạch cho các câu 1-5 và dòng quy trình -->
+        <td colspan="2" rowspan="7" style="border: 1px solid #000; background-color: #d9d9d9;"></td>
+      </tr>
+
+      <!-- Câu 2 -->
+      <tr>
+        <td style="border: 1px solid #000; padding: 4px 6px; vertical-align: middle;">
+          <div>2. Ý tưởng tự sát chủ động</div>
+          <div>Bạn đã thực sự có bất kỳ suy nghĩ nghiêm túc nào về việc tự sát chưa?</div>
+        </td>
+        <td style="border: 1px solid #000; padding: 4px 2px; vertical-align: middle; text-align: center; background-color: #ffff00;">
+          <div class="d-flex justify-content-center align-items-center">
+            <Checkbox size="md" v-model="data.Q2_3Thang" value="CO">
+              <template #afterText><span style="margin-left: 5px;">Có</span></template>
+            </Checkbox>
+          </div>
+        </td>
+        <td style="border: 1px solid #000; padding: 4px 2px; vertical-align: middle; text-align: center; background-color: #ffffff;">
+          <div class="d-flex justify-content-center align-items-center">
+            <Checkbox size="md" v-model="data.Q2_3Thang" value="KHONG">
+              <template #afterText><span style="margin-left: 5px;">Không</span></template>
+            </Checkbox>
+          </div>
+        </td>
+      </tr>
+
+      <!-- Dải ngăn cách giữa câu 2 và câu 3 theo mẫu -->
+      <tr style="height: 14px;">
+        <td style="border: 1px solid #000;"></td>
+        <td style="border: 1px solid #000; background-color: #ffff00;"></td>
+        <td style="border: 1px solid #000; background-color: #ffffff;"></td>
+      </tr>
+
+      <!-- Câu 3 -->
+      <tr>
+        <td style="border: 1px solid #000; padding: 4px 6px; vertical-align: middle;">
+          <div>3.Ý tưởng tự sát bằng phương pháp:</div>
+          <div>Bạn đã nghĩ làm thế nào để tự sát chưa?</div>
+        </td>
+        <td style="border: 1px solid #000; padding: 4px 2px; vertical-align: middle; text-align: center; background-color: #ffff00;">
+          <div class="d-flex justify-content-center align-items-center">
+            <Checkbox size="md" v-model="data.Q3_3Thang" value="CO">
+              <template #afterText><span style="margin-left: 5px;">Có</span></template>
+            </Checkbox>
+          </div>
+        </td>
+        <td style="border: 1px solid #000; padding: 4px 2px; vertical-align: middle; text-align: center; background-color: #ffffff;">
+          <div class="d-flex justify-content-center align-items-center">
+            <Checkbox size="md" v-model="data.Q3_3Thang" value="KHONG">
+              <template #afterText><span style="margin-left: 5px;">Không</span></template>
+            </Checkbox>
+          </div>
+        </td>
+      </tr>
+
+      <!-- Câu 4 -->
+      <tr>
+        <td style="border: 1px solid #000; padding: 4px 6px; vertical-align: middle;">
+          <div>4. Ý tưởng tự sát có chủ ý</div>
+          <div>Bạn đã có nghĩ đến tự sát và ra quyết định thực hiện chưa?</div>
+        </td>
+        <td style="border: 1px solid #000; padding: 4px 2px; vertical-align: middle; text-align: center; background-color: #cc0000; color: #ffffff;">
+          <div class="d-flex justify-content-center align-items-center">
+            <Checkbox size="md" v-model="data.Q4_3Thang" value="CO" style="color: #ffffff;">
+              <template #afterText><span style="margin-left: 5px; color: #ffffff;">Có</span></template>
+            </Checkbox>
+          </div>
+        </td>
+        <td style="border: 1px solid #000; padding: 4px 2px; vertical-align: middle; text-align: center; background-color: #ffffff;">
+          <div class="d-flex justify-content-center align-items-center">
+            <Checkbox size="md" v-model="data.Q4_3Thang" value="KHONG">
+              <template #afterText><span style="margin-left: 5px;">Không</span></template>
+            </Checkbox>
+          </div>
+        </td>
+      </tr>
+
+      <!-- Câu 5 -->
+      <tr>
+        <td style="border: 1px solid #000; padding: 4px 6px; vertical-align: middle;">
+          <div>5. Ý tưởng tự sát có chủ ý và lên kế hoạch</div>
+          <div>Bạn đã có bắt đầu suy nghĩ về cách tự sát và lên kế hoạch cho nó chưa?</div>
+        </td>
+        <td style="border: 1px solid #000; padding: 4px 2px; vertical-align: middle; text-align: center; background-color: #cc0000; color: #ffffff;">
+          <div class="d-flex justify-content-center align-items-center">
+            <Checkbox size="md" v-model="data.Q5_3Thang" value="CO" style="color: #ffffff;">
+              <template #afterText><span style="margin-left: 5px; color: #ffffff;">Có</span></template>
+            </Checkbox>
+          </div>
+        </td>
+        <td style="border: 1px solid #000; padding: 4px 2px; vertical-align: middle; text-align: center; background-color: #ffffff;">
+          <div class="d-flex justify-content-center align-items-center">
+            <Checkbox size="md" v-model="data.Q5_3Thang" value="KHONG">
+              <template #afterText><span style="margin-left: 5px;">Không</span></template>
+            </Checkbox>
+          </div>
+        </td>
+      </tr>
+
+      <!-- Phân cách quy trình -->
+      <tr>
+        <td style="border: 1px solid #000; padding: 3px 6px;">
+          Quy trình phát hiện, quản lý và phòng ngừa tự sát cho bệnh nhân nội trú
+        </td>
+        <td style="border: 1px solid #000; background-color: #ffffff;"></td>
+        <td style="border: 1px solid #000; background-color: #ffffff;"></td>
+      </tr>
+
+      <!-- Câu 6 -->
+      <tr>
+        <td style="border: 1px solid #000; padding: 4px 6px; vertical-align: middle;">
+          <div>6. Hành vi tự sát</div>
+          <div>Bạn đã bắt đầu thực hiện bất cứ điều gì để chuẩn bị kết thúc cuộc sống của bạn chưa?</div>
+        </td>
+        <td style="border: 1px solid #000; padding: 4px 2px; vertical-align: middle; text-align: center; background-color: #cc0000; color: #ffffff;">
+          <div class="d-flex justify-content-center align-items-center">
+            <Checkbox size="md" v-model="data.Q6_3Thang" value="CO" style="color: #ffffff;">
+              <template #afterText><span style="margin-left: 5px; color: #ffffff;">Có</span></template>
+            </Checkbox>
+          </div>
+        </td>
+        <td style="border: 1px solid #000; padding: 4px 2px; vertical-align: middle; text-align: center; background-color: #ffffff;">
+          <div class="d-flex justify-content-center align-items-center">
+            <Checkbox size="md" v-model="data.Q6_3Thang" value="KHONG">
+              <template #afterText><span style="margin-left: 5px;">Không</span></template>
+            </Checkbox>
+          </div>
+        </td>
+        <td style="width: 13%; border: 1px solid #000; padding: 4px 2px; vertical-align: middle; text-align: center; background-color: #ffff00;">
+          <div class="d-flex justify-content-center align-items-center">
+            <Checkbox size="md" v-model="data.Q6_CaDoi" value="CO">
+              <template #afterText><span style="margin-left: 5px;">Có</span></template>
+            </Checkbox>
+          </div>
+        </td>
+        <td style="width: 13%; border: 1px solid #000; padding: 4px 2px; vertical-align: middle; text-align: center; background-color: #ffffff;">
+          <div class="d-flex justify-content-center align-items-center">
+            <Checkbox size="md" v-model="data.Q6_CaDoi" value="KHONG">
+              <template #afterText><span style="margin-left: 5px;">Không</span></template>
+            </Checkbox>
+          </div>
+        </td>
+      </tr>
+
+      <!-- Câu 7 - Sub-row 1 -->
+      <tr>
+        <td style="border: 1px solid #000; padding: 4px 6px; vertical-align: middle;">
+          <div>7. Cố gắng tự sát:</div>
+          <div>Bạn đã có nỗ lực tự sát (toan tự sát)?</div>
+        </td>
+        <td style="border: 1px solid #000; background-color: #ffffff;"></td>
+        <td style="border: 1px solid #000; background-color: #ffffff;"></td>
+        <td style="border: 1px solid #000; background-color: #ffb300;"></td>
+        <td style="border: 1px solid #000; background-color: #ffffff;"></td>
+      </tr>
+
+      <!-- Câu 7 - Sub-row 2 -->
+      <tr>
+        <td style="border: 1px solid #000; padding: 4px 6px; vertical-align: middle;">
+          <div>Bạn đã từng thực hiện bao nhiêu lần toan tự sát trước đó:</div>
+        </td>
+        <td colspan="2" style="border: 1px solid #000; background-color: #ffffff;"></td>
+        <td colspan="2" style="border: 1px solid #000; padding: 2px 4px; vertical-align: middle; text-align: center;">
+          <Textarea v-model="data.Q7_SoLanToanTuSat" :line="false" :rows="1" textareaStyle="text-align: center;" placeholder="........" />
+        </td>
+      </tr>
+
+      <!-- Câu 7 - Sub-row 3 -->
+      <tr>
+        <td style="border: 1px solid #000; padding: 4px 6px; vertical-align: middle;">
+          <div>Lần toan tự sát cuối cùng của bạn cách đây là bao lâu?</div>
+        </td>
+        <td colspan="2" style="border: 1px solid #000; background-color: #ffffff;"></td>
+        <td colspan="2" style="border: 1px solid #000; padding: 0; vertical-align: middle;">
+          <table style="width: 100%; border-collapse: collapse; margin: 0; border: none;">
+            <tbody>
+              <tr>
+                <td style="padding: 3px 8px; border-bottom: 1px solid #000; background-color: #cc0000; color: #ffffff;">
+                  <div class="d-flex align-items-center">
+                    <Checkbox size="md" v-model="data.Q7_LanCuoiCachDay" value="DUOI_3_THANG" style="color: #ffffff;">
+                      <template #afterText><span style="margin-left: 8px; color: #ffffff;">&lt; 3 tháng</span></template>
+                    </Checkbox>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 3px 8px; border-bottom: 1px solid #000; background-color: #ffb300; color: #000000;">
+                  <div class="d-flex align-items-center">
+                    <Checkbox size="md" v-model="data.Q7_LanCuoiCachDay" value="4_12_THANG">
+                      <template #afterText><span style="margin-left: 8px;">4- 12 tháng</span></template>
+                    </Checkbox>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 3px 8px; border-bottom: 1px solid #000; background-color: #ffff66; color: #000000;">
+                  <div class="d-flex align-items-center">
+                    <Checkbox size="md" v-model="data.Q7_LanCuoiCachDay" value="1_5_NAM">
+                      <template #afterText><span style="margin-left: 8px;">1 - 5 năm</span></template>
+                    </Checkbox>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 3px 8px; background-color: #ffffff; color: #000000;">
+                  <div class="d-flex align-items-center">
+                    <Checkbox size="md" v-model="data.Q7_LanCuoiCachDay" value="TREN_5_NAM">
+                      <template #afterText><span style="margin-left: 8px;">&gt; 5 năm</span></template>
+                    </Checkbox>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+
+      <!-- Mức độ nguy cơ tự sát -->
+      <tr>
+        <td colspan="5" style="border: 1px solid #000; padding: 4px; text-align: center; font-weight: bold; font-size: 10pt; background-color: #ffffff;">
+          Mức độ nguy cơ tự sát
+        </td>
+      </tr>
+      <tr>
+        <!-- Cột Cao trùng khớp chính xác cột 1 (width 48%) -->
+        <td style="border: 1px solid #000; padding: 6px 4px; text-align: center; vertical-align: middle; background-color: #cc0000; color: #ffffff;">
+          <div class="d-flex justify-content-center align-items-center">
+            <Checkbox size="md" v-model="data.MucDoNguyCo" value="CAO" style="color: #ffffff;">
+              <template #afterText><span style="margin-left: 6px; color: #ffffff;">Cao</span></template>
+            </Checkbox>
+          </div>
+        </td>
+        <!-- Cột Trung bình trùng khớp chính xác cột 3 tháng qua (width 26%) -->
+        <td colspan="2" style="border: 1px solid #000; padding: 6px 4px; text-align: center; vertical-align: middle; background-color: #ffb300;">
+          <div class="d-flex justify-content-center align-items-center">
+            <Checkbox size="md" v-model="data.MucDoNguyCo" value="TRUNG_BINH">
+              <template #afterText><span style="margin-left: 6px;">Trung bình</span></template>
+            </Checkbox>
+          </div>
+        </td>
+        <!-- Cột Thấp trùng khớp chính xác cột Cả đời (width 26%) -->
+        <td colspan="2" style="border: 1px solid #000; padding: 6px 4px; text-align: center; vertical-align: middle; background-color: #ffff66;">
+          <div class="d-flex justify-content-center align-items-center">
+            <Checkbox size="md" v-model="data.MucDoNguyCo" value="THAP">
+              <template #afterText><span style="margin-left: 6px;">Thấp</span></template>
+            </Checkbox>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Chân trang ký tên -->
+  <div class="d-flex justify-content-end" style="margin-top: 15px; margin-right: 25px;">
+    <div style="text-align: center; min-width: 180px;">
+      <div class="font-weight-bold" style="font-size: 11pt;">Người thực hiện</div>
+      <div style="height: 2.2cm; display: flex; align-items: center; justify-content: center;">
+        <Signature code="NguoiThucHien" />
+      </div>
+    </div>
+  </div>
+</PageA4>
