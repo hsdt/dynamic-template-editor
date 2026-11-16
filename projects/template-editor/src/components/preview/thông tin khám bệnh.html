@@ -1,0 +1,304 @@
+<PageA4 style="font-size: 12pt; max-height: unset; height: auto; padding-bottom: 20px">
+  <div class="row no-gutters" style="page-break-inside: avoid;">
+    <div class="col-12 font-weight-bold input-ehr-lg">
+      A-
+      BỆNH ÁN</div>
+    <div class="col-12">
+      <Textarea v-model="hsThongTinBenhAn.LyDoVaoVien"><template #label>
+  <span style="font-weight: bold">I. Lý do vào
+    viện:
+  </span>
+</template></Textarea>
+    </div>
+    <div class="col-4 d-flex">
+      <Textarea label=".Vào ngày thứ" v-model="hsThongTinBenhAn.NoiDungChiTietObj.NgayThu" />
+      <div class="text-nowrap">của bệnh</div>
+    </div>
+  </div>
+  <div class="row no-gutters">
+    <div class="col-12 font-weight-bold input-ehr-lg">
+      II. Hỏi bệnh:</div>
+  </div>
+  <div class="row no-gutters">
+    <div class="col-12">
+      <span class="font-weight-bold">1. Quá trình
+        bệnh
+        lý:</span>
+      <span class="font-italic input-ehr-sm">( Tình
+        trạng
+        trước khi mắc bệnh, các dấu hiệu ban đầu, sự tiến triển của bệnh,
+        quá trình điều trị và tình trạng bệnh hiện nay)</span>
+      <Textarea v-model="hsThongTinBenhAn.QuaTrinhBenhLy" />
+    </div>
+  </div>
+  <div class="row no-gutters">
+    <div class="col-12">
+      <span class="font-weight-bold">2. Tiền sử
+        bệnh:
+      </span><br />
+      <span>+ Bản thân:</span>
+      <span class="font-italic input-ehr-sm">(Sự
+        phát
+        triển về tâm thần và thể chất từ nhỏ đến lớn: những bệnh đã mắc phải:
+        tình hình học tập: khả năng lao động, công tác; đặc điểm tính cách từ
+        nhỏ
+        đến
+        lớn)</span>
+      <Textarea v-model="hsThongTinBenhAn.TienSuBanThan" />
+    </div>
+  </div>
+  <div class="row no-gutters">
+    <div class="col-12">
+      <span class="font-weight">Đặc điểm liên quan
+        bệnh:
+      </span>
+    </div>
+  </div>
+  <table class="table table-ehr-bordered input-ehr-sm">
+    <tr>
+      <td class="text-center" width="5%">TT</td>
+      <td class="text-center" width="12%"></td>
+      <td class="text-center" width="8%">Ký hiệu</td>
+      <td class="text-center" width="25%">Thời gian
+        (tính
+        theo tháng)</td>
+      <td class="text-center" width="5%">TT</td>
+      <td class="text-center" width="12%"></td>
+      <td class="text-center" width="8%">Ký hiệu</td>
+      <td class="text-center" width="25%">Thời gian
+        (tính
+        theo tháng)</td>
+    </tr>
+    <tr>
+      <td class="text-center">1</td>
+      <td>- Dị ứng</td>
+      <td class="text-center">
+        <Checkbox v-model="hsThongTinBenhAn.NoiDungChiTietObj.DacDiem_IsDiUng" size="md" :value="true" />
+      </td>
+      <td>
+        <Textarea v-model="hsThongTinBenhAn.NoiDungChiTietObj.DacDiem_ThoiGianDiUng" />
+      </td>
+      <td class="text-center">4</td>
+      <td>- Thuốc lá</td>
+      <td class="text-center">
+        <Checkbox v-model="hsThongTinBenhAn.NoiDungChiTietObj.DacDiem_IsThuocLa" size="md" :value="true" />
+      </td>
+      <td>
+        <Textarea v-model="hsThongTinBenhAn.NoiDungChiTietObj.DacDiem_ThoiGianThuocLa" />
+      </td>
+    </tr>
+    <tr>
+      <td class="text-center">2</td>
+      <td>- Ma túy</td>
+      <td class="text-center">
+        <Checkbox v-model="hsThongTinBenhAn.NoiDungChiTietObj.DacDiem_IsMaTuy" size="md" :value="true" />
+      </td>
+      <td>
+        <Textarea v-model="hsThongTinBenhAn.NoiDungChiTietObj.DacDiem_ThoiGianMaTuy" />
+      </td>
+      <td class="text-center">5</td>
+      <td>- Thuốc lào</td>
+      <td class="text-center">
+        <Checkbox v-model="hsThongTinBenhAn.NoiDungChiTietObj.DacDiem_IsThuocLao" size="md" :value="true" />
+      </td>
+      <td>
+        <Textarea v-model="hsThongTinBenhAn.NoiDungChiTietObj.DacDiem_ThoiGianThuocLao" />
+      </td>
+    </tr>
+    <tr>
+      <td class="text-center">3</td>
+      <td>- Rượu, bia</td>
+      <td class="text-center">
+        <Checkbox v-model="hsThongTinBenhAn.NoiDungChiTietObj.DacDiem_IsRuouBia" size="md" :value="true" />
+      </td>
+      <td>
+        <Textarea v-model="hsThongTinBenhAn.NoiDungChiTietObj.DacDiem_ThoiGianRuouBia" />
+      </td>
+      <td class="text-center">6</td>
+      <td>- Khác</td>
+      <td class="text-center">
+        <Checkbox v-model="hsThongTinBenhAn.NoiDungChiTietObj.DacDiem_IsKhac" size="md" :value="true" />
+      </td>
+      <td>
+        <Textarea v-model="hsThongTinBenhAn.NoiDungChiTietObj.DacDiem_ThoiGianKhac" />
+      </td>
+    </tr>
+  </table>
+  <div>
+    <span>+ Gia đình:</span>
+    <span class="font-italic input-ehr-sm">( Ông,
+      bà,
+      cha, mẹ, anh, chị, em ruột, con cái, họ hàng, có ai mắc bệnh gì
+      không? chú ý bệnh thần kinh tâm thần)</span>
+    <Textarea v-model="hsThongTinBenhAn.TienSuGiaDinh" />
+  </div>
+  <div class="row m-t-sm no-gutters">
+    <div class="col-12 font-weight-bold input-ehr-lg">
+      III. Khám bệnh:</div>
+  </div>
+  <div class="row no-gutters">
+    <span class="font-weight-bold">1. Toàn thân:
+    </span>
+    <span>
+      <i class="input-ehr-sm">( Da niêm mạc, hệ thống
+        hạch,
+        tuyến giáp, vị trí, kích thước, di động, v.v...)</i>
+    </span>
+  </div>
+  <div class="row no-gutters">
+    <div class="col-9">
+      <Textarea rows="6" v-model="hsThongTinBenhAn.ToanThan" />
+    </div>
+    <div class="col-3">
+      <table class="table table-ehr-bordered input-ehr-sm">
+        <tr>
+          <td>
+            <div class="input-ehr">
+              <span class="text-nowrap">Mạch:
+              </span>
+              <Textarea maxlength="4" v-model="hsThongTinBenhAn.Mach" />
+              <span> lần/phút</span>
+            </div>
+            <div class="input-ehr">
+              <span class="text-nowrap">Nhiệt độ:
+              </span>
+              <Textarea maxlength="4" v-model="hsThongTinBenhAn.NhietDo" />
+              <span> &deg;C</span>
+            </div>
+            <div class="input-ehr">
+              <span class="text-nowrap">Huyết áp:
+              </span>
+              <Textarea maxlength="4" v-model="hsThongTinBenhAn.HuyetApToiDa" />
+              <span>/</span>
+              <Textarea maxlength="4" v-model="hsThongTinBenhAn.HuyetApToiThieu" />
+              <span> mmHg</span>
+            </div>
+            <div class="input-ehr">
+              <span class="text-nowrap">Nhịp thở:
+              </span>
+              <Textarea maxlength="4" v-model="hsThongTinBenhAn.NhipTho" />
+              <span> lần/phút</span>
+            </div>
+            <div class="input-ehr">
+              <span class="text-nowrap">Cân nặng:
+              </span>
+              <Textarea maxlength="4" v-model="hsThongTinBenhAn.CanNang" />
+              <span> kg</span>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <div class="row m-b-sm no-gutters">
+    <div class="col-12">
+      <span class="font-weight-bold">2. Các cơ
+        quan:
+      </span>
+    </div>
+  </div>
+  <Textarea label="+ Tuần hoàn:" v-model="hsThongTinBenhAn.TuanHoan" />
+  <Textarea label="+ Hô hấp:" v-model="hsThongTinBenhAn.HoHap" />
+  <Textarea label="+ Tiêu hóa:" v-model="hsThongTinBenhAn.TieuHoa" />
+  <Textarea label="+ Thận- Tiết niệu- Sinh dục:" v-model="hsThongTinBenhAn.ThanTietNieuSinhDuc" />
+  <Textarea label="+ Cơ - Xương - Khớp:" v-model="hsThongTinBenhAn.CoXuongKhop" />
+  <Textarea label="+ Tai - Mũi - Họng:" v-model="hsThongTinBenhAn.TaiMuiHong" />
+  <Textarea label="+ Răng - Hàm - Mặt:" v-model="hsThongTinBenhAn.RangHamMat" />
+  <Textarea label="+ Mắt:" v-model="hsThongTinBenhAn.Mat" />
+  <Textarea label="+ Nội, tiết, dinh dưỡng và các bệnh lý khác:" v-model="hsThongTinBenhAn.CoQuanKhac" />
+  <div>
+    <b>3. Khám</b>
+  </div>
+  <div>
+    <b>a. Thần kinh</b>
+  </div>
+  <Textarea label="Dây thần kinh sọ não:" v-model="hsThongTinBenhAn.NoiDungChiTietObj.DayThanKinhSoNao" />
+  <Textarea label="Đáy mắt:" v-model="hsThongTinBenhAn.NoiDungChiTietObj.DayMat" />
+  <Textarea label="Vận động:" v-model="hsThongTinBenhAn.NoiDungChiTietObj.VanDong" />
+  <Textarea label="Trương lực cơ:" v-model="hsThongTinBenhAn.NoiDungChiTietObj.TruongLucCo" />
+  <Textarea label="Cảm giác (nông, sâu):" v-model="hsThongTinBenhAn.NoiDungChiTietObj.CamGiac" />
+  <Textarea label="Phản xạ:" v-model="hsThongTinBenhAn.NoiDungChiTietObj.PhanXa" />
+  <div>
+    <b>b. Tâm thần:</b>
+  </div>
+  <Textarea label="Biểu hiện chung:" v-model="hsThongTinBenhAn.NoiDungChiTietObj.BieuHienChung" />
+  <div class="row no-gutters">
+    <span style="flex: 0 0 20%">Ý định hướng lực:
+    </span>
+    <div class="col">
+      <Textarea label="- Không gian:" v-model="hsThongTinBenhAn.NoiDungChiTietObj.KhongGian" />
+      <Textarea label="- Thời gian:" v-model="hsThongTinBenhAn.NoiDungChiTietObj.ThoiGian" />
+      <Textarea label="- Bản thân:" v-model="hsThongTinBenhAn.NoiDungChiTietObj.BanThan" />
+    </div>
+  </div>
+  <Textarea label="Tình cảm, cảm xúc:" v-model="hsThongTinBenhAn.NoiDungChiTietObj.TinhCamCamXuc" />
+  <Textarea label="Tri giác (khả năng nhận thức thực tại khách quan, các rối loạn):"
+    v-model="hsThongTinBenhAn.NoiDungChiTietObj.TriGiac" />
+  <div class="row no-gutters">
+    <div style="flex: 0 0 20%">Tư duy:</div>
+    <div class="col">
+      <Textarea label="- Hình thức:" v-model="hsThongTinBenhAn.NoiDungChiTietObj.HinhThuc" />
+      <Textarea label="- Nội dung:" v-model="hsThongTinBenhAn.NoiDungChiTietObj.NoiDung" />
+    </div>
+  </div>
+  <div class="row no-gutters">
+    <div style="flex: 0 0 20%">Hành vi tác phong:
+    </div>
+    <div class="col">
+      <Textarea label="- Hoạt động có ý chí:" v-model="hsThongTinBenhAn.NoiDungChiTietObj.HoatDongCoYChi" />
+      <Textarea label="- Hoạt động bản năng:" v-model="hsThongTinBenhAn.NoiDungChiTietObj.HoatDongBanNang" />
+    </div>
+  </div>
+  <div class="row no-gutters">
+    <div style="flex: 0 0 20%">Trí nhớ:</div>
+    <div class="col">
+      <Textarea label="- Nhớ máy móc:" v-model="hsThongTinBenhAn.NoiDungChiTietObj.NhoMayMoc" />
+      <Textarea label="- Nhớ không hiểu:" v-model="hsThongTinBenhAn.NoiDungChiTietObj.NhoKhongHieu" />
+    </div>
+  </div>
+  <div class="row no-gutters">
+    <div style="flex: 0 0 20%">Trí năng:</div>
+    <div class="col">
+      <Textarea label="- Khả năng phân tích:" v-model="hsThongTinBenhAn.NoiDungChiTietObj.KhaNangPhanTich" />
+      <Textarea label="- Khả năng tổng hợp:" v-model="hsThongTinBenhAn.NoiDungChiTietObj.KhaNangTongHop" />
+    </div>
+  </div>
+  <Textarea label="Chú ý:" v-model="hsThongTinBenhAn.NoiDungChiTietObj.ChuY" />
+  <Textarea v-model="hsThongTinBenhAn.XetNghiemCLS"><template #label>
+  <span style="font-weight: bold;">4. Các xét
+    nghiệm
+    cận lâm sàng cần làm:</span>
+</template></Textarea>
+  <Textarea v-model="hsThongTinBenhAn.TomTatBenhAn"><template #label>
+  <span style="font-weight: bold;">5. Tóm tắt triệu
+    trứng và hội chứng:</span>
+</template></Textarea>
+  <div>
+    <b>IV. Chẩn đoán khi vào khoa điều trị</b>
+  </div>
+  <Textarea label="+ Bệnh chính:" v-model="hsThongTinBenhAn.ChanDoanVaoKhoa" />
+  <Textarea v-model="hsThongTinBenhAn.ChanDoanBenhKemTheo"><template #label>+ Bệnh kèm theo<i>(nếu có):</i>
+</template></Textarea>
+  <Textarea label="+ Phân biệt:" v-model="hsThongTinBenhAn.ChanDoanPhanBiet" />
+  <div>
+    <b>V. Tiên lượng</b>
+  </div>
+  <Textarea v-model="hsThongTinBenhAn.TienLuong" />
+  <div>
+    <b>VI. Hướng điều trị</b>
+  </div>
+  <Textarea v-model="hsThongTinBenhAn.HuongDieuTri" />
+  <div class="row no-gutters">
+    <div class="col-6 offset-6">
+      <DatePicker v-model="hsThongTinBenhAn.NoiDungChiTietObj.NgayLamBenhAn"
+        format="HH [giờ] mm [phút, ngày] DD/MM/YYYY" inputStyle="text-align: center" />
+    </div>
+    <div class="col-6 offset-6">
+      <div class="text-center font-weight-bold" style="font-size: 13.5pt">
+        <b>Bác sĩ làm bệnh án</b>
+      </div>
+      <Signature code="BacSiLamBenhAn" />
+    </div>
+  </div>
+  <div style="height: 30px;"></div>
+</PageA4>

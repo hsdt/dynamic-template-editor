@@ -1,0 +1,449 @@
+<PageA4 style="padding: 10mm 14mm 10mm 16mm; font-size: 10.5pt; line-height: 1.3; height: auto !important;">
+  <!-- Mã biểu mẫu góc trên phải -->
+  <div class="text-right" style="font-size: 9.5pt; color: #666; margin-bottom: 2px; text-align: right;">
+    BM 03
+  </div>
+
+  <!-- Header -->
+  <div class="row no-gutters" style="margin-bottom: 8px;">
+    <div class="col-4 text-center">
+      <div class="font-weight-bold" style="font-size: 10.5pt; line-height: 1.25;">
+        <div>BỆNH VIỆN TÂM THẦN</div>
+        <div>THÀNH PHỐ ĐÀ NẴNG</div>
+      </div>
+      <div style="margin-top: 2px; text-align: left; padding-left: 6px;">
+        <Textarea label="Khoa:" :modelValue="hsBenhAn.TenKhoaKham" line :rows="1" />
+      </div>
+    </div>
+
+    <div class="col-8 text-center" style="padding: 0 4px;">
+      <div class="font-weight-bold" style="font-size: 12pt; line-height: 1.25;">
+        PHIẾU ĐÁNH GIÁ TÌNH TRẠNG DINH DƯỠNG
+      </div>
+      <div style="font-size: 11pt; margin-top: 2px;">
+        (Dùng cho phụ nữ mang thai)
+      </div>
+    </div>
+  </div>
+
+  <!-- Thông tin hành chính -->
+  <div class="row no-gutters" style="margin-bottom: 2px;">
+    <div class="col-7">
+      <Textarea label="Họ tên người bệnh:" :modelValue="hsBenhAn.BenhNhan.HoTen" line :rows="1" />
+    </div>
+    <div class="col-2" style="padding-left: 4px;">
+      <Textarea label="Tuổi:" :modelValue="hsBenhAn.Tuoi" line :rows="1" />
+    </div>
+    <div class="col-3" style="padding-left: 4px;">
+      <Textarea label="Nam/Nữ:" :modelValue="hsBenhAn.BenhNhan.GioiTinh ? 'Nam' : 'Nữ'" line :rows="1" />
+    </div>
+  </div>
+
+  <div class="row no-gutters align-items-center" style="margin-bottom: 2px;">
+    <div class="col-4">
+      <div class="d-flex align-items-center">
+        <span class="text-nowrap">Tuổi thai:&nbsp;</span>
+        <Textarea :modelValue="hsBenhAn.TuoiThai" line :rows="1" style="width: 55px;" textareaStyle="text-align: center;" />
+        <span class="text-nowrap">&nbsp;tuần</span>
+      </div>
+    </div>
+    <div class="col-3">
+      <div class="d-flex align-items-center">
+        <span class="text-nowrap">Theo&nbsp;</span>
+        <Checkbox size="sm" v-model="data.TinhTuoiThaiTheo" value="KINH_CUOI">
+          <template #afterText><span style="margin-left: 4px;">kinh cuối</span></template>
+        </Checkbox>
+      </div>
+    </div>
+    <div class="col-5">
+      <Checkbox size="sm" v-model="data.TinhTuoiThaiTheo" value="SIEU_AM_3_THANG_DAU">
+        <template #afterText><span style="margin-left: 4px;">Siêu âm 3 tháng đầu thai kỳ</span></template>
+      </Checkbox>
+    </div>
+  </div>
+
+  <div style="margin-bottom: 2px;">
+    <Textarea label="Chẩn đoán:" :modelValue="hsBenhAn.ChanDoan" line :rows="1" />
+  </div>
+
+  <div class="row no-gutters align-items-center" style="margin-bottom: 2px;">
+    <div class="col-5">
+      <div class="d-flex align-items-center">
+        <span class="text-nowrap">Cân nặng trước mang thai:&nbsp;</span>
+        <Textarea v-model="data.CanNangTruocMangThai" line :rows="1" style="width: 50px;" textareaStyle="text-align: center;" />
+        <span class="text-nowrap">&nbsp;kg</span>
+      </div>
+    </div>
+    <div class="col-3">
+      <div class="d-flex align-items-center">
+        <span class="text-nowrap">Chiều cao:&nbsp;</span>
+        <Textarea v-model="hsBenhAn.ChieuCao" line :rows="1" style="width: 55px;" textareaStyle="text-align: center;" />
+        <span class="text-nowrap">&nbsp;cm</span>
+      </div>
+    </div>
+    <div class="col-4">
+      <Textarea label="BMI trước mang thai:"
+        :modelValue="data.CanNangTruocMangThai && hsBenhAn.ChieuCao ? (Number(data.CanNangTruocMangThai) / Math.pow(Number(hsBenhAn.ChieuCao) / 100, 2)).toFixed(1) : (data.BMITruocMangThai || '')"
+        @update:modelValue="data.BMITruocMangThai = $event"
+        line :rows="1" />
+    </div>
+  </div>
+
+  <div class="row no-gutters align-items-center" style="margin-bottom: 6px;">
+    <div class="col-5">
+      <div class="d-flex align-items-center">
+        <span class="text-nowrap">Cân nặng hiện tại:&nbsp;</span>
+        <Textarea v-model="hsBenhAn.CanNang" line :rows="1" style="width: 55px;" textareaStyle="text-align: center;" />
+        <span class="text-nowrap">&nbsp;Kg</span>
+      </div>
+    </div>
+    <div class="col-7">
+      <div class="d-flex align-items-center">
+        <span class="text-nowrap">Chu vi vòng cánh tay:&nbsp;</span>
+        <Textarea v-model="data.ChuViVongCanhTay" line :rows="1" style="width: 70px;" textareaStyle="text-align: center;" />
+        <span class="text-nowrap">&nbsp;cm</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1. Đánh giá tình trạng dinh dưỡng -->
+  <div class="font-weight-bold" style="margin-bottom: 4px;">
+    1. Đánh giá tình trạng dinh dưỡng
+  </div>
+
+  <table class="table table-bordered" style="width: 100%; border: 1px solid #000; border-collapse: collapse; margin-bottom: 6px; font-size: 10pt;">
+    <tbody>
+      <!-- BMI trước mang thai -->
+      <tr>
+        <td rowspan="3" style="width: 22%; border: 1px solid #000; padding: 2px 6px; vertical-align: top; text-align: center;">
+          BMI trước mang thai
+        </td>
+        <td style="width: 46%; border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          18,5 - 24,9
+        </td>
+        <td style="width: 32%; border: 1px solid #000; padding: 2px 8px; vertical-align: middle;">
+          <Checkbox size="sm" v-model="data.DiemBMITruocMangThai" value="0">
+            <template #afterText><span style="margin-left: 5px;">0 điểm</span></template>
+          </Checkbox>
+        </td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          &ge;25,0
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; vertical-align: middle;">
+          <Checkbox size="sm" v-model="data.DiemBMITruocMangThai" value="1">
+            <template #afterText><span style="margin-left: 5px;">1 điểm</span></template>
+          </Checkbox>
+        </td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          &lt; 18,5
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; vertical-align: middle;">
+          <Checkbox size="sm" v-model="data.DiemBMITruocMangThai" value="2">
+            <template #afterText><span style="margin-left: 5px;">2 điểm</span></template>
+          </Checkbox>
+        </td>
+      </tr>
+
+      <!-- Chu vi vòng cánh tay -->
+      <tr>
+        <td rowspan="2" style="border: 1px solid #000; padding: 2px 6px; vertical-align: top; text-align: center;">
+          Chu vi vòng cánh tay
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          &ge; 23 cm
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; vertical-align: middle;">
+          <Checkbox size="sm" v-model="data.DiemChuViCanhTay" value="0">
+            <template #afterText><span style="margin-left: 5px;">0 điểm</span></template>
+          </Checkbox>
+        </td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          &lt; 23 cm
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; vertical-align: middle;">
+          <Checkbox size="sm" v-model="data.DiemChuViCanhTay" value="2">
+            <template #afterText><span style="margin-left: 5px;">2 điểm</span></template>
+          </Checkbox>
+        </td>
+      </tr>
+
+      <!-- Tốc độ tăng cân -->
+      <tr>
+        <td rowspan="2" style="border: 1px solid #000; padding: 2px 6px; vertical-align: top; text-align: center;">
+          Tốc độ tăng cân
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          Tăng cân theo khuyến nghị
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; vertical-align: middle;">
+          <Checkbox size="sm" v-model="data.DiemTocDoTangCan" value="0">
+            <template #afterText><span style="margin-left: 5px;">0 điểm</span></template>
+          </Checkbox>
+        </td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          Tăng cân trên hoặc dưới mức khuyến nghị
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; vertical-align: middle;">
+          <Checkbox size="sm" v-model="data.DiemTocDoTangCan" value="1">
+            <template #afterText><span style="margin-left: 5px;">1 điểm</span></template>
+          </Checkbox>
+        </td>
+      </tr>
+
+      <!-- Bệnh kèm theo -->
+      <tr>
+        <td rowspan="2" style="border: 1px solid #000; padding: 2px 6px; vertical-align: top; text-align: center;">
+          Bệnh kèm theo liên quan dinh dưỡng
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          Không
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; vertical-align: middle;">
+          <Checkbox size="sm" v-model="data.DiemBenhKemTheo" value="0">
+            <template #afterText><span style="margin-left: 5px;">0 điểm</span></template>
+          </Checkbox>
+        </td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          Tăng huyết áp, đái tháo đường, nghén nặng, thiếu máu dinh dưỡng, bệnh lý tiêu hóa
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; vertical-align: top;">
+          <Checkbox size="sm" v-model="data.DiemBenhKemTheo" value="1">
+            <template #afterText><span style="margin-left: 5px;">1 điểm</span></template>
+          </Checkbox>
+        </td>
+      </tr>
+
+      <!-- Kết luận -->
+      <tr>
+        <td rowspan="2" class="font-weight-bold" style="border: 1px solid #000; padding: 2px 6px; vertical-align: top; text-align: center;">
+          Kết luận
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          &lt; 2 điểm
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; vertical-align: middle;">
+          <Checkbox size="sm" v-model="data.KetLuan" value="BINH_THUONG">
+            <template #afterText><span style="margin-left: 5px;">Bình thường</span></template>
+          </Checkbox>
+        </td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          &ge; 2 điểm
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; vertical-align: middle;">
+          <Checkbox size="sm" v-model="data.KetLuan" value="CO_NGUY_CO">
+            <template #afterText><span style="margin-left: 5px;">Có nguy cơ về dinh dưỡng</span></template>
+          </Checkbox>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- 2. Kế hoạch can thiệp -->
+  <div class="font-weight-bold" style="margin-bottom: 4px;">
+    2. Kế hoạch can thiệp
+  </div>
+
+  <table class="table table-bordered" style="width: 100%; border: 1px solid #000; border-collapse: collapse; margin-bottom: 4px; font-size: 10pt;">
+    <tbody>
+      <!-- Chỉ định chế độ ăn -->
+      <tr>
+        <td style="width: 22%; border: 1px solid #000; padding: 2px 6px; text-align: center; vertical-align: middle;">
+          Chỉ định chế độ ăn
+        </td>
+        <td style="width: 56%; border: 1px solid #000; padding: 2px 8px; vertical-align: middle;">
+          <Textarea label="Mã số" v-model="data.MaSoCheDoAn" :line="false" :rows="1" />
+        </td>
+        <td style="width: 22%; border: 1px solid #000; padding: 2px 6px; vertical-align: middle;">
+          <Textarea v-model="data.ChiDinhCheDoAnGhiChu" :line="false" :rows="1" textareaStyle="text-align: center;" />
+        </td>
+      </tr>
+
+      <!-- Đường nuôi ăn -->
+      <tr>
+        <td rowspan="3" style="border: 1px solid #000; padding: 2px 6px; vertical-align: top; text-align: center;">
+          Đường nuôi ăn
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          Đường miệng
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 6px; text-align: center; vertical-align: middle;">
+          <div class="d-flex justify-content-center">
+            <Checkbox size="sm" native v-model="data.NuoiAn_DuongMieng" />
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          Ống thông
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 6px; text-align: center; vertical-align: middle;">
+          <div class="d-flex justify-content-center">
+            <Checkbox size="sm" native v-model="data.NuoiAn_OngThong" />
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          Tĩnh mạch
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 6px; text-align: center; vertical-align: middle;">
+          <div class="d-flex justify-content-center">
+            <Checkbox size="sm" native v-model="data.NuoiAn_TinhMach" />
+          </div>
+        </td>
+      </tr>
+
+      <!-- Mời hội chẩn dinh dưỡng -->
+      <tr>
+        <td rowspan="2" style="border: 1px solid #000; padding: 2px 6px; vertical-align: top; text-align: center;">
+          Mời hội chẩn dinh dưỡng
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          Có
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 6px; text-align: center; vertical-align: middle;">
+          <div class="d-flex justify-content-center">
+            <Checkbox size="sm" v-model="data.MoiHoiChanDD" value="CO" />
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          Không
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 6px; text-align: center; vertical-align: middle;">
+          <div class="d-flex justify-content-center">
+            <Checkbox size="sm" v-model="data.MoiHoiChanDD" value="KHONG" />
+          </div>
+        </td>
+      </tr>
+
+      <!-- Tái đánh giá -->
+      <tr>
+        <td rowspan="2" class="font-weight-bold" style="border: 1px solid #000; padding: 2px 6px; vertical-align: top; text-align: center;">
+          Tái đánh giá
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          Sau 7 ngày <em>(PNMT* không cần can thiệp dinh dưỡng)</em>
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 6px; text-align: center; vertical-align: middle;">
+          <div class="d-flex justify-content-center">
+            <Checkbox size="sm" v-model="data.TaiDanhGia" value="SAU_7_NGAY" />
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid #000; padding: 2px 8px; text-align: right; vertical-align: middle;">
+          Sau 3 ngày <em>(PNMT* cần can thiệp dinh dưỡng)</em>
+        </td>
+        <td style="border: 1px solid #000; padding: 2px 6px; text-align: center; vertical-align: middle;">
+          <div class="d-flex justify-content-center">
+            <Checkbox size="sm" v-model="data.TaiDanhGia" value="SAU_3_NGAY" />
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Ghi chú PNMT & Chữ ký Bác sĩ -->
+  <div class="row no-gutters" style="margin-bottom: 6px;">
+    <div class="col-5 font-italic" style="padding-left: 16px;">
+      PNMT*: phụ nữ mang thai
+    </div>
+    <div class="col-7 text-center">
+      <div>
+        <DatePicker v-model="data.NgayKyBacSi" format="[Đà Nẵng, ngày] DD [tháng] MM [năm] YYYY"
+          placeholder="Đà Nẵng, ngày ......... tháng......... năm 20...."
+          style="text-align: center; width: 290px; margin: 0 auto;"
+          inputStyle="text-align: center;" />
+      </div>
+      <div style="margin-top: 2px;">BÁC SĨ KHÁM BỆNH</div>
+      <div style="height: 1.5cm; display: flex; align-items: center; justify-content: center;">
+        <Signature code="BacSiKhamBenh" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Phần hướng dẫn và bảng tham khảo cuối trang -->
+  <div style="font-size: 8.5pt; line-height: 1.25; padding-left: 14px;">
+    <!-- Công thức BMI -->
+    <div class="d-flex align-items-center font-italic" style="margin-bottom: 4px;">
+      <span>BMI(kg/m<sup>2</sup>) =&nbsp;</span>
+      <span style="display: inline-block; text-align: center; vertical-align: middle;">
+        <span style="display: block; border-bottom: 1px solid #000; padding: 0 4px;">Cân nặng (kg)</span>
+        <span style="display: block; padding: 0 4px;">Chiều cao (m) X chiều cao (m)</span>
+      </span>
+    </div>
+
+    <div><strong>Cán bộ thực hiện:</strong> Bác sĩ điều trị</div>
+    <div><strong>Đối tượng đánh giá:</strong> tất cả PNMT nằm viện đều cần được đánh giá tình trạng dinh dưỡng để có kế hoạch can thiệp dinh dưỡng phù hợp</div>
+    <div><strong>Thời gian thực hiện:</strong> trong vòng 36 giờ sau nhập viện</div>
+    <div><strong>Thời gian đánh giá:</strong> Ở PNMT không cần can thiệp dinh dưỡng: tái đánh giá sau mỗi tuần</div>
+    <div style="padding-left: 98px;">Ở PNMT có can thiệp dinh dưỡng: tái đánh giá sau 3 ngày</div>
+    <div><strong>Mời hội chẩn dinh dưỡng:</strong> do bác sĩ điều trị quyết định tuỳ theo từng trường hợp cụ thể</div>
+    <div><strong>Một số lưu ý:</strong> - Nếu PNMT không rõ cân nặng trước khi mang thai: sử dụng BMI trong lần khám đầu tiên trong 3 tháng đầu thai kỳ</div>
+    <div style="margin-bottom: 2px;">Bảng khuyến nghị tăng cân trong 6 tháng cuối thai kỳ ở PNMT:</div>
+
+    <table class="table table-bordered text-center" style="width: 100%; border: 1px solid #000; border-collapse: collapse; font-size: 8.5pt; margin-bottom: 0;">
+      <thead>
+        <tr>
+          <th colspan="2" style="width: 28%; border: 1px solid #000; padding: 2px 4px; font-weight: normal; vertical-align: top;">
+            BMI trước mang thai
+          </th>
+          <th style="width: 20%; border: 1px solid #000; padding: 2px 4px; font-weight: normal; vertical-align: top;">
+            Tăng cân thai kỳ (Kg)
+          </th>
+          <th style="width: 26%; border: 1px solid #000; padding: 2px 4px; font-weight: normal; vertical-align: top;">
+            Khuyến nghị tăng cân trong 6 tháng cuối thai kỳ theo tuần (kg)
+          </th>
+          <th style="width: 26%; border: 1px solid #000; padding: 2px 4px; font-weight: normal; vertical-align: top;">
+            Khuyến nghị tăng cân trong 6 tháng cuối thai kỳ theo tháng (kg)
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="width: 14%; border: 1px solid #000; padding: 1px 4px;">Suy DD</td>
+          <td style="width: 14%; border: 1px solid #000; padding: 1px 4px;">&lt; 18,5</td>
+          <td style="border: 1px solid #000; padding: 1px 4px;">12,5 - 18</td>
+          <td style="border: 1px solid #000; padding: 1px 4px;">0,4 - 0,6</td>
+          <td style="border: 1px solid #000; padding: 1px 4px;">1,8 - 2,7</td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #000; padding: 1px 4px;">Bình thường</td>
+          <td style="border: 1px solid #000; padding: 1px 4px;">18,5 - 24,9</td>
+          <td style="border: 1px solid #000; padding: 1px 4px;">11,5 - 16</td>
+          <td style="border: 1px solid #000; padding: 1px 4px;">0,4 - 0,5</td>
+          <td style="border: 1px solid #000; padding: 1px 4px;">1,8</td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #000; padding: 1px 4px;">Thừa cân</td>
+          <td style="border: 1px solid #000; padding: 1px 4px;">25,0 - 29,9</td>
+          <td style="border: 1px solid #000; padding: 1px 4px;">7 - 11,5</td>
+          <td style="border: 1px solid #000; padding: 1px 4px;">0,2 - 0,3</td>
+          <td style="border: 1px solid #000; padding: 1px 4px;">0,9</td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #000; padding: 1px 4px;">Béo phì</td>
+          <td style="border: 1px solid #000; padding: 1px 4px;">&ge; 30,0</td>
+          <td style="border: 1px solid #000; padding: 1px 4px;">5 - 9</td>
+          <td style="border: 1px solid #000; padding: 1px 4px;">0,2 - 0,3</td>
+          <td style="border: 1px solid #000; padding: 1px 4px;">0,7 - 0,9</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</PageA4>
+

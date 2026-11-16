@@ -1,0 +1,162 @@
+<PageA4 style="font-size: 12pt; line-height: 1.35; padding: 18mm 15mm 15mm 20mm; height: auto !important;">
+  <!-- Mã số quy trình & biểu mẫu -->
+  <div class="row no-gutters" style="margin-bottom: 10px; font-size: 10pt;">
+    <div class="col-8 font-italic">
+      QT.06.KHTH. QT cung cấp tóm tắt hồ sơ bệnh án
+    </div>
+    <div class="col-4 font-italic text-right" style="text-align: right;">
+      BM.06.KHTH.04
+    </div>
+  </div>
+
+  <!-- Header đơn vị & Quốc hiệu -->
+  <div class="row no-gutters" style="margin-bottom: 15px;">
+    <div class="col-5 text-center">
+      <div style="font-size: 10.5pt;">SỞ Y TẾ THÀNH PHỐ ĐÀ NẴNG</div>
+      <div class="font-weight-bold" style="font-size: 10.5pt;">
+        <div>BỆNH VIỆN TÂM THẦN</div>
+        <div>THÀNH PHỐ ĐÀ NẴNG</div>
+      </div>
+      <div style="width: 140px; height: 1px; background: #000; margin: 3px auto 6px;"></div>
+      <div style="display: flex; justify-content: center; align-items: baseline; font-size: 11pt;">
+        <span>Số:&nbsp;&nbsp;</span>
+        <Textarea v-model="data.SoGXN" line :rows="1" style="width: 60px;" />
+        <span>/GXN-BVTT</span>
+      </div>
+    </div>
+
+    <div class="col-5 text-center">
+      <div class="font-weight-bold" style="font-size: 10.5pt;">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>
+      <div class="font-weight-bold" style="font-size: 10.5pt;">Độc lập – Tự do – Hạnh phúc</div>
+      <div style="width: 170px; height: 1px; background: #000; margin: 3px auto;"></div>
+    </div>
+
+    <div class="col-2 text-right" style="font-size: 10pt; line-height: 1.3;">
+      <div class="font-weight-bold">MS 06</div>
+      <div class="text-nowrap">Số hồ sơ/Số BA</div>
+      <Textarea v-model="data.SoHoSoBA" line :rows="1" />
+    </div>
+  </div>
+
+  <!-- Tiêu đề biểu mẫu -->
+  <div class="text-center" style="margin-bottom: 16px;">
+    <div class="font-weight-bold" style="font-size: 13pt; margin-bottom: 4px;">
+      GIẤY XÁC NHẬN QUÁ TRÌNH ĐIỀU TRỊ NỘI TRÚ
+    </div>
+    <div class="font-weight-bold" style="font-size: 11.5pt;">
+      Bệnh viện Tâm thần thành phố Đà Nẵng xác nhận:
+    </div>
+  </div>
+
+  <!-- Thông tin hành chính & quá trình điều trị -->
+  <div style="margin-bottom: 6px;">
+    <Textarea label="- Họ tên người bệnh:" v-model="data.HoTenNguoiBenh" line :rows="1" />
+  </div>
+
+  <div class="row no-gutters align-items-center" style="margin-bottom: 6px;">
+    <div class="col-5">
+      <DatePicker label="- Ngày/tháng/năm sinh:" v-model="data.NgaySinh" format="DD/MM/YYYY" placeholder="......../ ......../ ............" />
+    </div>
+    <div class="col-3">
+      <div class="d-flex align-items-center">
+        <span class="text-nowrap">(Tuổi&nbsp;</span>
+        <Textarea v-model="data.Tuoi" line :rows="1" style="width: 50px;" />
+        <span class="text-nowrap">);</span>
+      </div>
+    </div>
+    <div class="col-4">
+      <Textarea label="Nam/nữ:" v-model="data.GioiTinh" line :rows="1" />
+    </div>
+  </div>
+
+  <div class="row no-gutters" style="margin-bottom: 6px;">
+    <div class="col-4">
+      <Textarea label="- Dân tộc:" v-model="data.DanToc" line :rows="1" />
+    </div>
+    <div class="col-8">
+      <Textarea label="Nghề nghiệp:" v-model="data.NgheNghiep" line :rows="1" />
+    </div>
+  </div>
+
+  <div style="margin-bottom: 6px;">
+    <Textarea label="- Số CCCD/CMND/Định danh công dân/Hộ chiếu:" v-model="data.SoCCCD" line :rows="1" />
+  </div>
+
+  <div class="row no-gutters" style="margin-bottom: 6px;">
+    <div class="col-5">
+      <DatePicker label="Ngày cấp:" v-model="data.NgayCapCCCD" format="DD/MM/YYYY" placeholder="........./ ........./ ................" />
+    </div>
+  </div>
+
+  <div style="margin-bottom: 6px;">
+    <Textarea label="- Mã số BHXH/Thẻ BHYT (nếu có) số:" v-model="data.SoBHYT" line :rows="1" />
+  </div>
+
+  <div style="margin-bottom: 6px;">
+    <Textarea label="- Địa chỉ:" v-model="data.DiaChi" line :rows="1" />
+  </div>
+
+  <div style="margin-bottom: 6px;">
+    <DatePicker label="- Vào viện lúc:" v-model="data.ThoiGianVaoVien"
+      format="HH [giờ] mm [phút, ngày] DD [tháng] MM [năm] YYYY"
+      placeholder="............ giờ.......... phút, ngày ............ tháng............ năm ............" />
+  </div>
+
+  <div style="margin-bottom: 6px;">
+    <Textarea label="- Hiện đang điều trị nội trú tại" v-model="data.NoiDieuTriNoiTru" line :rows="1" />
+  </div>
+
+  <div style="margin-bottom: 6px;">
+    <DatePicker label="hoặc đã ra viện lúc:" v-model="data.ThoiGianRaVien"
+      format="HH [giờ] mm [phút, ngày] DD [tháng] MM [năm] YYYY"
+      placeholder="........ giờ ......... phút, ngày............ tháng ......... năm ............." />
+  </div>
+
+  <div style="margin-bottom: 6px;">
+    <div style="margin-bottom: 2px;">- Mô tả tình trạng bệnh, tật của người bệnh đã hoặc đang điều trị nội trú:</div>
+    <Textarea v-model="data.MoTaTinhTrangBenh" line :rows="3" />
+  </div>
+
+  <div style="margin-bottom: 6px;">
+    <Textarea label="- Chẩn đoán:" v-model="data.ChanDoan" line :rows="1" />
+  </div>
+
+  <div style="margin-bottom: 6px;">
+    <Textarea label="- Phương pháp điều trị:" v-model="data.PhuongPhapDieuTri" line :rows="1" />
+  </div>
+
+  <div style="margin-bottom: 12px;">
+    <Textarea label="- Ghi chú (nếu có):" v-model="data.GhiChu" line :rows="1" />
+  </div>
+
+  <!-- Phần ký tên và xác nhận -->
+  <div class="row no-gutters" style="margin-top: 20px; text-align: center;">
+    <div class="col-6">
+      <div class="font-italic" style="font-size: 11pt;">
+        <DatePicker v-model="data.NgayKyDonVi" format="[Ngày] DD [tháng] MM [năm] YYYY"
+          placeholder="Ngày........ tháng....... năm 20......."
+          style="text-align: center; font-style: italic; width: 240px; margin: 0 auto;"
+          inputStyle="text-align: center; font-style: italic;" />
+      </div>
+      <div class="font-weight-bold" style="font-size: 11pt; margin-top: 4px;">Đại diện đơn vị</div>
+      <div class="font-italic" style="font-size: 11pt; margin-top: 2px;">(Ký, ghi rõ họ tên, đóng dấu)</div>
+      <div style="height: 2.5cm; display: flex; align-items: center; justify-content: center;">
+        <Signature code="DaiDienDonVi" />
+      </div>
+    </div>
+
+    <div class="col-6">
+      <div class="font-italic" style="font-size: 11pt;">
+        <DatePicker v-model="data.NgayKyNguoiKham" format="[Ngày] DD [tháng] MM [năm] YYYY"
+          placeholder="Ngày........tháng....... năm 20........"
+          style="text-align: center; font-style: italic; width: 240px; margin: 0 auto;"
+          inputStyle="text-align: center; font-style: italic;" />
+      </div>
+      <div class="font-weight-bold" style="font-size: 11pt; margin-top: 4px;">Người hành nghề khám bệnh, chữa bệnh</div>
+      <div class="font-italic" style="font-size: 11pt; margin-top: 2px;">(Ký, ghi rõ họ tên)</div>
+      <div style="height: 2.5cm; display: flex; align-items: center; justify-content: center;">
+        <Signature code="NguoiHanhNghe" />
+      </div>
+    </div>
+  </div>
+</PageA4>

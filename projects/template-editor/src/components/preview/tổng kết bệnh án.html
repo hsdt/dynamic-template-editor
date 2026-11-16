@@ -1,0 +1,149 @@
+<PageA4 style="font-size: 12pt; max-height: unset; height: auto; padding-bottom: 20px">
+  <div class="row no-gutters">
+    <div class="col-12 font-weight-bold"> TỔNG KẾT
+      BỆNH
+      ÁN:</div>
+  </div>
+  <table class="table table-ehr-bordered" style="margin-bottom: 10px;">
+    <tr>
+      <td colspan="4">
+        <div class="row no-gutters">
+          <div class="col-12">
+            <span>
+              <b>1. Quá trình bệnh lý và diễn biến lâm
+                sàng:
+              </b>
+            </span>
+            <Textarea v-model="hsTongKetBenhAn.QuaTrinhBenhLy" rows="5" />
+          </div>
+        </div>
+        <div class="row no-gutters">
+          <div class="col-12">
+            <span>
+              <b>2. Tóm tắt kết quả xét nghiệm cận lâm
+                sàng
+                có
+                giá
+                trị chẩn đoán:</b>
+            </span>
+            <Textarea v-model="hsTongKetBenhAn.TomTatXetNghiem" rows="5" />
+          </div>
+          <div class="col-12">
+            <Textarea label="Giải phẫu bệnh (khi có sinh thiết)"
+              v-model="hsTongKetBenhAn.NoiDungChiTietObj.GiaiPhauBenhKhiCoSinhThiet" />
+          </div>
+          <div class="col-4"></div>
+          <div class="col-2">
+            <Checkbox v-model="hsTongKetBenhAn.NoiDungChiTietObj.GiaiPhauSinhThiet" value="LANH_TINH"
+              beforeText="1. Lành tính" />
+          </div>
+          <div class="col-2">
+            <Checkbox v-model="hsTongKetBenhAn.NoiDungChiTietObj.GiaiPhauSinhThiet" value="NGHI_NGO"
+              beforeText="2. Nghi ngờ" />
+          </div>
+          <div class="col-2">
+            <Checkbox v-model="hsTongKetBenhAn.NoiDungChiTietObj.GiaiPhauSinhThiet" value="AC_TINH"
+              beforeText="3. Ác tính" />
+          </div>
+        </div>
+        <div class="row no-gutters">
+          <div class="col-12">
+            <span>
+              <b>3. Phương pháp điều trị:</b>
+            </span>
+            <Textarea v-model="hsTongKetBenhAn.PhuongPhapDieuTri" rows="5" />
+          </div>
+        </div>
+        <div class="row no-gutters" style="margin-top:10px">
+          <div class="col-12">
+            <span>
+              <b>4. Tình trạng người bệnh ra viện:</b>
+            </span>
+            <Textarea v-model="hsTongKetBenhAn.TinhTrangRaVien" rows="5" />
+          </div>
+        </div>
+        <div class="row no-gutters" style="margin-top:10px">
+          <div class="col-12">
+            <span>
+              <b>5. Hướng điều trị và các chế độ tiếp
+                theo:
+              </b>
+            </span>
+            <Textarea v-model="hsTongKetBenhAn.HuongDieuTriTiepTheo" rows="5" />
+          </div>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2" width="40%" class="text-center font-weight-bold"> Hồ sơ, phim, ảnh</td>
+      <td rowspan="4" class="text-center font-weight-bold">
+        <span> Người giao hồ sơ</span>
+        <Signature code="NguoiGiaoHoSo" />
+      </td>
+      <td rowspan="8" width="30%" class="text-center font-weight-bold">
+        <DatePicker inputStyle="font-size: 11pt" v-model="hsTongKetBenhAn.NoiDungChiTietObj.NgayKetThuc"
+          format="HH [giờ] mm [phút, ngày] DD/MM/YYYY" />
+        <span>Bác sĩ điều trị</span>
+        <Signature code="BacSiDieuTri" />
+      </td>
+    </tr>
+    <tr>
+      <td width="30%" class="text-center "> Loại</td>
+      <td width="10%" class="text-center "> Số tờ
+      </td>
+    </tr>
+    <tr>
+      <td> XQuang</td>
+      <td>
+        <Textarea v-model="hsTongKetBenhAn.NoiDungChiTietObj.SoTo_xQuang" maxlength="5" />
+      </td>
+    </tr>
+    <tr>
+      <td> CT Scanner</td>
+      <td>
+        <Textarea v-model="hsTongKetBenhAn.NoiDungChiTietObj.SoTo_CT" maxlength="5" />
+      </td>
+    </tr>
+    <tr>
+      <td> Siêu âm</td>
+      <td>
+        <Textarea v-model="hsTongKetBenhAn.NoiDungChiTietObj.SoTo_sieuAm" maxlength="5" />
+      </td>
+      <td rowspan="4" class="text-center font-weight-bold">
+        <span> Người nhận hồ sơ</span>
+        <Signature code="NguoiNhanHoSo" />
+      </td>
+    </tr>
+    <tr>
+      <td> Xét nghiệm</td>
+      <td>
+        <Textarea v-model="hsTongKetBenhAn.NoiDungChiTietObj.SoTo_xetNghiem" maxlength="5" />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div class=" input-ehr">
+          <span>Khác</span>
+          <Textarea v-model="hsTongKetBenhAn.NoiDungChiTietObj.CLS_Khac" maxlength="25" />
+        </div>
+      </td>
+      <td>
+        <Textarea v-model="hsTongKetBenhAn.NoiDungChiTietObj.SoTo_khac" maxlength="5" />
+      </td>
+    </tr>
+    <tr>
+      <td> Tổng bộ hồ sơ</td>
+      <td>
+        <Textarea v-model="hsTongKetBenhAn.NoiDungChiTietObj.SoTo_toanBoHS" maxlength="5" />
+      </td>
+    </tr>
+  </table>
+  <div class="row no-gutters">
+    <div class="text-center" style=" bottom: 0px;font-size:12px;margin-top:-20px;margin-left:400px">
+      <span>
+        <i>04</i>
+      </span>
+    </div>
+    <div class="text-right" style=" bottom: 0px;font-size:12px;margin-top:-20px;margin-left:200px"></div>
+  </div>
+</PageA4>

@@ -170,11 +170,12 @@ Xem các file trong [template-capture/components](template-capture/components) �
 - Áp dụng cho: Textarea, DatePicker, Select có hỗ trợ prop `label`
 - **Lưu ý**: Chỉ dùng wrapper khi cần layout phức tạp, ví dụ checkbox + textarea trên cùng một hàng, hoặc nhiều field song song
 
-### 7. Quy tắc riêng cho Textarea và Checkbox
+### 7. Quy tắc riêng cho Textarea, Checkbox và IcdList
 - `Textarea` 1 dòng: luôn ưu tiên `line :rows="1"`
 - **Không dùng `:suffix` cho `Textarea` trong bất kỳ trường hợp nào**
-- Checkbox có text bên phải: ưu tiên `afterText` thay vì `beforeText`
-- Checkbox có nội dung dài hoặc cần giữ layout: dùng `class="col-span-*"` + `afterText` hoặc slot `#afterText`
+- Checkbox có text bên phải: ưu tiên `after-text` thay vì `before-text`
+- Checkbox có nội dung dài hoặc cần giữ layout: dùng `class="col-span-*"` + `after-text` hoặc slot `#afterText`
+- Khi dùng `IcdList`, bắt buộc phải truyền prop `path-items` trỏ tới đường dẫn dữ liệu mảng đó (ví dụ `:items="data.ListIcd"` đi kèm `path-items="data.ListIcd"`).
 
 ### 8. TODO khi không chắc chắn
 Nếu không xác định được chính xác component hoặc binding:

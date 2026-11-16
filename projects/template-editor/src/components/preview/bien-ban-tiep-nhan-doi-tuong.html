@@ -1,0 +1,147 @@
+<PageA4 style="font-size: 12pt; line-height: 1.35; padding: 20mm 20mm 20mm 25mm; height: auto !important;">
+  <div class="row no-gutters" style="margin-bottom: 12px; font-size: 10.5pt; color: #333;">
+    <div class="col-8 font-italic">
+      QT.10.KHTH.QT Tiếp nhận và ra viện bệnh nhân lang thang
+    </div>
+    <div class="col-4 font-italic text-right" style="text-align: right;">
+      BM 10.KHTH.01
+    </div>
+  </div>
+
+  <div class="text-center" style="margin-bottom: 15px;">
+    <div class="font-weight-bold" style="font-size: 12pt;">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>
+    <div class="font-weight-bold" style="font-size: 12pt; text-decoration: underline;">Độc lập - Tự do - Hạnh phúc</div>
+  </div>
+
+  <div class="text-center font-weight-bold" style="font-size: 13pt; margin-bottom: 15px;">
+    BIÊN BẢN TIẾP NHẬN ĐỐI TƯỢNG
+  </div>
+
+  <div style="margin-bottom: 6px;">
+    <DatePicker label="Hôm nay: lúc" v-model="data.ThoiGianTiepNhan"
+      format="HH [giờ] mm [, ngày] DD [tháng] MM [năm] YYYY"
+      placeholder="...... giờ...... , ngày..........tháng .........năm ............" />
+  </div>
+  <div style="margin-bottom: 6px;">
+    <Textarea label="Tại:" v-model="data.DiaDiemTiepNhan" line :rows="1" />
+  </div>
+  <div style="margin-top: 6px; margin-bottom: 8px;">Chúng tôi gồm:</div>
+
+  <div style="margin-bottom: 10px;">
+    <div class="font-weight-bold" style="margin-bottom: 4px;">I. Bên giao: Công an phường (xã)</div>
+    <div class="row no-gutters" style="margin-bottom: 4px;">
+      <div class="col-8">
+        <Textarea label="Ông (bà):" v-model="data.BenGiaoOngBa" line :rows="1" />
+      </div>
+      <div class="col-4">
+        <Textarea label="Chức vụ:" v-model="data.BenGiaoChucVu" line :rows="1" />
+      </div>
+    </div>
+    <Textarea v-model="data.BenGiaoChiTietThem" line :rows="1" style="margin-bottom: 4px;" />
+  </div>
+
+  <div style="margin-bottom: 10px;">
+    <div class="font-weight-bold" style="margin-bottom: 4px;">II. Bên nhận:</div>
+    <div class="row no-gutters" style="margin-bottom: 4px;">
+      <div class="col-8">
+        <Textarea label="Ông (bà):" v-model="data.BenNhanOngBa1" line :rows="1" />
+      </div>
+      <div class="col-4">
+        <Textarea label="Chức vụ:" v-model="data.BenNhanChucVu1" line :rows="1" />
+      </div>
+    </div>
+    <Textarea v-model="data.BenNhanChiTietThem1" line :rows="1" style="margin-bottom: 4px;" />
+    
+    <div class="row no-gutters" style="margin-bottom: 4px;">
+      <div class="col-8">
+        <Textarea label="Ông (bà):" v-model="data.BenNhanOngBa2" line :rows="1" />
+      </div>
+      <div class="col-4">
+        <Textarea label="Chức vụ:" v-model="data.BenNhanChucVu2" line :rows="1" />
+      </div>
+    </div>
+    <Textarea v-model="data.BenNhanChiTietThem2" line :rows="1" style="margin-bottom: 4px;" />
+  </div>
+
+  <div style="margin-bottom: 10px;">
+    <div class="font-weight-bold" style="margin-bottom: 4px;">III. Bên chứng kiến: Trung tâm Công tác xã hội TP Đà Nẵng</div>
+    <div class="row no-gutters" style="margin-bottom: 4px;">
+      <div class="col-8">
+        <Textarea label="Ông (bà):" v-model="data.ChungKienOngBa" line :rows="1" />
+      </div>
+      <div class="col-4">
+        <Textarea label="Chức vụ:" v-model="data.ChungKienChucVu" line :rows="1" />
+      </div>
+    </div>
+    <Textarea v-model="data.ChungKienChiTietThem" line :rows="1" style="margin-bottom: 4px;" />
+  </div>
+
+  <div style="margin-bottom: 10px;">
+    <div style="margin-bottom: 6px;">Tiến hành lập biên bản tiếp nhận đối tượng xã hội như sau:</div>
+    <div class="row no-gutters" style="margin-bottom: 4px;">
+      <div class="col-8">
+        <Textarea label="Họ và tên:" line :rows="1" :modelValue="hsBenhAn?.BenhNhan?.HoTen || data.HoTen"
+          @update:modelValue="data.HoTen = $event" />
+      </div>
+      <div class="col-4">
+        <Textarea label="; Sinh năm:" line :rows="1"
+          :modelValue="moment(hsBenhAn?.BenhNhan?.NgaySinh).isValid() ? moment(hsBenhAn?.BenhNhan?.NgaySinh).year() : data.NamSinh"
+          @update:modelValue="data.NamSinh = $event" />
+      </div>
+    </div>
+    <Textarea label="Là đối tượng:" v-model="data.LaDoiTuong" line :rows="2" style="margin-bottom: 4px;" />
+    <Textarea label="Trú tại:" v-model="data.TruTai" line :rows="2" style="margin-bottom: 4px;" />
+    <Textarea label="Cùng với:" v-model="data.CungVoi" line :rows="2" style="margin-bottom: 4px;" />
+    <Textarea label="Tình trạng sức khỏe (do cán bộ y tế ghi):" v-model="data.TinhTrangSucKhoe" line :rows="5"
+      style="margin-bottom: 4px;" />
+  </div>
+
+  <div style="margin-bottom: 12px;">
+    <div class="font-weight-bold" style="margin-bottom: 4px;">Tài sản kèm theo:</div>
+    <Textarea label="- Tiền mặt:" v-model="data.TaiSanTienMat" line :rows="1" style="margin-bottom: 4px;" />
+    <Textarea label="- Tài sản khác:" v-model="data.TaiSanKhac" line :rows="2" style="margin-bottom: 4px;" />
+  </div>
+
+  <div style="margin-bottom: 15px; text-align: justify;">
+    <div class="d-flex align-items-center" style="margin-bottom: 4px;">
+      <span class="text-nowrap">Biên bản kết thúc lúc&nbsp;</span>
+      <DatePicker v-model="data.ThoiGianKetThuc" format="HH [giờ] mm" placeholder="..........giờ........."
+        style="width: 140px;" />
+      <span>&nbsp;cùng ngày.</span>
+    </div>
+    <div>Biên bản được đọc lại cho những người có liên quan nghe và ký tên dưới đây./.</div>
+  </div>
+
+  <div style="display: flex; justify-content: space-between; margin-top: 15px; text-align: center;">
+    <div style="flex: 1; padding: 0 4px;">
+      <div class="font-weight-bold">BÊN NHẬN</div>
+      <div style="height: 2.5cm; display: flex; align-items: center; justify-content: center;">
+        <Signature code="BenNhan" />
+      </div>
+    </div>
+    <div style="flex: 1; padding: 0 4px;">
+      <div class="font-weight-bold">ĐỐI TƯỢNG</div>
+      <div style="height: 2.5cm; display: flex; align-items: center; justify-content: center;">
+        <Signature code="DoiTuong" />
+      </div>
+    </div>
+    <div style="flex: 1; padding: 0 4px;">
+      <div class="font-weight-bold">Y TẾ</div>
+      <div style="height: 2.5cm; display: flex; align-items: center; justify-content: center;">
+        <Signature code="YTe" />
+      </div>
+    </div>
+    <div style="flex: 1; padding: 0 4px;">
+      <div class="font-weight-bold">CHỨNG KIẾN</div>
+      <div style="height: 2.5cm; display: flex; align-items: center; justify-content: center;">
+        <Signature code="ChungKien" />
+      </div>
+    </div>
+    <div style="flex: 1; padding: 0 4px;">
+      <div class="font-weight-bold">BÊN GIAO</div>
+      <div style="height: 2.5cm; display: flex; align-items: center; justify-content: center;">
+        <Signature code="BenGiao" />
+      </div>
+    </div>
+  </div>
+</PageA4>

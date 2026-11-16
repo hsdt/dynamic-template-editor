@@ -1,0 +1,173 @@
+<PageA4 style="font-size: 12pt; line-height: 1.35; padding: 20mm 20mm 20mm 25mm;">
+  <div class="row no-gutters" style="margin-bottom: 15px;">
+    <div class="col-5 text-center">
+      <div style="font-size: 11pt;">
+        {{ config.CoSoTrucThuoc || data.TenCoQuanChuQuan || 'TÊN CƠ QUAN CHỦ QUẢN' }}
+      </div>
+      <div class="font-weight-bold" style="font-size: 11pt;">
+        {{ config.TenBenhVien || data.TenCoSoDieuTriBatBuoc || 'TÊN CƠ SỞ ĐIỀU TRỊ BẮT BUỘC' }}
+      </div>
+      <div style="margin-top: 4px; display: flex; justify-content: center; align-items: baseline;">
+        <span>Số:&nbsp;</span>
+        <Textarea v-model="data.SoBienBan" line :rows="1" style="width: 60px; display: inline-block;" />
+        <span>/BBGN</span>
+      </div>
+    </div>
+    <div class="col-7 text-center">
+      <div class="font-weight-bold" style="font-size: 11pt;">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>
+      <div class="font-weight-bold" style="font-size: 11pt; text-decoration: underline;">Độc lập - Tự do - Hạnh phúc
+      </div>
+      <div class="font-italic" style="margin-top: 4px; font-size: 11pt;">
+        <DatePicker v-model="data.NgayThangNam" format="[Đà Nẵng, ngày] DD [tháng] MM [năm] YYYY"
+          placeholder="......, ngày .... tháng .... năm ..."
+          style="text-align: center; font-style: italic; width: 280px; margin: 0 auto;"
+          inputStyle="text-align: center; font-style: italic;" />
+      </div>
+    </div>
+  </div>
+
+  <div class="text-center" style="margin-bottom: 18px;">
+    <div class="font-weight-bold" style="font-size: 13pt;">BIÊN BẢN</div>
+    <div class="font-weight-bold" style="font-size: 12pt; line-height: 1.35;">
+      GIAO, NHẬN NGƯỜI BỊ ÁP DỤNG BIỆN PHÁP TƯ PHÁP BẮT BUỘC CHỮA BỆNH
+    </div>
+  </div>
+
+  <div class="d-flex" style="gap: 15px; margin-bottom: 10px; align-items: flex-start;">
+    <div
+      style="width: 3.2cm; height: 4.2cm; border: 1px solid #000; display: flex; align-items: center; justify-content: center; text-align: center; overflow: hidden; flex-shrink: 0; box-sizing: border-box;">
+      <img v-if="hsBenhAn.BenhNhan.UrlImageProfile" :src="hsBenhAn.BenhNhan.UrlImageProfile"
+        style="width: 100%; height: 100%; object-fit: cover;" alt="Ảnh của người bị bắt buộc chữa bệnh" />
+      <div v-else class="font-italic" style="font-size: 11pt; line-height: 1.3; padding: 4px;">
+        Ảnh của người<br />bị bắt buộc<br />chữa bệnh,<br />đóng dấu giáp<br />lai của cơ sở<br />điều trị<br />bắt buộc
+      </div>
+    </div>
+    <div style="flex: 1;">
+      <div style="margin-bottom: 4px; margin-top: 35px;">
+        <DatePicker label="Vào lúc" v-model="data.ThoiGianTiepNhan"
+          format="HH [giờ] mm [phút, ngày] DD [tháng] MM [năm] YYYY"
+          placeholder=".....giờ.......phút, ngày.........tháng........năm......." />
+      </div>
+      <div style="margin-bottom: 4px;">
+        <Textarea label="Tại: (địa điểm tiếp nhận)" v-model="data.DiaDiemTiepNhan" line :rows="2" />
+      </div>
+      <div style="margin-top: 6px;">Chúng tôi gồm:</div>
+    </div>
+  </div>
+
+  <div style="margin-bottom: 10px;">
+    <div class="font-weight-bold" style="margin-bottom: 2px;">1. Đại diện bên giao:</div>
+    <div class="row no-gutters" style="margin-bottom: 4px;">
+      <div class="col-4">
+        <Textarea label="Ông/Bà:" v-model="data.BenGiaoOngBa" line :rows="1" />
+      </div>
+      <div class="col-4">
+        <Textarea label="Chức vụ:" v-model="data.BenGiaoChucVu" line :rows="1" />
+      </div>
+      <div class="col-4">
+        <Textarea label="Điện thoại:" v-model="data.BenGiaoDienThoai" line :rows="1" />
+      </div>
+    </div>
+    <Textarea label="Đại diện (ghi tên cơ sở điều trị bắt buộc):" v-model="data.BenGiaoCoSoDieuTri" line :rows="1" />
+  </div>
+
+  <div style="margin-bottom: 10px;">
+    <div class="font-weight-bold" style="margin-bottom: 2px;">2. Đại diện bên nhận:</div>
+    <div class="row no-gutters" style="margin-bottom: 4px;">
+      <div class="col-4">
+        <Textarea label="Ông/Bà:" v-model="data.BenNhanOngBa" line :rows="1" />
+      </div>
+      <div class="col-4">
+        <Textarea label="Chức vụ:" v-model="data.BenNhanChucVu" line :rows="1" />
+      </div>
+      <div class="col-4">
+        <Textarea label="Điện thoại:" v-model="data.BenNhanDienThoai" line :rows="1" />
+      </div>
+    </div>
+    <Textarea label="Đại diện (ghi đúng theo Giấy giới thiệu):" v-model="data.BenNhanGiayGioiThieu" line :rows="1"
+      style="margin-bottom: 4px;" />
+    <div>Đã tiến hành giao, nhận hồ sơ và bàn giao người đã kết thúc việc chấp hành biện pháp tư pháp bắt buộc chữa bệnh:</div>
+  </div>
+
+  <div style="margin-bottom: 10px;">
+    <div class="font-weight-bold" style="margin-bottom: 2px;">
+      3. Người chấp hành biện pháp tư pháp bắt buộc chữa bệnh đã kết thúc áp dụng biện pháp bắt buộc chữa bệnh:
+    </div>
+    <div class="row no-gutters" style="margin-bottom: 4px;">
+      <div class="col-5">
+        <Textarea label="Họ và tên:" line :rows="1" :modelValue="hsBenhAn.BenhNhan.HoTen" />
+      </div>
+      <div class="col-4">
+        <Textarea label="Năm sinh:" line :rows="1" :modelValue="moment(hsBenhAn.BenhNhan.NgaySinh).year()" />
+      </div>
+      <div class="col-3">
+        <Textarea label="Giới tính:" line :rows="1" :modelValue="hsBenhAn.BenhNhan.GioiTinh ? 'nam' : 'nữ'" />
+      </div>
+    </div>
+    <Textarea label="Địa chỉ thường trú:" v-model="data.NguoiBenhDiaChiThuongTru" line :rows="1"
+      style="margin-bottom: 4px;" />
+    <Textarea label="Tình trạng người chấp hành biện pháp tư pháp bắt buộc chữa bệnh:"
+      v-model="data.TinhTrangKhiKetThuc" line :rows="2" />
+  </div>
+
+  <div style="margin-bottom: 10px;">
+    <Textarea label="4. Thời gian chấp hành biện pháp tư pháp bắt buộc chữa bệnh tại cơ sở:"
+      v-model="data.TenCoSoDieuTri" line :rows="1" style="margin-bottom: 4px;" />
+    <div class="d-flex align-items-center" style="margin-bottom: 4px;">
+      <span class="font-italic text-nowrap">(ghi tên cơ sở điều trị bắt buộc)</span><span class="text-nowrap">&nbsp;là:&nbsp;</span>
+      <Textarea v-model="data.SoNgayChapHanh" line :rows="1" style="width: 50px;" />
+      <span class="text-nowrap">&nbsp;ngày (bằng chữ:&nbsp;</span>
+      <Textarea v-model="data.SoNgayChapHanhBangChu" line :rows="1" style="flex: 1;" />
+      <span class="text-nowrap">), cụ thể</span>
+    </div>
+    <div class="d-flex align-items-center" style="gap: 6px;">
+      <span>(từ ngày</span>
+      <DatePicker v-model="data.TuNgay" format="DD [tháng] MM [năm] YYYY" placeholder="......tháng......năm...."
+        style="width: 170px;" />
+      <span>đến ngày</span>
+      <DatePicker v-model="data.DenNgay" format="DD [tháng] MM [năm] YYYY" placeholder=".....tháng....năm...."
+        style="width: 170px;" />
+      <span>).</span>
+    </div>
+  </div>
+
+  <div style="margin-bottom: 12px;">
+    <div class="font-weight-bold" style="margin-bottom: 4px;">5. Hồ sơ bao gồm:</div>
+    <Textarea label="- Giấy ra viện (số, ngày, tháng, năm):" v-model="data.HoSoGiayRaVien" line :rows="1"
+      style="margin-bottom: 4px;" />
+    <Textarea label="- Đơn thuốc (số, ngày, tháng, năm):" v-model="data.HoSoDonThuoc" line :rows="1"
+      style="margin-bottom: 4px;" />
+    <Textarea label="- Tài liệu khác (nếu có):" v-model="data.HoSoTaiLieuKhac" line :rows="1" />
+  </div>
+
+  <div style="margin-bottom: 6px; text-align: justify;">
+    Biên bản này được lập thành 03 bản, bên giao giữ 01 bản, bên nhận giữ 02 bản có giá trị như nhau.
+  </div>
+  <div style="margin-bottom: 15px; text-align: justify;">
+    Những người có tên trên đã đọc lại, nhất trí và cùng ký tên xác nhận dưới đây.
+  </div>
+
+  <div class="row no-gutters" style="margin-top: 10px;">
+    <div class="col-4 text-center">
+      <div class="font-weight-bold">Đại diện bên giao</div>
+      <div class="font-italic" style="font-size: 11pt;">(Ký, ghi rõ họ tên)</div>
+      <div style="height: 2.5cm; display: flex; align-items: center; justify-content: center;">
+        <Signature code="NguoiBenh_BenGiao" />
+      </div>
+    </div>
+    <div class="col-4 text-center">
+      <div class="font-weight-bold">Đại diện bên nhận</div>
+      <div class="font-italic" style="font-size: 11pt;">(Ký, ghi rõ họ tên)</div>
+      <div style="height: 2.5cm; display: flex; align-items: center; justify-content: center;">
+        <Signature code="BenNhan" />
+      </div>
+    </div>
+    <div class="col-4 text-center">
+      <div class="font-weight-bold">Xác nhận của cơ sở<br />điều trị bắt buộc</div>
+      <div class="font-italic" style="font-size: 11pt;">(Ký, ghi rõ họ tên, đóng dấu)</div>
+      <div style="height: 2.5cm; display: flex; align-items: center; justify-content: center;">
+        <Signature code="CoSoDieuTri" />
+      </div>
+    </div>
+  </div>
+</PageA4>
