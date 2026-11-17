@@ -129,12 +129,7 @@ export default {
   },
   emits: ['update:modelValue', 'search', 'change'],
   setup(props, { emit, slots }) {
-    const onFieldChange = inject<((path: string, value: any) => void) | null>('onFieldChange', null);
     const onSelectSearch = inject<((path: string, payload: { term: string; items: any[] }) => void) | null>('onSelectSearch', null);
-    const emitFieldChange = (value: any) => {
-      if (!props.path) return;
-      onFieldChange?.(props.path, value);
-    };
     const isOpen = ref(false);
     const isSingleInputActive = ref(false);
     const search = ref('');
@@ -297,7 +292,6 @@ export default {
         : getItemValue(selectedItems.value[0] || '');
 
       emit('update:modelValue', value);
-      emitFieldChange(value);
       emit('change', props.multiple ? selectedItems.value : selectedItems.value[0]);
     };
 

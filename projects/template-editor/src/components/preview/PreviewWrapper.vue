@@ -1,6 +1,10 @@
 <template>
-  <DatePickerPortal />
-  <Preview v-model:template="template" v-model:editMode="editMode" :context="context" />
+  <Preview
+    v-model:template="template"
+    v-model:script="script"
+    v-model:editMode="editMode"
+    :context="context"
+  />
   <!-- <Codemirror v-model:value="template" :options="{ mode: 'text/html', theme: 'default', tabSize: 2 }" height="400px" :border="true" /> -->
 </template>
 
@@ -8,18 +12,18 @@
 import Preview from './Preview.vue';
 import "codemirror/mode/htmlmixed/htmlmixed.js"
 import '@imengyu/vue3-context-menu/lib/vue3-context-menu.css'
-import DatePickerPortal from '../forms/DatePickerPortal.vue';
 import moment from 'moment';
 // @ts-ignore - import raw HTML template
 import defaultTemplate from './default-template.html?raw';
 
 export default {
   name: 'PreviewWrapper',
-  components: { Preview, DatePickerPortal },
+  components: { Preview },
   data() {
     return {
       editMode: true,
       template: defaultTemplate,
+      script: '',
       context: {
         moment: moment,
         log: console.log,
@@ -122,8 +126,8 @@ export default {
             "QuaTrinhBenhLy": "Cách vào viện vài ngày, bệnh nhân ở nhà xuất hiện ho đờm, tức ngực, khó thở, mệt mỏi. vào viện",
             "TienSuBenh_BanThan": "khoẻ mạnh ",
             "TienSuBenh_GiaDinh": "Khoẻ mạnh ",
-            "KhamBenh_ToanThan": "Bệnh nhân tỉnh, tiếp xúc tốt \\nDa, niêm mạc kém hồng \\nThể trạng trung bình\\nKhông phù, không XHDD\\nTuyến giáp không to, hạch ngoại vi không sờ thấy ",
-            "KhamBenh_TuanHoan": "Chưa phát hiện tiếng tim bệnh lý \\nT1, T2 đều rõ ",
+            "KhamBenh_ToanThan": "Bệnh nhân tỉnh, tiếp xúc tốt \nDa, niêm mạc kém hồng \nThể trạng trung bình\nKhông phù, không XHDD\nTuyến giáp không to, hạch ngoại vi không sờ thấy ",
+            "KhamBenh_TuanHoan": "Chưa phát hiện tiếng tim bệnh lý \nT1, T2 đều rõ ",
             "KhamBenh_HoHap": "Phổi rales ẩm rải rác 2 bên phổi ",
             "KhamBenh_TieuHoa": "Bụng mềm, không chướng ",
             "KhamBenh_ThanKinh": "Chưa ghi nhận bất thường",
@@ -132,7 +136,7 @@ export default {
             "KhamBenh_RangHamMat": "Chưa ghi nhận bất thường",
             "KhamBenh_TietNieu": "Chưa ghi nhận bất thường",
             "KhamBenh_xetNghiemCLSCanLam": "Tổng pttb máu, SHM, XQ ngực ",
-            "KhamBenh_tomTatBenhAn": "Bệnh nhân ở nhà xuất hiện ho, khó thở, Qua hỏi, khám tháy \\nHC nhiễm trùng (+)\\nTim đều \\nBụng mềm \\nPhổi rales ẩm, rales nổ ",
+            "KhamBenh_tomTatBenhAn": "Bệnh nhân ở nhà xuất hiện ho, khó thở, Qua hỏi, khám tháy \nHC nhiễm trùng (+)\nTim đều \nBụng mềm \nPhổi rales ẩm, rales nổ ",
             "KhamBenh_TienLuong": "Khá",
             "KhamBenh_HuongDieuTri": "nội khoa ",
             "KhamBenh_Mat": "Chưa ghi nhận bất thường",
@@ -586,7 +590,7 @@ export default {
         dmQuanHuyen: [],
         dmTinhThanh: []
       }
-    }
+    };
   }
-}
+};
 </script>

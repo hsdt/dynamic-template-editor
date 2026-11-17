@@ -1,58 +1,107 @@
-import { Component, Input, OnInit, OnDestroy, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnInit,
+  OnDestroy,
+  OnChanges,
+  SimpleChanges,
+  Output,
+  EventEmitter,
+  ElementRef,
+  ViewChild,
+  NgZone
+} from '@angular/core';
 import { VueLoader } from '../../services/vue-loader';
-import { FormsModule } from '@angular/forms';
-import { App, ComponentPublicInstance } from 'vue';
+import type { PreviewMountInstance, PreviewSelection } from '@hsdt/vue-template-editor/types';
 
 @Component({
   selector: 'template-editor',
   standalone: true,
-  imports: [FormsModule],
-  template: `<div id="template-editor"></div>`,
+  template: `<div #container class="template-editor-host" style="width: 100%; height: 100%; display: flex; flex-direction: column;"></div>`,
+  styles: [`
+    :host {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+    }
+  `]
 })
 export class TemplateEditor implements OnInit, OnChanges, OnDestroy {
-  app: App | null = null;
-  vm: ComponentPublicInstance | null = null;
-  
+  @ViewChild('container', { static: true }) containerRef!: ElementRef<HTMLDivElement>;
+
+  private previewInstance: PreviewMountInstance | null = null;
+
   @Input('template') template = '';
   @Output() templateChange = new EventEmitter<string>();
-  
-  @Input('context') context = {};
+
+  @Input('script') script = '';
+  @Output() scriptChange = new EventEmitter<string>();
+
+  @Input('context') context: any = {};
   @Output() contextChange = new EventEmitter<any>();
 
   @Input('editMode') editMode = true;
   @Output() editModeChange = new EventEmitter<boolean>();
 
-  constructor(private vueLoader: VueLoader) {}
+  @Output() scriptError = new EventEmitter<string>();
+  @Output() selectionChange = new EventEmitter<PreviewSelection | null>();
+
+  constructor(private vueLoader: VueLoader, private ngZone: NgZone) {}
 
   async ngOnInit() {
-    this.app = await this.vueLoader.createPreview();
-    if (!this.app) return console.error('Failed to load Vue preview component.');
-    this.vm = this.app.mount('#template-editor');
-    const data = this.vm.$data as any;
-    data.template = this.template;
-    data.context = this.context;
-    this.contextChange.emit(data.context);
-    data.editMode = true;
-    this.vm.$watch('template', (newVal: any) => {
-      this.templateChange.emit(newVal);
+    const el = this.containerRef?.nativeElement;
+    if (!el) return;
+    this.previewInstance = await this.vueLoader.mountPreview(el, {
+      template: this.template,
+      script: this.script,
+      context: this.context,
+      editMode: this.editMode,
+      onTemplateChange: (val: string) => {
+        this.template = val;
+        this.templateChange.emit(val);
+      },
+      onScriptChange: (val: string) => {
+        this.script = val;
+        this.scriptChange.emit(val);
+      },
+      onContextChange: (val: any) => {
+        this.context = val;
+        this.contextChange.emit(val);
+      },
+      onEditModeChange: (val: boolean) => {
+        this.editMode = val;
+        this.editModeChange.emit(val);
+      },
+      onScriptError: (err: string) => {
+        this.scriptError.emit(err);
+      },
+      onSelectionChange: (selection: PreviewSelection | null) => {
+        this.ngZone.run(() => this.selectionChange.emit(selection));
+      },
     });
-    this.vm.$watch('editMode', (newVal: any) => {
-      this.editModeChange.emit(newVal);
-    });
+
+    if (!this.previewInstance) {
+      console.error('[TemplateEditor] Failed to load & mount Vue Preview component.');
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (!this.vm) return;
-    const data = this.vm.$data as any;
-    if (changes['template']) {
-      data.template = this.template;
-    }
-    if (changes['editMode']) {
-      data.editMode = this.editMode;
+    if (!this.previewInstance) return;
+
+    const updatedProps: Record<string, any> = {};
+    if (changes['template']) updatedProps['template'] = this.template;
+    if (changes['script']) updatedProps['script'] = this.script;
+    if (changes['context']) updatedProps['context'] = this.context;
+    if (changes['editMode']) updatedProps['editMode'] = this.editMode;
+
+    if (Object.keys(updatedProps).length > 0) {
+      this.previewInstance.updateProps(updatedProps);
     }
   }
 
   ngOnDestroy(): void {
-    this.app?.unmount();
+    this.previewInstance?.unmount();
+    this.previewInstance = null;
   }
 }

@@ -29,7 +29,7 @@
 </template>
 
 <script lang="ts">
-import { ref, watch, inject, type PropType } from 'vue';
+import { ref, watch, type PropType } from 'vue';
 import type { StyleValue } from 'vue';
 import moment from 'moment';
 import mask from '../../directives/mask-datetime';
@@ -51,14 +51,9 @@ export default {
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
-    const onFieldChange = inject<((path: string, value: any) => void) | null>('onFieldChange', null);
     const wrapperRef = ref<HTMLElement | null>(null);
     const displayValue = ref('');
     const { open, syncValue } = useDatePickerService();
-    const emitFieldChange = (value: any) => {
-      if (!props.path) return;
-      onFieldChange?.(props.path, value);
-    };
 
     // Tự động phát hiện mode từ format
     const detectMode = (format: string): 'date' | 'datetime' => {
@@ -83,7 +78,6 @@ export default {
         const display = m.format(props.format);
         displayValue.value = display;
         emit('update:modelValue', m.format());
-        emitFieldChange(m.format());
         syncValue(display, wrapperRef.value);
       }
     };
@@ -122,7 +116,6 @@ export default {
             const display = parsed.format(props.format);
             displayValue.value = display;
             emit('update:modelValue', parsed.format());
-            emitFieldChange(parsed.format());
             syncValue(display, wrapperRef.value);
           }
         }

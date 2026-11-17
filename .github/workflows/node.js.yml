@@ -2,83 +2,114 @@ name: Node.js CI/CD
 
 on:
   push:
-    branches: [ "main" ]
-    paths-ignore:
-      - 'README.md'
-      - '/assets/**'
+    branches:
+      - main
+    tags:
+      - 'v*'
   pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
+  workflow_dispatch:
 
 permissions:
   contents: write
+  packages: write
+
+env:
+  NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
-  build-deploy:
+  build-and-publish:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [20.19.4]
-
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Set release metadata
-      id: release_metadata
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-      run: |
-        SHORT_SHA="${GITHUB_SHA::7}"
-        echo "template_editor_release_tag=template-editor-build-${SHORT_SHA}" >> "$GITHUB_OUTPUT"
-        echo "template_editor_zip_name=template-editor-${SHORT_SHA}.zip" >> "$GITHUB_OUTPUT"
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@hsdt'
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Install dependencies
-      run: npm ci
-    - name: Install template-editor dependencies
-      working-directory: ./projects/template-editor
-      run: npm ci
+      - name: Resolve publish version
+        id: pkg_meta
+        if: |
+          github.event_name != 'pull_request' &&
+          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+        working-directory: ./projects/template-editor
+        run: |
+          BASE_VERSION=$(node -p "require('./package.json').version")
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            TARGET_VERSION="${GITHUB_REF_NAME#v}"
+            if [[ "$TARGET_VERSION" == *-* ]]; then
+              DIST_TAG="next"
+            else
+              DIST_TAG="latest"
+            fi
+          else
+            PUBLISHED=$(npm view "@hsdt/vue-template-editor@${BASE_VERSION}" version 2>/dev/null || true)
+            if [ -n "$PUBLISHED" ]; then
+              TARGET_VERSION="${BASE_VERSION}-dev.${GITHUB_RUN_NUMBER}.${GITHUB_SHA::7}"
+              DIST_TAG="dev"
+            else
+              TARGET_VERSION="${BASE_VERSION}"
+              DIST_TAG="latest"
+            fi
+          fi
 
-    - name: Build template-editor release artifact
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-      run: npm run build:template-editor:shell
+          if [ "$TARGET_VERSION" != "$BASE_VERSION" ]; then
+            npm version "$TARGET_VERSION" --no-git-tag-version --allow-same-version
+          fi
 
-    - name: Archive template-editor build
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-      run: |
-        cd dist
-        zip -r "${{ steps.release_metadata.outputs.template_editor_zip_name }}" template-editor
+          echo "version=${TARGET_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "dist_tag=${DIST_TAG}" >> "$GITHUB_OUTPUT"
 
-    - name: Build deploy artifacts
-      run: npm run build:all:demo
+      - name: Build library and Angular shell demo
+        run: npm run build:all:demo
 
-    - name: Copy all built files to deploy folder
-      run: |
-        mkdir deploy
-        mkdir deploy/guide
-        mkdir deploy/template-editor
+      - name: Pack library tarball
+        run: |
+          mkdir -p dist
+          npm pack --workspace @hsdt/vue-template-editor --pack-destination ./dist
 
-        cp -r dist/shell/* deploy/
-        cp -r projects/guide/* deploy/guide/
-        cp -r dist/template-editor/* deploy/template-editor/
-        touch deploy/.nojekyll
+      - name: Upload package tarball artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vue-template-editor-package
+          path: dist/hsdt-vue-template-editor-*.tgz
 
-    - name: Deploy to GitHub Pages
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-      uses: peaceiris/actions-gh-pages@v4
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./deploy
+      - name: Prepare GitHub Pages bundle
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        run: |
+          rm -rf deploy
+          mkdir -p deploy/guide
+          cp -r dist/shell/browser/* deploy/
+          cp -r projects/guide/* deploy/guide/
+          touch deploy/.nojekyll
 
-    - name: Create template-editor release
-      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-      uses: softprops/action-gh-release@v2
-      with:
-        tag_name: ${{ steps.release_metadata.outputs.template_editor_release_tag }}
-        name: Template Editor Build ${{ steps.release_metadata.outputs.template_editor_release_tag }}
-        generate_release_notes: true
-        files: dist/${{ steps.release_metadata.outputs.template_editor_zip_name }}
+      - name: Deploy demo to GitHub Pages
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy
+
+      - name: Publish @hsdt/vue-template-editor to GitHub Packages
+        if: |
+          github.event_name != 'pull_request' &&
+          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+        working-directory: ./projects/template-editor
+        run: npm publish --tag "${{ steps.pkg_meta.outputs.dist_tag }}"
+
+      - name: Create GitHub Release on version tag
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: dist/hsdt-vue-template-editor-*.tgz
