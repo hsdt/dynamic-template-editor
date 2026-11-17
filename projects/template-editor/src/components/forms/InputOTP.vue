@@ -22,7 +22,7 @@
 </template>
 
 <script lang="ts">
-import { ref, watch, computed, nextTick, onMounted, onBeforeUnmount, inject } from 'vue';
+import { ref, watch, computed, nextTick, onMounted, onBeforeUnmount } from 'vue';
 
 export default {
   name: 'InputOTP',
@@ -40,7 +40,6 @@ export default {
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
-    const onFieldChange = inject<((path: string, value: any) => void) | null>('onFieldChange', null);
     const inputGroup = ref<HTMLElement | null>(null);
     const elementRefs = ref<HTMLElement[]>([]);
     const valueArray = ref<string[]>([]);
@@ -49,10 +48,6 @@ export default {
     const isFocused = ref(false);
     const hasInitialized = ref(false);
     const isInternalModelSync = ref(false);
-    const emitFieldChange = (value: any) => {
-      if (!props.path) return;
-      onFieldChange?.(props.path, value);
-    };
 
     const specialKeys = ['Backspace', 'Tab', 'End', 'Home', 'ArrowLeft', 'ArrowRight', 'Delete', ' '];
 
@@ -95,7 +90,6 @@ export default {
     const emitModelValue = (value: string) => {
       isInternalModelSync.value = true;
       emit('update:modelValue', value);
-      emitFieldChange(value);
     };
 
     const getNormalizedSegmentValue = (index: number) => {

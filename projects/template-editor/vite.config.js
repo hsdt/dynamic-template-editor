@@ -1,47 +1,47 @@
+import path from 'node:path'
 import { fileURLToPath, URL } from 'node:url'
 
-import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import { defineConfig } from 'vite'
 import vueDevTools from 'vite-plugin-vue-devtools'
-import federation from '@originjs/vite-plugin-federation'
-import path from 'node:path'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-const baseByMode = {
-  shell: '/template-editor/',
-  demo: '/dynamic-template-editor/template-editor/',
-}
-
-// https://vite.dev/config/
-export default defineConfig(({ mode }) => ({
-  base: baseByMode[mode] ?? '/',
+export default defineConfig(({ command }) => ({
+  base: '/',
+  ...(command === 'build' ? { define: { 'process.env.NODE_ENV': JSON.stringify('production') } } : {}),
   plugins: [
     vue(),
-    vueDevTools(),
-    federation({
-      filename: 'remoteEntry.js',
-      name: 'ComponentFactory',
-      exposes: {
-        './component-factory': './src/component-factory.ts',
-      }
-    })
+    ...(command === 'serve' ? [vueDevTools()] : []),
   ],
   resolve: {
     alias: {
+      'vue': 'vue/dist/vue.esm-bundler.js',
       '@': fileURLToPath(new URL('./src', import.meta.url)),
-      'shared/helpers': path.resolve(__dirname, '../shared/helpers'),
-      'shared/types': path.resolve(__dirname, '../shared/types'),
-      'shared/utils': path.resolve(__dirname, '../shared/utils'),
-      'shared/constants': path.resolve(__dirname, '../shared/constants'),
     },
   },
 
   build: {
-    outDir: path.resolve(__dirname, '../../dist/template-editor'),
-    target: 'esnext',
-    emptyOutDir: true,
+    outDir: path.resolve(__dirname, 'dist'),
+    target: 'es2022',
+    emptyOutDir: false,
     chunkSizeWarningLimit: 10000,
+    lib: {
+      entry: {
+        index: path.resolve(__dirname, 'src/index.ts'),
+        types: path.resolve(__dirname, 'src/types/index.ts'),
+        utils: path.resolve(__dirname, 'src/utils/index.ts'),
+      },
+      formats: ['es'],
+      fileName: (_format, entryName) => entryName === 'index'
+        ? 'index.js'
+        : `${entryName}/index.js`,
+      cssFileName: 'style',
+    },
+  },
+
+  server: {
+    allowedHosts: true
   }
 }))

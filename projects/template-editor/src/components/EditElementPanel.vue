@@ -117,7 +117,8 @@
 </template>
 
 <script lang="ts">
-import { VirtualNode } from 'shared/utils';
+import { PropType } from 'vue';
+import { VirtualNode } from '@/utils';
 
 const attributeSuggestionMap: Record<string, string[]> = {
   div: ['style', 'class', 'id'],
@@ -129,8 +130,8 @@ const attributeSuggestionMap: Record<string, string[]> = {
   a: ['style', 'class', 'href', 'target', 'rel', 'title'],
   select: ['style', 'class', 'name', 'multiple', 'disabled', 'required'],
   option: ['style', 'class', 'value', 'selected', 'label'],
-  PageA4: ['style', 'class', 'landscape'],
-  PageA5: ['style', 'class', 'landscape'],
+  PageA4: ['style', 'class', 'landscape', 'autoPaginate'],
+  PageA5: ['style', 'class', 'landscape', 'autoPaginate'],
   Textarea: ['style', 'class', 'v-model', 'type', 'label', 'line', 'suffix', 'placeholder', 'rows', 'maxlength', 'disabled', 'readonly', 'textarea-style'],
   InputOTP: ['style', 'class', 'v-model', 'type', 'readonly', 'disabled', 'mask-length', 'pad-char', 'pad-start'],
   Select: ['style', 'class', 'v-model', 'items', 'bind-label', 'bind-value', 'placeholder', 'multiple', 'disabled', 'readonly', 'label', 'search-by-keys'],
@@ -169,9 +170,9 @@ export default {
   name: "EditElementPanel",
   props: {
     selectedNode: {
-      type: Object,
+      type: Object as PropType<VirtualNode | null>,
       default: null,
-    } as unknown as () => VirtualNode | null,
+    },
   },
   emits: ["close"],
   data() {
@@ -351,7 +352,7 @@ export default {
   background: white;
   border-left: 1px solid #ddd;
   box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
+  z-index: 100003;
   display: flex;
   flex-direction: column;
 }

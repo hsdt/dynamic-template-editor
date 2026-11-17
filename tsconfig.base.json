@@ -11,12 +11,18 @@
     "importHelpers": true,
     "target": "ES2022",
     "module": "preserve",
+    "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
-      "shared/helpers": ["projects/shared/helpers"],
-      "shared/types": ["projects/shared/types"],
-      "shared/utils": ["projects/shared/utils"],
-      "shared/constants": ["projects/shared/constants"]
-    },
-  },
+      "@hsdt/vue-template-editor": [
+        "projects/template-editor/dist/index"
+      ],
+      "@hsdt/vue-template-editor/types": [
+        "projects/template-editor/src/types/index.ts"
+      ],
+      "@hsdt/vue-template-editor/utils": [
+        "projects/template-editor/src/utils/index.ts"
+      ]
+    }
+  }
 }

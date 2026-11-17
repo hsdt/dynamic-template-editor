@@ -13,13 +13,13 @@ export const templateCategories: TemplateCategory[] = [
         label: 'A4 Page',
         icon: 'fa fa-file-o',
         template:
-          '<PageA4 style="padding: 3mm 15mm 3mm 15mm;">New Page Content</div></PageA4>',
+          '<PageA4 style="padding: 3mm 15mm 3mm 15mm;"><div>New Page Content</div></PageA4>',
       },
       {
         label: 'A5 Page',
         icon: 'fa fa-file-o',
         template:
-          '<PageA5 style="padding: 3mm 15mm 3mm 15mm;">New Page Content</div></PageA5>',
+          '<PageA5 style="padding: 3mm 15mm 3mm 15mm;"><div>New Page Content</div></PageA5>',
       },
       // Grid Layouts
       {

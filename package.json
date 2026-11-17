@@ -1,21 +1,23 @@
 {
   "name": "dynamic-template-editor",
   "version": "0.0.0",
+  "workspaces": [
+    "projects/template-editor"
+  ],
   "scripts": {
-    "start:shell": "npm run build:template-editor:shell && ng s shell",
-    "build:shell": "npm run build:template-editor:shell && ng build shell",
-    "serve:shell": "cd dist/shell && npx serve -l 4200 --cors",
+    "start:shell": "npm run build:template-editor && ng serve shell",
+    "dev:shell": "npm run build:template-editor && concurrently \"npm run watch:template-editor\" \"ng serve shell\"",
+    "build:shell": "npm run build:template-editor && ng build shell",
+    "serve:shell": "cd dist/shell/browser && npx serve -l 4200 --cors",
     "start:template-editor": "cd projects/template-editor && vite",
-    "build:template-editor": "cd projects/template-editor && vite build",
-    "build:template-editor:shell": "cd projects/template-editor && vite build --mode shell",
-    "build:template-editor:demo": "cd projects/template-editor && vite build --mode demo",
-    "serve:template-editor": "cd dist/template-editor && npx serve -l 4202 --cors",
-    "build:all:demo": "npm run build:template-editor:demo && ng build shell --configuration=demo",
+    "watch:template-editor": "npm run watch --workspace @hsdt/vue-template-editor",
+    "build:template-editor": "npm run build --workspace @hsdt/vue-template-editor",
+    "pack:template-editor": "npm run build:template-editor && npm pack --workspace @hsdt/vue-template-editor",
+    "build:all:demo": "npm run build:template-editor && ng build shell --configuration=demo",
     "capture:template": "cd projects/template-editor && node ./scripts/capture-template-artifacts.mjs"
   },
   "private": true,
   "dependencies": {
-    "@angular-architects/module-federation": "^20.0.0",
     "@angular/animations": "^20.0.0",
     "@angular/common": "^20.0.0",
     "@angular/compiler": "^20.0.0",
@@ -23,11 +25,10 @@
     "@angular/forms": "^20.0.0",
     "@angular/platform-browser": "^20.0.0",
     "@angular/router": "^20.0.0",
-    "@softarc/native-federation-node": "^2.0.10",
-    "es-module-shims": "^1.5.12",
     "js-beautify": "^1.15.4",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
+    "@hsdt/vue-template-editor": "file:projects/template-editor",
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
@@ -44,7 +45,6 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "ngx-build-plus": "^20.0.0",
     "typescript": "~5.8.2",
     "vue": "^3.5.22"
   }

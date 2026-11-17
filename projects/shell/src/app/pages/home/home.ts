@@ -25,7 +25,7 @@ export class Home{
     <div><b>Select multiple</b></div>
     <Select v-model="data.tags" label="Tags:" placeholder="Chọn tags"
       bind-label="label" bind-value="value" :items="tagList" multiple />
-    <div style="color:#0066cc">Tags đã chọn {{ data.tags }}</b></div>
+    <div style="color:#0066cc">Tags đã chọn: <b>{{ data.tags }}</b></div>
 
     <div><b>DatePicker - Chọn ngày sinh</b></div>
     <DatePicker v-model="data.birthday" placeholder="Chọn ngày sinh" format="DD/MM/YYYY" />
@@ -65,6 +65,16 @@ export class Home{
   <PageA4 style="padding:5mm">
     <XmlViewer url="https://sample-files.com/downloads/data/xml/international.xml" />
   </PageA4>`;
+  script = `// Khởi tạo reactive state từ $context
+const data = reactive($context.data || {});
+
+// Computed: Hiển thị tên viết hoa
+const upperName = computed(() => (data.name || '').toUpperCase());
+
+return {
+  data,
+  upperName
+};`;
   editMode = true;
   context = {
     log: console.log,

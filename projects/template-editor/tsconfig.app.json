@@ -1,11 +1,17 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ]
+    },
     "outDir": "dist",
     "types": [
       "vite/client"
     ],
-    "rootDir": "../",
+    "rootDir": "./src",
     "lib": ["ES2022", "dom"],
     "jsx": "preserve",
     "jsxImportSource": "vue",
@@ -23,8 +29,6 @@
   "include": [
     "src/**/*.js",
     "src/**/*.ts",
-    "src/**/*.vue",
-    "../shared/**/*.ts",
-    "../shared/**/*.js"
+    "src/**/*.vue"
   ]
 }
