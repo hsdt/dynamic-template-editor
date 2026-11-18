@@ -54,10 +54,31 @@ export function detectPageFormat(element: Element): PageFormatConfig {
   };
 }
 
+export interface PrintElementOptions {
+  scopeSelector?: string;
+  noBackgroundLine?: boolean;
+}
+
 export const DEFAULT_PRINT_SELECTOR =
   '.page-a4-wrapper, .page-a5-wrapper, .editor-host-container, template-editor, [c-id="123456"], .content-root, Root, root, .preview-container';
 
+let activeAfterPrintCleanup: (() => void) | null = null;
+
+function getEffectiveCssZoom(el: Element | null): number {
+  let zoom = 1;
+  let current = el;
+  while (current) {
+    const z = parseFloat((window.getComputedStyle(current) as any).zoom);
+    if (!Number.isNaN(z) && z > 0 && z !== 1) {
+      zoom *= z;
+    }
+    current = current.parentElement;
+  }
+  return zoom || 1;
+}
+
 function measureAdaptiveContentWidth(element: HTMLElement): number {
+  const effectiveZoom = getEffectiveCssZoom(element);
   const rootRect = element.getBoundingClientRect();
   const visibleChildren = Array.from(element.children).filter((child) => {
     const htmlChild = child as HTMLElement;
@@ -67,15 +88,15 @@ function measureAdaptiveContentWidth(element: HTMLElement): number {
   }) as HTMLElement[];
 
   if (visibleChildren.length === 0) {
-    return Math.max(element.scrollWidth || 0, rootRect.width || 0, 1);
+    return Math.max(element.scrollWidth || 0, (rootRect.width || 0) / effectiveZoom, 1);
   }
 
   const childRects = visibleChildren.map((child) => child.getBoundingClientRect());
   const left = Math.min(...childRects.map((rect) => rect.left));
   const right = Math.max(...childRects.map((rect) => rect.right));
-  const visualSpan = Math.max(0, right - left);
+  const visualSpan = Math.max(0, right - left) / effectiveZoom;
   const widestChild = Math.max(
-    ...visibleChildren.map((child, index) => Math.max(child.scrollWidth || 0, childRects[index].width || 0))
+    ...visibleChildren.map((child, index) => Math.max(child.scrollWidth || 0, (childRects[index].width || 0) / effectiveZoom))
   );
 
   // Root của Preview luôn rộng 100% editor. Lấy bounding box của nội dung con giúp
@@ -83,7 +104,11 @@ function measureAdaptiveContentWidth(element: HTMLElement): number {
   return Math.max(visualSpan, widestChild, 1);
 }
 
-export const handleBeforePrint = (selector: string = DEFAULT_PRINT_SELECTOR) => {
+export const handleBeforePrint = (selector: string = DEFAULT_PRINT_SELECTOR, options?: PrintElementOptions) => {
+  if (activeAfterPrintCleanup) {
+    activeAfterPrintCleanup();
+  }
+
   let elContainer = document.querySelector('#print-container') as HTMLElement;
   if (!elContainer) {
     elContainer = document.createElement('div');
@@ -91,34 +116,56 @@ export const handleBeforePrint = (selector: string = DEFAULT_PRINT_SELECTOR) => 
     document.body.appendChild(elContainer);
   }
 
+  const scopeRoot: ParentNode = options?.scopeSelector
+    ? (document.querySelector(options.scopeSelector) || document)
+    : document;
+
+  const pickDefaultElement = (): HTMLElement | null => {
+    const pagedWrappers = scopeRoot.querySelectorAll('.page-a4-wrapper, .page-a5-wrapper');
+    if (pagedWrappers.length === 1) {
+      return pagedWrappers[0] as HTMLElement;
+    }
+    return (
+      scopeRoot.querySelector('[c-id="123456"], .content-root, Root, root') ||
+      scopeRoot.querySelector('.page-a4-wrapper, .page-a5-wrapper') ||
+      scopeRoot.querySelector('.editor-host-container template-editor') ||
+      scopeRoot.querySelector(DEFAULT_PRINT_SELECTOR)
+    ) as HTMLElement | null;
+  };
+
   // Với selector mặc định, ưu tiên nội dung thật thay vì clone toàn bộ editor host.
   // Điều này đặc biệt quan trọng cho template tự do vì editor host thường có height/overflow cố định.
-  const elToPrint = selector === DEFAULT_PRINT_SELECTOR
-    ? document.querySelector('.page-a4-wrapper, .page-a5-wrapper') ||
-    document.querySelector('[c-id="123456"], .content-root, Root, root') ||
-    document.querySelector('.editor-host-container template-editor') ||
-    document.querySelector(DEFAULT_PRINT_SELECTOR)
-    : document.querySelector(selector) ||
-    document.querySelector('.page-a4-wrapper, .page-a5-wrapper') ||
-    document.querySelector('[c-id="123456"], .content-root, Root, root') ||
-    document.querySelector(DEFAULT_PRINT_SELECTOR);
+  const elToPrint = (selector === DEFAULT_PRINT_SELECTOR
+    ? pickDefaultElement()
+    : (scopeRoot.querySelector(selector) || pickDefaultElement())) as HTMLElement | null;
 
   if (!elToPrint) return;
 
   const pageFormat = detectPageFormat(elToPrint);
   const cloned = elToPrint.cloneNode(true) as HTMLElement;
   const isAdaptive = pageFormat.layoutMode === 'adaptive';
+  const typoSource = (isAdaptive
+    ? elToPrint
+    : (elToPrint.querySelector('.page-a4-sheet, .page-a5-sheet') || elToPrint)) as HTMLElement;
+  const computedTypo = window.getComputedStyle(typoSource);
+  const inheritedTypographyCss = `
+    font-family: ${computedTypo.fontFamily};
+    font-size: ${computedTypo.fontSize};
+    line-height: ${computedTypo.lineHeight};
+    color: ${computedTypo.color};
+  `;
   // Template tự do để trình duyệt quyết định khổ giấy/hướng giấy và hiển thị
   // các tùy chọn tương ứng trong print preview. PageA4/PageA5 vẫn khóa khổ chuẩn.
   const browserPageSizeRule = isAdaptive ? 'auto' : pageFormat.sizeRule;
 
   // A4 trừ lề 10mm mỗi bên, quy đổi tại 96 DPI.
   const adaptivePrintableWidthPx = (pageFormat.widthMm - 20) * (96 / 25.4);
+  const effectiveZoom = getEffectiveCssZoom(elToPrint);
   const sourceWidthPx = isAdaptive
-    ? measureAdaptiveContentWidth(elToPrint as HTMLElement)
+    ? measureAdaptiveContentWidth(elToPrint)
     : Math.max(
-      (elToPrint as HTMLElement).scrollWidth || 0,
-      (elToPrint as HTMLElement).getBoundingClientRect?.().width || 0,
+      elToPrint.scrollWidth || 0,
+      (elToPrint.getBoundingClientRect?.().width || 0) / effectiveZoom,
       1
     );
   const adaptiveScale = isAdaptive
@@ -143,10 +190,20 @@ export const handleBeforePrint = (selector: string = DEFAULT_PRINT_SELECTOR) => 
   originalInputs.forEach((orig, idx) => {
     const clone = clonedInputs[idx];
     if (clone && orig) {
-      if ((orig as HTMLInputElement).type === 'checkbox' || (orig as HTMLInputElement).type === 'radio') {
+      if (orig instanceof HTMLSelectElement && clone instanceof HTMLSelectElement) {
+        clone.selectedIndex = orig.selectedIndex;
+        Array.from(clone.options).forEach((opt, optIdx) => {
+          opt.defaultSelected = optIdx === orig.selectedIndex;
+        });
+      } else if ((orig as HTMLInputElement).type === 'checkbox' || (orig as HTMLInputElement).type === 'radio') {
         (clone as HTMLInputElement).checked = (orig as HTMLInputElement).checked;
+        (clone as HTMLInputElement).defaultChecked = (orig as HTMLInputElement).checked;
+      } else {
+        clone.value = orig.value;
+        if (orig instanceof HTMLInputElement && clone instanceof HTMLInputElement) {
+          clone.defaultValue = orig.value;
+        }
       }
-      clone.value = orig.value;
       if (orig.style.height) clone.style.height = orig.style.height;
       if (orig.style.minHeight) clone.style.minHeight = orig.style.minHeight;
     }
@@ -174,11 +231,24 @@ export const handleBeforePrint = (selector: string = DEFAULT_PRINT_SELECTOR) => 
     }
   });
 
-  // Loại bỏ các container nguồn ẩn sau khi đã đồng bộ
+  // Loại bỏ các container nguồn ẩn và highlight thiết kế sau khi đã đồng bộ
   cloned.querySelectorAll('.page-a4-source, .page-a5-source').forEach((el) => el.remove());
+  const artifactClasses = [
+    'element-highlight',
+    'empty-placeholder',
+    'drop-target-before',
+    'drop-target-after',
+    'drop-target-inside',
+  ];
+  artifactClasses.forEach((cls) => cloned.classList.remove(cls));
+  cloned
+    .querySelectorAll('.element-highlight, .empty-placeholder, .drop-target-before, .drop-target-after, .drop-target-inside')
+    .forEach((el) => el.classList.remove(...artifactClasses));
 
-  // Gắn clone vào container in
+  // Gắn clone vào container in, giữ ngữ cảnh .hoso-viewer/.paper-viewer nếu đang mở trong EMR viewer
   elContainer.innerHTML = '';
+  elContainer.classList.toggle('hoso-viewer', Boolean(elToPrint.closest('.hoso-viewer')));
+  elContainer.classList.toggle('paper-viewer', Boolean(elToPrint.closest('.paper-viewer')));
   elContainer.classList.toggle('print-layout-adaptive', isAdaptive);
   elContainer.classList.toggle('print-layout-paged', !isAdaptive);
   elContainer.appendChild(cloned);
@@ -203,6 +273,9 @@ export const handleBeforePrint = (selector: string = DEFAULT_PRINT_SELECTOR) => 
         size: ${browserPageSizeRule};
         margin: ${isAdaptive ? '10mm' : '0mm'} !important;
       }
+      @page :first {
+        margin-top: ${isAdaptive ? '10mm' : '0mm'} !important;
+      }
       * {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
@@ -211,26 +284,56 @@ export const handleBeforePrint = (selector: string = DEFAULT_PRINT_SELECTOR) => 
       html, body {
         margin: 0 !important;
         padding: 0 !important;
+        min-width: 0 !important;
         background: #ffffff !important;
         overflow: visible !important;
         width: 100% !important;
         height: auto !important;
-        font-size: ${isAdaptive ? 'initial' : '0'} !important;
-        line-height: ${isAdaptive ? 'normal' : '0'} !important;
+      }
+      body {
+        font-size: ${isAdaptive ? computedTypo.fontSize : '0'} !important;
+        line-height: ${isAdaptive ? computedTypo.lineHeight : '0'} !important;
       }
       body > *:not(#print-container) {
         display: none !important;
       }
-      #print-container {
+      #print-container,
+      #print-container.hoso-viewer,
+      #print-container.paper-viewer {
         display: block !important;
         position: static !important;
         margin: 0 !important;
         padding: 0 !important;
         overflow: visible !important;
         width: 100% !important;
-        font-size: ${isAdaptive ? 'initial' : '0'} !important;
-        line-height: ${isAdaptive ? 'normal' : '0'} !important;
+        height: auto !important;
+        min-height: 0 !important;
+        background: #ffffff !important;
+        font-size: ${isAdaptive ? computedTypo.fontSize : '0'} !important;
+        line-height: ${isAdaptive ? computedTypo.lineHeight : '0'} !important;
       }
+      #print-container [c-id="123456"] {
+        display: block !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        min-height: 0 !important;
+        width: 100% !important;
+      }
+      #print-container .no-print,
+      #print-container .noprint,
+      #print-container .print-display-none,
+      #print-container .hs-backdrop-disable {
+        display: none !important;
+      }
+      ${options?.noBackgroundLine ? `
+      #print-container .textarea-line,
+      #print-container .input-container,
+      #print-container .datepicker-input,
+      #print-container .textarea-ehr-line,
+      #print-container .div-ehr-line {
+        background: none !important;
+      }
+      ` : ''}
       #print-container.print-layout-adaptive .print-adaptive-root {
         display: block !important;
         position: static !important;
@@ -243,6 +346,7 @@ export const handleBeforePrint = (selector: string = DEFAULT_PRINT_SELECTOR) => 
         zoom: ${adaptiveScale};
         transform-origin: top left !important;
         break-inside: auto !important;
+        ${inheritedTypographyCss}
       }
       #print-container.print-layout-adaptive .editor-host-container,
       #print-container.print-layout-adaptive template-editor,
@@ -285,8 +389,7 @@ export const handleBeforePrint = (selector: string = DEFAULT_PRINT_SELECTOR) => 
         page-break-inside: avoid !important;
         break-inside: avoid !important;
         box-shadow: none !important;
-        font-size: initial !important;
-        line-height: normal !important;
+        ${inheritedTypographyCss}
       }
       .page-a4-sheet.landscape {
         width: 296.8mm !important;
@@ -305,8 +408,7 @@ export const handleBeforePrint = (selector: string = DEFAULT_PRINT_SELECTOR) => 
         page-break-inside: avoid !important;
         break-inside: avoid !important;
         box-shadow: none !important;
-        font-size: initial !important;
-        line-height: normal !important;
+        ${inheritedTypographyCss}
       }
       .page-a5.landscape, .page-a5-sheet.landscape {
         width: 209.8mm !important;
@@ -328,16 +430,18 @@ export const handleBeforePrint = (selector: string = DEFAULT_PRINT_SELECTOR) => 
   // Dọn dẹp an toàn khi người dùng in xong hoặc hủy hộp thoại
   const cleanup = () => {
     window.removeEventListener('afterprint', cleanup);
+    activeAfterPrintCleanup = null;
     document.body.classList.remove('printing-mode');
     if (elContainer) elContainer.innerHTML = '';
     if (style && style.parentNode) style.remove();
   };
 
+  activeAfterPrintCleanup = cleanup;
   window.addEventListener('afterprint', cleanup, { once: true });
 };
 
-export function printElement(selector: string = DEFAULT_PRINT_SELECTOR) {
-  handleBeforePrint(selector);
+export function printElement(selector: string = DEFAULT_PRINT_SELECTOR, options?: PrintElementOptions) {
+  handleBeforePrint(selector, options);
   window.print();
 }
 
