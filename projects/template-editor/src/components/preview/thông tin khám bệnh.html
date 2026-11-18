@@ -54,76 +54,72 @@
       </span>
     </div>
   </div>
-  <table class="table table-ehr-bordered input-ehr-sm">
-    <tr>
-      <td class="text-center" width="5%">TT</td>
-      <td class="text-center" width="12%"></td>
-      <td class="text-center" width="8%">Ký hiệu</td>
-      <td class="text-center" width="25%">Thời gian
-        (tính
-        theo tháng)</td>
-      <td class="text-center" width="5%">TT</td>
-      <td class="text-center" width="12%"></td>
-      <td class="text-center" width="8%">Ký hiệu</td>
-      <td class="text-center" width="25%">Thời gian
-        (tính
-        theo tháng)</td>
-    </tr>
-    <tr>
-      <td class="text-center">1</td>
-      <td>- Dị ứng</td>
-      <td class="text-center">
+  <div class="table-container input-ehr-sm">
+    <div class="table-row" style="flex-wrap: nowrap;">
+      <div class="table-cell text-center" style="flex: 0 0 5%; max-width: 5%;">TT</div>
+      <div class="table-cell text-center" style="flex: 0 0 12%; max-width: 12%;"></div>
+      <div class="table-cell text-center" style="flex: 0 0 8%; max-width: 8%;">Ký hiệu</div>
+      <div class="table-cell text-center" style="flex: 0 0 25%; max-width: 25%;">Thời gian (tính theo tháng)</div>
+      <div class="table-cell text-center" style="flex: 0 0 5%; max-width: 5%;">TT</div>
+      <div class="table-cell text-center" style="flex: 0 0 12%; max-width: 12%;"></div>
+      <div class="table-cell text-center" style="flex: 0 0 8%; max-width: 8%;">Ký hiệu</div>
+      <div class="table-cell text-center" style="flex: 0 0 25%; max-width: 25%;">Thời gian (tính theo tháng)</div>
+    </div>
+    <div class="table-row" style="flex-wrap: nowrap;">
+      <div class="table-cell text-center" style="flex: 0 0 5%; max-width: 5%;">1</div>
+      <div class="table-cell" style="flex: 0 0 12%; max-width: 12%;">- Dị ứng</div>
+      <div class="table-cell text-center" style="flex: 0 0 8%; max-width: 8%;">
         <Checkbox v-model="hsThongTinBenhAn.NoiDungChiTietObj.DacDiem_IsDiUng" size="md" :value="true" />
-      </td>
-      <td>
+      </div>
+      <div class="table-cell" style="flex: 0 0 25%; max-width: 25%;">
         <Textarea v-model="hsThongTinBenhAn.NoiDungChiTietObj.DacDiem_ThoiGianDiUng" />
-      </td>
-      <td class="text-center">4</td>
-      <td>- Thuốc lá</td>
-      <td class="text-center">
+      </div>
+      <div class="table-cell text-center" style="flex: 0 0 5%; max-width: 5%;">4</div>
+      <div class="table-cell" style="flex: 0 0 12%; max-width: 12%;">- Thuốc lá</div>
+      <div class="table-cell text-center" style="flex: 0 0 8%; max-width: 8%;">
         <Checkbox v-model="hsThongTinBenhAn.NoiDungChiTietObj.DacDiem_IsThuocLa" size="md" :value="true" />
-      </td>
-      <td>
+      </div>
+      <div class="table-cell" style="flex: 0 0 25%; max-width: 25%;">
         <Textarea v-model="hsThongTinBenhAn.NoiDungChiTietObj.DacDiem_ThoiGianThuocLa" />
-      </td>
-    </tr>
-    <tr>
-      <td class="text-center">2</td>
-      <td>- Ma túy</td>
-      <td class="text-center">
+      </div>
+    </div>
+    <div class="table-row" style="flex-wrap: nowrap;">
+      <div class="table-cell text-center" style="flex: 0 0 5%; max-width: 5%;">2</div>
+      <div class="table-cell" style="flex: 0 0 12%; max-width: 12%;">- Ma túy</div>
+      <div class="table-cell text-center" style="flex: 0 0 8%; max-width: 8%;">
         <Checkbox v-model="hsThongTinBenhAn.NoiDungChiTietObj.DacDiem_IsMaTuy" size="md" :value="true" />
-      </td>
-      <td>
+      </div>
+      <div class="table-cell" style="flex: 0 0 25%; max-width: 25%;">
         <Textarea v-model="hsThongTinBenhAn.NoiDungChiTietObj.DacDiem_ThoiGianMaTuy" />
-      </td>
-      <td class="text-center">5</td>
-      <td>- Thuốc lào</td>
-      <td class="text-center">
+      </div>
+      <div class="table-cell text-center" style="flex: 0 0 5%; max-width: 5%;">5</div>
+      <div class="table-cell" style="flex: 0 0 12%; max-width: 12%;">- Thuốc lào</div>
+      <div class="table-cell text-center" style="flex: 0 0 8%; max-width: 8%;">
         <Checkbox v-model="hsThongTinBenhAn.NoiDungChiTietObj.DacDiem_IsThuocLao" size="md" :value="true" />
-      </td>
-      <td>
+      </div>
+      <div class="table-cell" style="flex: 0 0 25%; max-width: 25%;">
         <Textarea v-model="hsThongTinBenhAn.NoiDungChiTietObj.DacDiem_ThoiGianThuocLao" />
-      </td>
-    </tr>
-    <tr>
-      <td class="text-center">3</td>
-      <td>- Rượu, bia</td>
-      <td class="text-center">
+      </div>
+    </div>
+    <div class="table-row" style="flex-wrap: nowrap;">
+      <div class="table-cell text-center" style="flex: 0 0 5%; max-width: 5%;">3</div>
+      <div class="table-cell" style="flex: 0 0 12%; max-width: 12%;">- Rượu, bia</div>
+      <div class="table-cell text-center" style="flex: 0 0 8%; max-width: 8%;">
         <Checkbox v-model="hsThongTinBenhAn.NoiDungChiTietObj.DacDiem_IsRuouBia" size="md" :value="true" />
-      </td>
-      <td>
+      </div>
+      <div class="table-cell" style="flex: 0 0 25%; max-width: 25%;">
         <Textarea v-model="hsThongTinBenhAn.NoiDungChiTietObj.DacDiem_ThoiGianRuouBia" />
-      </td>
-      <td class="text-center">6</td>
-      <td>- Khác</td>
-      <td class="text-center">
+      </div>
+      <div class="table-cell text-center" style="flex: 0 0 5%; max-width: 5%;">6</div>
+      <div class="table-cell" style="flex: 0 0 12%; max-width: 12%;">- Khác</div>
+      <div class="table-cell text-center" style="flex: 0 0 8%; max-width: 8%;">
         <Checkbox v-model="hsThongTinBenhAn.NoiDungChiTietObj.DacDiem_IsKhac" size="md" :value="true" />
-      </td>
-      <td>
+      </div>
+      <div class="table-cell" style="flex: 0 0 25%; max-width: 25%;">
         <Textarea v-model="hsThongTinBenhAn.NoiDungChiTietObj.DacDiem_ThoiGianKhac" />
-      </td>
-    </tr>
-  </table>
+      </div>
+    </div>
+  </div>
   <div>
     <span>+ Gia đình:</span>
     <span class="font-italic input-ehr-sm">( Ông,
@@ -150,44 +146,35 @@
       <Textarea rows="6" v-model="hsThongTinBenhAn.ToanThan" />
     </div>
     <div class="col-3">
-      <table class="table table-ehr-bordered input-ehr-sm">
-        <tr>
-          <td>
-            <div class="input-ehr">
-              <span class="text-nowrap">Mạch:
-              </span>
-              <Textarea maxlength="4" v-model="hsThongTinBenhAn.Mach" />
-              <span> lần/phút</span>
-            </div>
-            <div class="input-ehr">
-              <span class="text-nowrap">Nhiệt độ:
-              </span>
-              <Textarea maxlength="4" v-model="hsThongTinBenhAn.NhietDo" />
-              <span> &deg;C</span>
-            </div>
-            <div class="input-ehr">
-              <span class="text-nowrap">Huyết áp:
-              </span>
-              <Textarea maxlength="4" v-model="hsThongTinBenhAn.HuyetApToiDa" />
-              <span>/</span>
-              <Textarea maxlength="4" v-model="hsThongTinBenhAn.HuyetApToiThieu" />
-              <span> mmHg</span>
-            </div>
-            <div class="input-ehr">
-              <span class="text-nowrap">Nhịp thở:
-              </span>
-              <Textarea maxlength="4" v-model="hsThongTinBenhAn.NhipTho" />
-              <span> lần/phút</span>
-            </div>
-            <div class="input-ehr">
-              <span class="text-nowrap">Cân nặng:
-              </span>
-              <Textarea maxlength="4" v-model="hsThongTinBenhAn.CanNang" />
-              <span> kg</span>
-            </div>
-          </td>
-        </tr>
-      </table>
+      <div class="table-container input-ehr-sm" style="box-sizing: border-box; padding: 4px 6px;">
+        <div class="input-ehr">
+          <span class="text-nowrap">Mạch:</span>
+          <Textarea maxlength="4" v-model="hsThongTinBenhAn.Mach" />
+          <span class="text-nowrap">&nbsp;lần/phút</span>
+        </div>
+        <div class="input-ehr">
+          <span class="text-nowrap">Nhiệt độ:</span>
+          <Textarea maxlength="4" v-model="hsThongTinBenhAn.NhietDo" />
+          <span class="text-nowrap">&nbsp;&deg;C</span>
+        </div>
+        <div class="input-ehr">
+          <span class="text-nowrap">Huyết áp:</span>
+          <Textarea maxlength="4" v-model="hsThongTinBenhAn.HuyetApToiDa" />
+          <span>/</span>
+          <Textarea maxlength="4" v-model="hsThongTinBenhAn.HuyetApToiThieu" />
+          <span class="text-nowrap">&nbsp;mmHg</span>
+        </div>
+        <div class="input-ehr">
+          <span class="text-nowrap">Nhịp thở:</span>
+          <Textarea maxlength="4" v-model="hsThongTinBenhAn.NhipTho" />
+          <span class="text-nowrap">&nbsp;lần/phút</span>
+        </div>
+        <div class="input-ehr">
+          <span class="text-nowrap">Cân nặng:</span>
+          <Textarea maxlength="4" v-model="hsThongTinBenhAn.CanNang" />
+          <span class="text-nowrap">&nbsp;kg</span>
+        </div>
+      </div>
     </div>
   </div>
   <div class="row m-b-sm no-gutters">

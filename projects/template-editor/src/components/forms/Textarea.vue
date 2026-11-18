@@ -59,13 +59,33 @@ export default {
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
-    // --- Reactive binding (keep internal ref non-nullable for helpers)
-    const input = ref<string>(props.modelValue ?? '')
-    const textarea = ref<HTMLTextAreaElement | null>(null)
+    const normalizeValue = (val: unknown) => {
+      const str = val == null ? '' : String(val)
+      return props.type === 'number' ? str.replace(/[^0-9]/g, '') : str
+    }
+
+    const computePad = () => {
+      const char = props.suffix.char ?? '\u00A0'
+      return char.repeat(props.suffix.length || 0)
+    }
 
     // --- Elements
     const labelSpan = ref<HTMLElement>()
-    const padEnd = ref('')
+    const padEnd = ref(computePad())
+    const ensurePad = (val: string) => {
+      const pad = padEnd.value
+      if (!pad) return val
+      return val.endsWith(pad) ? val : val + pad
+    }
+    const stripPad = (val: string) => {
+      const pad = padEnd.value
+      if (!pad) return val
+      return val.endsWith(pad) ? val.slice(0, -pad.length) : val
+    }
+
+    // --- Reactive binding (keep internal ref non-nullable for helpers)
+    const input = ref<string>(ensurePad(normalizeValue(props.modelValue)))
+    const textarea = ref<HTMLTextAreaElement | null>(null)
     const textareaHeight = ref(20)
     const labelSpanWidth = ref(0)
     let resizeObserver: ResizeObserver | null = null
@@ -83,24 +103,6 @@ export default {
       }
     }
 
-    const normalizeValue = (val: string) =>
-      props.type === 'number' ? (val ?? '').replace(/[^0-9]/g, '') : val ?? ''
-
-    const computePad = () => {
-      const char = props.suffix.char ?? '\u00A0'
-      return char.repeat(props.suffix.length || 0)
-    }
-    const ensurePad = (val: string) => {
-      const pad = padEnd.value
-      if (!pad) return val
-      return val.endsWith(pad) ? val : val + pad
-    }
-    const stripPad = (val: string) => {
-      const pad = padEnd.value
-      if (!pad) return val
-      return val.endsWith(pad) ? val.slice(0, -pad.length) : val
-    }
-
     const getSingleLineHeight = (el: HTMLTextAreaElement) => {
       const style = window.getComputedStyle(el)
       const lineHeight = parseFloat(style.lineHeight) || 20
@@ -113,8 +115,6 @@ export default {
 
     // --- Init
     onMounted(() => {
-      padEnd.value = computePad()
-      input.value = ensurePad(normalizeValue(props.modelValue ?? ''))
       nextTick(() => {
         if (textarea.value) {
           autosize(textarea.value)
@@ -166,7 +166,11 @@ export default {
         nextTick(() => setCaretPosition())
         return
       }
-      emit('update:modelValue', stripPad(padded))
+      const nextValue = stripPad(padded)
+      const currentValue = props.modelValue == null ? '' : String(props.modelValue)
+      if (nextValue !== currentValue) {
+        emit('update:modelValue', nextValue)
+      }
       nextTick(() => {
         if (textarea.value) autosize.update(textarea.value)
       })

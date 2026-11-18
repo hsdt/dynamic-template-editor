@@ -35,14 +35,11 @@
           v-for="(item, i) in selectedItems"
           :key="i"
           class="tag"
-        >
-          {{ getItemLabel(item) }}
-          <span
+        >{{ getItemLabel(item) }}<span
             v-if="!readonly && !disabled"
             class="remove"
             @mousedown.prevent.stop="removeItem(item)"
-          >❌</span>
-        </span>
+          >❌</span></span>
 
         <input
           ref="inputRef"
@@ -58,17 +55,14 @@
         <div
           v-for="(item, i) in selectedItems"
           :key="i"
-          class="tag"
+          class="tag is-single"
           :style="singleSelectedTagStyle"
           v-show="!showSingleInput && !search.length"
-        >
-          {{ getItemLabel(item) }}
-          <span
+        >{{ getItemLabel(item) }}<span
             v-if="!readonly && !disabled"
             class="remove"
             @mousedown.prevent.stop="removeItem(item)"
-          >❌</span>
-        </div>
+          >❌</span></div>
 
         <input
           v-if="showSingleInput"
@@ -466,10 +460,15 @@ export default {
 }
 
 .tag {
+  position: relative;
   align-items: center;
   padding: 1px;
   border-radius: 2px;
   transform: translateY(-2px);
+}
+
+.tag.is-single {
+  width: 100%;
 }
 
 .label-spacer {
@@ -484,6 +483,22 @@ export default {
   transition: opacity 0.12s ease;
   pointer-events: none;
   font-size: 8px;
+  line-height: 1;
+  text-indent: 0;
+}
+
+.tag.is-single .remove {
+  position: absolute;
+  top: 1px;
+  right: 2px;
+  margin-left: 0;
+  height: 20px;
+  line-height: 20px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 2px;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 2px;
 }
 
 .tag:hover .remove {
