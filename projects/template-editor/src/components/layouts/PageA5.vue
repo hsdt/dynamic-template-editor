@@ -263,6 +263,8 @@ export default {
   flex-direction: column;
   align-items: center;
   gap: 20px;
+  width: fit-content;
+  margin: 0 auto;
   overflow-anchor: none;
 }
 

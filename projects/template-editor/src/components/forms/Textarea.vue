@@ -67,9 +67,21 @@ export default {
     const labelSpan = ref<HTMLElement>()
     const padEnd = ref('')
     const textareaHeight = ref(20)
+    const labelSpanWidth = ref(0)
+    let resizeObserver: ResizeObserver | null = null
 
-    const labelSpanWidth = computed(() => labelSpan.value?.offsetWidth ?? 0)
     const textareaStyleNormalized = computed(() => props.textareaStyle)
+
+    const syncLayoutMetrics = () => {
+      labelSpanWidth.value = labelSpan.value?.offsetWidth ?? 0
+      if (textarea.value) {
+        const singleHeight = getSingleLineHeight(textarea.value)
+        if (singleHeight > 0) {
+          textareaHeight.value = singleHeight
+        }
+        autosize.update(textarea.value)
+      }
+    }
 
     const normalizeValue = (val: string) =>
       props.type === 'number' ? (val ?? '').replace(/[^0-9]/g, '') : val ?? ''
@@ -105,12 +117,25 @@ export default {
       input.value = ensurePad(normalizeValue(props.modelValue ?? ''))
       nextTick(() => {
         if (textarea.value) {
-          textareaHeight.value = getSingleLineHeight(textarea.value)
           autosize(textarea.value)
-          autosize.update(textarea.value)
+        }
+        syncLayoutMetrics()
+        if (typeof ResizeObserver !== 'undefined') {
+          resizeObserver = new ResizeObserver(() => {
+            syncLayoutMetrics()
+          })
+          if (labelSpan.value) resizeObserver.observe(labelSpan.value)
+          if (textarea.value) resizeObserver.observe(textarea.value)
         }
       })
     })
+
+    watch(
+      () => props.label,
+      () => {
+        nextTick(() => syncLayoutMetrics())
+      }
+    )
 
     watch(
       () => props.suffix,
@@ -148,6 +173,10 @@ export default {
     })
 
     onUnmounted(() => {
+      if (resizeObserver) {
+        resizeObserver.disconnect()
+        resizeObserver = null
+      }
       if (textarea.value) autosize.destroy(textarea.value)
     })
 
