@@ -169,6 +169,7 @@
       <div
         class="preview-container"
         ref="container"
+        @click="onCanvasClick"
         @contextmenu="onCanvasContextMenu"
         @dblclick="onCanvasDblClick"
         @dragover="onCanvasDragOver"
@@ -264,6 +265,7 @@ export default {
       selectedNode: null as VirtualNode | null,
       processedTemplate: '',
       selectedCid: '',
+      lastDblClickOriginCid: '',
       insertPosition: '',
       ContextMenuVisible: false,
       contextMenuOption: {
@@ -311,8 +313,10 @@ export default {
   },
   watch: {
     template: {
-      handler() {
-        this.processTemplate();
+      handler(newVal) {
+        if (newVal !== this.rootNode.innerHTML) {
+          this.processTemplate();
+        }
       }
     },
     script: {
@@ -334,6 +338,7 @@ export default {
       handler(newVal) {
         if (!newVal) {
           this.selectedCid = '';
+          this.lastDblClickOriginCid = '';
           this.selectedNode = null;
           this.unHighlightElement();
           this.$emit('selection-change', null);
@@ -528,6 +533,10 @@ export default {
       this.rootNode.innerHTML = this.template;
       this.rootNode.genComponentId();
       this.rootNode.setAttribute('c-id', this.rootId);
+      if (this.selectedCid && this.selectedCid !== this.rootId && !this.rootNode.querySelector(`[c-id=${this.selectedCid}]`)) {
+        this.selectedCid = '';
+        this.lastDblClickOriginCid = '';
+      }
       // Use outerHTML to keep the Root wrapper for single root element requirement
       this.processedTemplate = this.rootNode.outerHTML;
       this.renderPreview();
@@ -692,6 +701,19 @@ export default {
       });
     },
 
+    isSameOrAncestorCid(ancestorCid: string, childCid: string): boolean {
+      if (!ancestorCid || !childCid || ancestorCid === this.rootId) return false;
+      if (ancestorCid === childCid) return true;
+      let node = this.rootNode.querySelector(`[c-id=${childCid}]`)?.parentNode || null;
+      while (node) {
+        const cid = node.getAttribute('c-id');
+        if (cid === ancestorCid) return true;
+        if (cid === this.rootId) break;
+        node = node.parentNode;
+      }
+      return false;
+    },
+
     elementClickHandler(e: MouseEvent) {
       if (!this.editMode) return;
       e.preventDefault();
@@ -707,6 +729,7 @@ export default {
 
       this.clickTimeout = setTimeout(() => {
         this.selectedCid = cid;
+        this.lastDblClickOriginCid = cid;
         this.emitSelection(cid);
         if (cid === this.rootId) this.unHighlightElement();
         else this.highlightElement(targetEl);
@@ -729,6 +752,23 @@ export default {
       this.targetParentElement(clickedCid);
     },
 
+    onCanvasClick(e: MouseEvent) {
+      if (!this.editMode) return;
+      const target = e.target as HTMLElement | null;
+      const hitCidEl = target?.closest?.('[c-id]') as HTMLElement | null;
+      if (!hitCidEl || hitCidEl.getAttribute('c-id') === this.rootId) {
+        if (this.clickTimeout) {
+          clearTimeout(this.clickTimeout);
+          this.clickTimeout = null;
+        }
+        this.selectedCid = this.rootId;
+        this.lastDblClickOriginCid = '';
+        this.selectedNode = null;
+        this.unHighlightElement();
+        this.emitSelection(this.rootId);
+      }
+    },
+
     onCanvasDblClick() {
       if (!this.editMode) return;
       if (this.clickTimeout) {
@@ -739,8 +779,33 @@ export default {
     },
 
     targetParentElement(fallbackCid?: string) {
-      const currentCid = this.selectedCid || fallbackCid;
+      let currentCid: string | undefined;
+
+      if (fallbackCid) {
+        const hasValidSelection =
+          Boolean(this.selectedCid) &&
+          this.selectedCid !== this.rootId &&
+          Boolean(this.rootNode.querySelector(`[c-id=${this.selectedCid}]`));
+
+        const shouldContinueClimbing =
+          hasValidSelection &&
+          (this.selectedCid === fallbackCid ||
+            (this.lastDblClickOriginCid === fallbackCid &&
+              this.isSameOrAncestorCid(this.selectedCid, fallbackCid)));
+
+        if (shouldContinueClimbing) {
+          currentCid = this.selectedCid;
+        } else {
+          this.lastDblClickOriginCid = fallbackCid;
+          currentCid = fallbackCid;
+        }
+      } else if (this.selectedCid && this.selectedCid !== this.rootId) {
+        currentCid = this.selectedCid;
+      }
+
       if (!currentCid || currentCid === this.rootId) return;
+
+      const contentRoot = (this.$refs['content'] as HTMLElement) || document;
 
       // 1. Tìm node cha trong virtual tree
       let parentCid: string | null = null;
@@ -754,7 +819,7 @@ export default {
 
       // 2. Fallback tìm qua real DOM nếu virtual tree chưa liên kết
       if (!parentCid) {
-        const domEl = document.querySelector(`[c-id="${currentCid}"]`);
+        const domEl = contentRoot.querySelector(`[c-id="${currentCid}"]`);
         const domParent = domEl?.parentElement?.closest('[c-id]');
         parentCid = domParent?.getAttribute('c-id') || null;
         if (parentCid) {
@@ -764,6 +829,7 @@ export default {
 
       if (!parentCid || parentCid === this.rootId) {
         this.selectedCid = this.rootId;
+        this.lastDblClickOriginCid = '';
         this.selectedNode = null;
         this.unHighlightElement();
         this.emitSelection(this.rootId);
@@ -777,7 +843,7 @@ export default {
       this.emitSelection(parentCid);
 
       this.$nextTick(() => {
-        const el = document.querySelector(`[c-id="${parentCid}"]`) as HTMLElement;
+        const el = contentRoot.querySelector(`[c-id="${parentCid}"]`) as HTMLElement | null;
         if (el) {
           this.highlightElement(el);
           el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -1412,13 +1478,16 @@ export default {
   flex-direction: column;
   align-items: center;
   width: 100%;
+  min-height: 100%;
 }
 
 :deep([c-id="123456"]) {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
   width: 100%;
+  min-height: 100%;
+  padding: 16px 0;
   box-sizing: border-box;
 }
 

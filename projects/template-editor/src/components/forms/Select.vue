@@ -140,7 +140,11 @@ export default {
     const inputRef = ref<HTMLInputElement | null>(null);
     const labelSpan = ref<HTMLElement | null>(null);
     const hasLabel = computed(() => Boolean(slots['label'] || props.label));
-    const labelSpanWidth = computed(() => labelSpan.value?.offsetWidth ?? 0);
+    const labelSpanWidth = ref(0);
+    let labelResizeObserver: ResizeObserver | null = null;
+    const updateLabelWidth = () => {
+      labelSpanWidth.value = labelSpan.value?.offsetWidth ?? 0;
+    };
     const multipleLabelSpacerStyle = computed(() => ({
       width: labelSpanWidth.value + 'px',
       flex: `0 0 ${labelSpanWidth.value}px`,
@@ -369,11 +373,28 @@ export default {
     onMounted(() => {
       initSelected();
       document.addEventListener('mousedown', onClickOutside);
+      nextTick(() => {
+        updateLabelWidth();
+        if (typeof ResizeObserver !== 'undefined') {
+          labelResizeObserver = new ResizeObserver(() => updateLabelWidth());
+          if (labelSpan.value) labelResizeObserver.observe(labelSpan.value);
+          if (wrapperRef.value) labelResizeObserver.observe(wrapperRef.value);
+        }
+      });
     });
 
     onBeforeUnmount(() => {
       document.removeEventListener('mousedown', onClickOutside);
+      if (labelResizeObserver) {
+        labelResizeObserver.disconnect();
+        labelResizeObserver = null;
+      }
     });
+
+    watch(
+      () => props.label,
+      () => nextTick(() => updateLabelWidth())
+    );
 
     return {
       isOpen,

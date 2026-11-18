@@ -29,7 +29,7 @@
 </template>
 
 <script lang="ts">
-import { ref, watch, type PropType } from 'vue';
+import { nextTick, onMounted, onUnmounted, ref, watch, type PropType } from 'vue';
 import type { StyleValue } from 'vue';
 import moment from 'moment';
 import mask from '../../directives/mask-datetime';
@@ -125,13 +125,30 @@ export default {
     // Tính toán độ rộng label (dùng slot)
     const labelSpan = ref<HTMLElement>()
     const labelSpanWidth = ref(0)
+    let resizeObserver: ResizeObserver | null = null
     const updateLabelWidth = () => {
       labelSpanWidth.value = labelSpan.value?.offsetWidth ?? 0
     }
-    if (typeof window !== 'undefined') {
-      setTimeout(updateLabelWidth, 0)
-    }
-    // Nếu slot label thay đổi, cần cập nhật lại width (nếu cần, có thể dùng watchEffect hoặc onUpdated)
+    onMounted(() => {
+      nextTick(() => {
+        updateLabelWidth()
+        if (typeof ResizeObserver !== 'undefined') {
+          resizeObserver = new ResizeObserver(() => updateLabelWidth())
+          if (labelSpan.value) resizeObserver.observe(labelSpan.value)
+          if (wrapperRef.value) resizeObserver.observe(wrapperRef.value)
+        }
+      })
+    })
+    onUnmounted(() => {
+      if (resizeObserver) {
+        resizeObserver.disconnect()
+        resizeObserver = null
+      }
+    })
+    watch(
+      () => props.label,
+      () => nextTick(() => updateLabelWidth())
+    )
 
     return {
       wrapperRef,
