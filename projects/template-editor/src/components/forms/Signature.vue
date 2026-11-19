@@ -1,108 +1,47 @@
 <template>
-  <div class="hs-signature" @contextmenu.prevent="openContextMenu">
+  <div class="hs-signature">
     <div v-if="codeLine" class="signature-code">{{ codeLine }}</div>
 
-    <div v-if="activeSignature && activeSignature.Active">
-      <div class="signature-preview">
-        <img
-          :src="activeSignature.AnhChuKy"
-          @click="openSignatureHistory"
-        />
-      </div>
-    </div>
-
-    <div v-else class="text-center">
+    <div class="text-center">
       <span
-        class="click-to-sign no-print"
-        title="Click để ký tên"
-        @click="handleSign"
+        class="click-to-sign no-print noprint"
+        title="Chuyển bản ký PDF để thực hiện ký số"
+        @click="handleClick"
       >
         Ký tên
       </span>
     </div>
-
-    <ContextMenu ref="signatureMenu">
-      <template #default="{ subject }">
-        <li @click="openSignatureHistory">
-          <i class="fa fa-search text-warning"></i>
-          Lịch sử ký
-        </li>
-      </template>
-    </ContextMenu>
   </div>
 </template>
 
 <script lang="ts">
-import { computed, inject, ref } from 'vue';
-import ContextMenu from '../ContextMenu.vue';
+import { computed, inject } from 'vue';
 
-type SignatureItem = {
-  Active?: boolean;
-  AnhChuKy?: string;
-  ViTri?: string;
+type NotifyApi = {
+  info?: (message: string, title?: string) => void;
 };
-
-type SignatureHandler = (code: string) => void;
 
 export default {
   name: 'Signature',
-  components: {
-    ContextMenu
-  },
   props: {
     code: { type: String, default: '' }
   },
   setup(props) {
-    const signatureData = inject<Record<string, any> | null>('signature', null);
     const MauHoSo = inject<string | null>('MauHoSo', null);
-    const openSignatureHistoryFn = inject<((code: string) => void) | null>('openSignatureHistory', null);
-    const handleSignFn = inject<((code: string) => void) | null>('handleSign', null);
-    const signatureMenu = ref<InstanceType<typeof ContextMenu> | null>(null);
-
-    const history = computed<SignatureItem[]>(() => {
-      const source = signatureData ?? {};
-      const groups = Object.values(source).filter(Array.isArray) as SignatureItem[][];
-      const flat = groups.flat();
-      if (!props.code) return flat;
-      return flat.filter(item => item?.ViTri === props.code);
-    });
-
-    const activeSignature = computed<SignatureItem | null>(() => {
-      return history.value.find(sig => sig?.Active) ?? null;
-    });
-
-    const signatureForCode = computed<SignatureItem | null>(() => {
-      return activeSignature.value ?? history.value[0] ?? null;
-    });
-
-    const signatureCode = computed(() => props.code || signatureForCode.value?.ViTri || '');
+    const notify = inject<NotifyApi | null>('notify', null);
 
     const codeLine = computed(() => {
-      const parts = [MauHoSo, signatureCode.value].filter(Boolean);
+      const parts = [MauHoSo, props.code].filter(Boolean);
       return parts.join('_');
     });
 
-    const openSignatureHistory = () => {
-      openSignatureHistoryFn?.(signatureCode.value);
-    };
-
-    const handleSign = () => {
-      handleSignFn?.(signatureCode.value);
-    };
-
-    const openContextMenu = (event: MouseEvent) => {
-      event.stopPropagation();
-      event.preventDefault();
-      signatureMenu.value?.showFromEvent?.(event, signatureCode.value);
+    const handleClick = () => {
+      notify?.info?.('Vui lòng chuyển bản ký PDF để thực hiện ký số.');
     };
 
     return {
-      activeSignature,
       codeLine,
-      openSignatureHistory,
-      handleSign,
-      openContextMenu,
-      signatureMenu
+      handleClick
     };
   }
 };
@@ -118,14 +57,6 @@ export default {
   color: #ffffff;
   font-size: 0.5px;
   text-align: center;
-}
-.signature-preview {
-  text-align: center;
-}
-.signature-preview img {
-  max-width: 100%;
-  max-height: 69px;
-  cursor: pointer;
 }
 .click-to-sign {
   cursor: pointer;
