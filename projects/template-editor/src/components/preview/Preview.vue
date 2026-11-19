@@ -609,10 +609,8 @@ export default {
               }
             : logFn('onSelectSearch')
         );
-        this.app.provide('signature', this.context?.['signature'] ?? null);
         this.app.provide('MauHoSo', this.context?.['MauHoSo'] ?? null);
-        this.app.provide('openSignatureHistory', this.context?.['openSignatureHistory'] ?? logFn('openSignatureHistory'));
-        this.app.provide('handleSign', this.context?.['handleSign'] ?? logFn('handleSign'));
+        this.app.provide('notify', this.context?.['notify'] ?? this.evaluatedScope?.['notify'] ?? null);
         this.app.provide('insertICD', this.context?.['insertICD'] ?? logFn('insertICD'));
         this.app.provide('editICD', this.context?.['editICD'] ?? logFn('editICD'));
         this.app.provide('removeICD', this.context?.['removeICD'] ?? logFn('removeICD'));
