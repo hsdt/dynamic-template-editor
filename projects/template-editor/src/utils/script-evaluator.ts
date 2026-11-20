@@ -1,3 +1,4 @@
+import moment from 'moment';
 import * as Vue from 'vue';
 
 export interface EvalScriptResult {
@@ -90,6 +91,7 @@ export async function evalScriptScope(
     } = Vue;
 
     const $context = contextObj || {};
+    const momentFn = $context['moment'] || moment;
 
     // Danh sách biến toàn cục nhạy cảm cần cách ly (shadowing) để bảo vệ trình duyệt và token
     const sandboxBlocklist = [
@@ -126,6 +128,7 @@ export async function evalScriptScope(
       'isRef',
       'isReactive',
       '$context',
+      'moment',
       ...sandboxBlocklist,
       body
     );
@@ -147,6 +150,7 @@ export async function evalScriptScope(
       isRef,
       isReactive,
       $context,
+      momentFn,
       ...sandboxBlocklist.map(() => undefined)
     );
 

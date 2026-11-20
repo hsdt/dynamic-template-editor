@@ -5,6 +5,7 @@
       v-if="$slots['label'] || label"
       class="hs-label-span"
       ref="labelSpan"
+      :style="labelStyleComputed"
     >
       <template v-if="$slots['label']">
         <slot name="label"></slot>
@@ -18,7 +19,15 @@
       class="textarea-line"
       :class="{ 'textarea-line-none': !line }"
       v-model="input"
-      :style="[textareaStyleNormalized, { textIndent: ($slots['label'] || label) ? labelSpanWidth + 'px' : undefined, minHeight: textareaHeight + 'px' }]"
+      :style="[
+        wrapperLineHeightStyle,
+        textareaStyleNormalized,
+        {
+          textIndent: ($slots['label'] || label) ? labelSpanWidth + 'px' : undefined,
+          minHeight: textareaHeight + 'px',
+          backgroundSize: line ? `136px ${lineHeightPx}px` : undefined
+        }
+      ]"
       :placeholder="placeholder"
       :disabled="disabled"
       :readonly="readonly"
@@ -87,14 +96,52 @@ export default {
     const input = ref<string>(ensurePad(normalizeValue(props.modelValue)))
     const textarea = ref<HTMLTextAreaElement | null>(null)
     const textareaHeight = ref(20)
+    const lineHeightPx = ref(20)
+    const labelTopPx = ref(0)
+    const textareaFontSize = ref('12pt')
+    const textareaFontFamily = ref('')
     const labelSpanWidth = ref(0)
     let resizeObserver: ResizeObserver | null = null
+
+    const extractLineHeightFromStyle = (rawStyle: unknown): string | undefined => {
+      if (!rawStyle) return undefined
+      if (typeof rawStyle === 'string') {
+        const match = rawStyle.match(/(?:^|;)\s*line-height\s*:\s*([^;]+)/i)
+        return match?.[1]?.trim() || undefined
+      }
+      if (typeof rawStyle === 'object' && !Array.isArray(rawStyle)) {
+        const val = (rawStyle as Record<string, unknown>)['lineHeight'] ?? (rawStyle as Record<string, unknown>)['line-height']
+        return val != null && String(val).trim() ? String(val).trim() : undefined
+      }
+      return undefined
+    }
+
+    const wrapperLineHeightStyle = computed(() => {
+      const lh = extractLineHeightFromStyle(props.style)
+      return lh ? { lineHeight: lh } : undefined
+    })
+
+    const labelStyleComputed = computed(() => ({
+      top: `${labelTopPx.value}px`,
+      lineHeight: `${lineHeightPx.value}px`,
+      fontSize: textareaFontSize.value,
+      ...(textareaFontFamily.value ? { fontFamily: textareaFontFamily.value } : {})
+    }))
 
     const textareaStyleNormalized = computed(() => props.textareaStyle)
 
     const syncLayoutMetrics = () => {
       labelSpanWidth.value = labelSpan.value?.offsetWidth ?? 0
       if (textarea.value) {
+        const computedStyle = window.getComputedStyle(textarea.value)
+        const lh = parseFloat(computedStyle.lineHeight) || 20
+        const padTop = parseFloat(computedStyle.paddingTop) || 0
+        const borderTop = parseFloat(computedStyle.borderTopWidth) || 0
+        lineHeightPx.value = lh
+        labelTopPx.value = padTop + borderTop
+        textareaFontSize.value = computedStyle.fontSize || '12pt'
+        textareaFontFamily.value = computedStyle.fontFamily || ''
+
         const singleHeight = getSingleLineHeight(textarea.value)
         if (singleHeight > 0) {
           textareaHeight.value = singleHeight
@@ -131,10 +178,11 @@ export default {
     })
 
     watch(
-      () => props.label,
+      [() => props.label, () => props.style, () => props.textareaStyle],
       () => {
         nextTick(() => syncLayoutMetrics())
-      }
+      },
+      { deep: true }
     )
 
     watch(
@@ -210,6 +258,9 @@ export default {
       textarea,
       labelSpan,
       labelSpanWidth,
+      lineHeightPx,
+      wrapperLineHeightStyle,
+      labelStyleComputed,
       textareaHeight,
       textareaStyleNormalized,
       setCaretPosition,
@@ -234,8 +285,6 @@ export default {
   z-index: 1;
   position: absolute;
   background: white;
-  line-height: 1;
-  bottom: calc(100% - 20px);
   left: 0;
 }
 .textarea-line {
