@@ -17,9 +17,20 @@
             <span>In bản in</span>
           </button>
           <button
+            type="button"
+            class="script-toggle-btn"
+            :class="{ active: showContextDrawer }"
+            @click="toggleContextDrawer"
+            title="Xem cấu trúc dữ liệu Context (hsBenhAn, phieuVaoVien, data...)"
+          >
+            <i class="fa fa-database"></i>
+            <span>Dữ liệu Context</span>
+          </button>
+          <button
+            type="button"
             class="script-toggle-btn"
             :class="{ active: showScriptEditor, 'has-error': !!scriptError }"
-            @click="showScriptEditor = !showScriptEditor"
+            @click="toggleScriptDrawer"
             title="Mở / Đóng trình soạn thảo JavaScript Logic"
           >
             <i class="fa fa-code"></i>
@@ -73,7 +84,7 @@
           <template v-else>
             <i class="fa fa-lightbulb-o footer-tip-icon"></i>
             <span class="footer-tip-text">
-              Hỗ trợ: <code>reactive()</code>, <code>computed()</code>, <code>watch()</code>, <code>ref()</code>, <code>$context</code>, top-level <code>await</code>. Hãy <code>return</code> các biến cần dùng trong template.
+              Hỗ trợ: <code>reactive()</code>, <code>computed()</code>, <code>watch()</code>, <code>ref()</code>, <code>moment</code>, <code>$context</code>, top-level <code>await</code>. Biến trong context đã có sẵn ở template; chỉ <code>return</code> biến/hàm mới.
             </span>
           </template>
         </div>
@@ -162,8 +173,149 @@
       <!-- Overlay -->
       <div v-if="selectedNode" class="editor-overlay" @click="selectedNode = null; unHighlightElement()"></div>
 
+      <!-- Context Schema Drawer (Collapsible) -->
+      <div class="script-editor-drawer context-drawer" v-if="showContextDrawer && editMode">
+        <div class="script-drawer-header">
+          <div class="drawer-title">
+            <span class="js-badge context-badge">CTX</span>
+            <span class="drawer-heading">Cấu trúc Dữ liệu Context ({{ filteredContextFields.length }} trường)</span>
+          </div>
+
+          <div class="drawer-tools">
+            <div class="ctx-view-switch" role="group" aria-label="Chế độ xem Context">
+              <button
+                type="button"
+                class="ctx-switch-btn"
+                :class="{ active: contextViewMode === 'table' }"
+                @click="contextViewMode = 'table'"
+              >
+                Bảng
+              </button>
+              <button
+                type="button"
+                class="ctx-switch-btn"
+                :class="{ active: contextViewMode === 'tree' }"
+                @click="contextViewMode = 'tree'"
+              >
+                Cây JSON
+              </button>
+            </div>
+            <template v-if="contextViewMode === 'tree'">
+              <button type="button" class="tool-btn" @click="expandAllContextTree" title="Mở rộng toàn bộ nhánh">Mở hết</button>
+              <button type="button" class="tool-btn" @click="collapseAllContextTree" title="Thu gọn về cấp 1">Thu gọn</button>
+            </template>
+            <input
+              type="search"
+              v-model="contextSearch"
+              class="context-search-input"
+              placeholder="Tìm tên trường (vd: HoTen, BHYT, LyDoVaoVien...)"
+              aria-label="Tìm trường dữ liệu Context"
+              autocorrect="off"
+              autocapitalize="none"
+              spellcheck="false"
+            />
+            <button type="button" class="drawer-close-btn" @click="showContextDrawer = false" title="Đóng">✕</button>
+          </div>
+        </div>
+
+        <div class="context-group-bar">
+          <button
+            type="button"
+            class="context-group-pill"
+            :class="{ active: activeContextGroup === 'ALL' }"
+            @click="activeContextGroup = 'ALL'"
+          >
+            Tất cả
+          </button>
+          <button
+            v-for="grp in contextGroups"
+            :key="grp"
+            type="button"
+            class="context-group-pill"
+            :class="{ active: activeContextGroup === grp }"
+            @click="activeContextGroup = grp"
+          >
+            {{ grp }}
+          </button>
+        </div>
+
+        <div class="context-table-scroll">
+          <table v-if="contextViewMode === 'table'" class="context-schema-table">
+            <thead>
+              <tr>
+                <th>Đường dẫn (Binding Path)</th>
+                <th>Kiểu / Giá trị mẫu</th>
+                <th style="width: 220px;">Copy nhanh</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="field in filteredContextFields" :key="field.path">
+                <td>
+                  <code class="ctx-path">{{ field.path }}</code>
+                </td>
+                <td>
+                  <span class="ctx-type">{{ field.valueType }}</span>
+                  <span v-if="field.sample !== undefined && field.sample !== null" class="ctx-sample">{{ field.sample }}</span>
+                </td>
+                <td>
+                  <div class="ctx-actions">
+                    <button
+                      type="button"
+                      class="tool-btn"
+                      :class="{ 'is-copied': copiedContextKey === `${field.path}:path` }"
+                      @click="copyContextText(field.path, `${field.path}:path`)"
+                    >
+                      {{ copiedContextKey === `${field.path}:path` ? 'Đã copy' : 'Path' }}
+                    </button>
+                    <button
+                      type="button"
+                      class="tool-btn"
+                      :class="{ 'is-copied': copiedContextKey === `${field.path}:interp` }"
+                      @click="copyInterpolation(field.path)"
+                    >
+                      {{ copiedContextKey === `${field.path}:interp` ? 'Đã copy' : '{' + '{ }' + '}' }}
+                    </button>
+                    <button
+                      type="button"
+                      class="tool-btn format-btn"
+                      :class="{ 'is-copied': copiedContextKey === `${field.path}:ta` }"
+                      @click="copyTextareaSnippet(field)"
+                    >
+                      {{ copiedContextKey === `${field.path}:ta` ? 'Đã copy' : 'Textarea' }}
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr v-if="filteredContextFields.length === 0">
+                <td colspan="3" class="text-center py-3" style="color: #94a3b8;">
+                  Không tìm thấy trường dữ liệu phù hợp trong context.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div v-else class="context-tree-container">
+            <ContextTreeNode
+              v-for="node in contextTreeNodes"
+              :key="node.path"
+              :node="node"
+              :depth="0"
+              :copiedKey="copiedContextKey"
+              :expandSignal="contextTreeExpandSignal"
+              :forceExpand="Boolean(contextSearch.trim())"
+              @copy-path="copyContextText($event, `${$event}:path`)"
+              @copy-interp="copyInterpolation($event)"
+              @copy-textarea="copyTextareaSnippet($event)"
+            />
+            <div v-if="contextTreeNodes.length === 0" class="text-center py-3" style="color: #94a3b8; font-size: 12px;">
+              Không tìm thấy nhánh dữ liệu phù hợp trong context.
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Panel chỉnh sửa -->
-      <EditElementPanel :selectedNode="selectedNode" @close="closeEditPanel" />
+      <EditElementPanel :selectedNode="selectedNode" :context="context" @close="closeEditPanel" />
 
       <!-- Preview container with canvas drop & contextmenu support -->
       <div
@@ -207,7 +359,7 @@ import PageA5 from '../layouts/PageA5.vue';
 import Textarea from '../forms/Textarea.vue';
 import InputOTP from '../forms/InputOTP.vue';
 import Signature from '../forms/Signature.vue';
-import { VirtualHTMLParser, VirtualNode, evalScriptScope, createTrackedState } from '@/utils';
+import { VirtualHTMLParser, VirtualNode, evalScriptScope, createTrackedState, extractContextSchema, buildContextTree, type ContextFieldSchema, type ContextTreeEntry } from '@/utils';
 import EditElementPanel from '../EditElementPanel.vue';
 import { handlePrint, printElement } from '@/helpers';
 import { ContextMenu as ImContextMenu, ContextMenuItem as ImContextMenuItem } from '@imengyu/vue3-context-menu';
@@ -224,6 +376,7 @@ import { installContextMenuDirective } from '../../directives/context-menu';
 import IcdGroupItem from '../forms/IcdGroupItem.vue';
 import IcdList from '../forms/IcdList.vue';
 import XmlViewer from './XmlViewer.vue';
+import ContextTreeNode from './ContextTreeNode.vue';
 
 export default {
   name: 'Preview',
@@ -232,7 +385,8 @@ export default {
     ImContextMenu,
     ImContextMenuItem,
     DatePickerPortal,
-    Codemirror
+    Codemirror,
+    ContextTreeNode
   },
   props: {
     template: {
@@ -286,6 +440,13 @@ export default {
       currentDropTarget: null as { cid: string; position: string } | null,
       localScript: this.script || '',
       showScriptEditor: false,
+      showContextDrawer: false,
+      contextViewMode: 'table' as 'table' | 'tree',
+      contextTreeExpandSignal: 0,
+      contextSearch: '',
+      activeContextGroup: 'ALL',
+      copiedContextKey: '',
+      copyResetTimer: null as ReturnType<typeof setTimeout> | null,
       scriptError: null as string | null,
       evaluatedScope: {} as Record<string, any>,
       activeScriptScope: null as EffectScope | null,
@@ -311,6 +472,31 @@ export default {
       clickTimeout: null as ReturnType<typeof setTimeout> | null,
     };
   },
+  computed: {
+    contextSchemaFields(): ContextFieldSchema[] {
+      return extractContextSchema(this.context, { maxItems: 5000 });
+    },
+    contextGroups(): string[] {
+      return Array.from(new Set(this.contextSchemaFields.map((item) => item.group)));
+    },
+    filteredContextFields(): ContextFieldSchema[] {
+      const q = this.contextSearch.trim().toLowerCase();
+      return this.contextSchemaFields.filter((item) => {
+        if (this.activeContextGroup !== 'ALL' && item.group !== this.activeContextGroup) {
+          return false;
+        }
+        if (!q) return true;
+        return `${item.path} ${item.sample ?? ''}`.toLowerCase().includes(q);
+      });
+    },
+    contextTreeNodes(): ContextTreeEntry[] {
+      return buildContextTree(this.context, {
+        group: this.activeContextGroup,
+        keyword: this.contextSearch,
+        maxDepth: 6,
+      });
+    }
+  },
   watch: {
     template: {
       handler(newVal) {
@@ -331,6 +517,13 @@ export default {
       async handler(newVal, oldVal) {
         if (newVal !== oldVal) {
           await this.evalScript();
+        }
+      }
+    },
+    contextGroups: {
+      handler(groups: string[]) {
+        if (this.activeContextGroup !== 'ALL' && !groups.includes(this.activeContextGroup)) {
+          this.activeContextGroup = 'ALL';
         }
       }
     },
@@ -367,6 +560,10 @@ export default {
       clearTimeout(this.scriptDebounceTimer);
       this.scriptDebounceTimer = null;
     }
+    if (this.copyResetTimer) {
+      clearTimeout(this.copyResetTimer);
+      this.copyResetTimer = null;
+    }
     if (this.activeScriptScope) {
       this.activeScriptScope.stop();
       this.activeScriptScope = null;
@@ -377,6 +574,61 @@ export default {
     }
   },
   methods: {
+    toggleScriptDrawer() {
+      this.showScriptEditor = !this.showScriptEditor;
+      if (this.showScriptEditor) {
+        this.showContextDrawer = false;
+      }
+    },
+
+    toggleContextDrawer() {
+      this.showContextDrawer = !this.showContextDrawer;
+      if (this.showContextDrawer) {
+        this.showScriptEditor = false;
+      }
+    },
+
+    async copyContextText(text: string, markerKey: string) {
+      try {
+        await navigator.clipboard?.writeText(text);
+        this.copiedContextKey = markerKey;
+        if (this.copyResetTimer) clearTimeout(this.copyResetTimer);
+        this.copyResetTimer = setTimeout(() => {
+          this.copiedContextKey = '';
+        }, 1500);
+      } catch {
+        // Bỏ qua nếu trình duyệt chặn quyền clipboard
+      }
+    },
+
+    expandAllContextTree() {
+      this.contextTreeExpandSignal = this.contextTreeExpandSignal > 0 ? this.contextTreeExpandSignal + 1 : 1;
+    },
+
+    collapseAllContextTree() {
+      this.contextTreeExpandSignal = this.contextTreeExpandSignal < 0 ? this.contextTreeExpandSignal - 1 : -1;
+    },
+
+    copyInterpolation(path: string) {
+      this.copyContextText(`{{ ${path} }}`, `${path}:interp`);
+    },
+
+    copyTextareaSnippet(field: { path: string; group?: string }) {
+      const leaf = field.path.split('.').pop() || 'Giá trị';
+      const root = field.group || field.path.split(/[.[]/)[0];
+      const isWritable =
+        root === 'data' ||
+        root === 'phieuVaoVien' ||
+        root === 'hsThongTinBenhAn' ||
+        root === 'hsTongKetBenhAn' ||
+        (root === 'hsBenhAn' && Boolean(this.context && 'dmTinhThanh' in this.context));
+      const binding = isWritable
+        ? `v-model="${field.path}"`
+        : `readonly :modelValue="${field.path}"`;
+      const snippet = `<Textarea label="${leaf}:" ${binding} :line="true"></Textarea>`;
+      this.copyContextText(snippet, `${field.path}:ta`);
+    },
+
     onPrintShortcut(event: KeyboardEvent) {
       if (this.editMode) {
         handlePrint(event);
@@ -1269,6 +1521,162 @@ export default {
   align-items: center;
   gap: 8px;
   font-family: monospace;
+}
+
+.context-badge {
+  background: #0ea5e9;
+  color: #082f49;
+}
+
+.context-search-input {
+  width: 260px;
+  max-width: 100%;
+  background: #1e293b;
+  color: #e2e8f0;
+  border: 1px solid #334155;
+  border-radius: 5px;
+  padding: 4px 9px;
+  font-size: 12px;
+  outline: none;
+}
+
+.context-search-input:focus {
+  border-color: #38bdf8;
+}
+
+.context-group-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 6px 14px;
+  background: #0b1120;
+  border-bottom: 1px solid #1e293b;
+}
+
+.context-group-pill {
+  background: #1e293b;
+  color: #cbd5e1;
+  border: 1px solid #334155;
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 11.5px;
+  cursor: pointer;
+}
+
+.context-group-pill.active {
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #38bdf8;
+}
+
+.context-table-scroll {
+  flex: 1;
+  overflow: auto;
+  background: #0b1120;
+}
+
+.context-schema-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: #e2e8f0;
+  font-size: 12px;
+}
+
+.context-schema-table th,
+.context-schema-table td {
+  padding: 6px 12px;
+  border-bottom: 1px solid #1e293b;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.context-schema-table th {
+  position: sticky;
+  top: 0;
+  background: #0f172a;
+  color: #94a3b8;
+  font-weight: 600;
+  z-index: 1;
+}
+
+.ctx-path {
+  color: #38bdf8;
+  font-family: 'Fira Code', 'Consolas', monospace;
+  font-size: 11.5px;
+}
+
+.ctx-type {
+  display: inline-block;
+  padding: 1px 6px;
+  margin-right: 6px;
+  border-radius: 4px;
+  background: #1e293b;
+  color: #fbbf24;
+  font-size: 11px;
+}
+
+.ctx-sample {
+  color: #94a3b8;
+  font-size: 11.5px;
+}
+
+.ctx-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 6px;
+}
+
+.ctx-actions .tool-btn {
+  white-space: nowrap;
+  flex-shrink: 0;
+  outline: none;
+}
+
+.ctx-actions .tool-btn:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.ctx-actions .tool-btn:focus-visible {
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.5);
+}
+
+.ctx-actions .tool-btn.is-copied {
+  background: #064e3b;
+  border-color: #10b981;
+  color: #6ee7b7;
+}
+
+.ctx-view-switch {
+  display: inline-flex;
+  align-items: center;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.ctx-switch-btn {
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.ctx-switch-btn.active {
+  background: #0284c7;
+  color: #fff;
+}
+
+.context-tree-container {
+  padding: 4px 0;
 }
 
 /* Script Editor Drawer */

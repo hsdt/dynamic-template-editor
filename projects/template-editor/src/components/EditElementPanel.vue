@@ -28,6 +28,9 @@
               :value="attr.value"
               @input="updateAttributeValue(String(attr.key), ($event.target as HTMLInputElement).value)"
               placeholder="Attribute value"
+              autocorrect="off"
+              autocapitalize="none"
+              spellcheck="false"
               :list="getValueSuggestions(String(attr.key)).length ? `attr-value-${String(attr.key)}` : undefined"
             />
             <datalist
@@ -97,6 +100,9 @@
               type="text"
               v-model="newAttribute.value"
               placeholder="Enter attribute value"
+              autocorrect="off"
+              autocapitalize="none"
+              spellcheck="false"
               :list="currentValueSuggestions.length ? 'attribute-value-suggestions' : undefined"
             />
             <datalist v-if="currentValueSuggestions.length" id="attribute-value-suggestions">
@@ -118,7 +124,18 @@
 
 <script lang="ts">
 import { PropType } from 'vue';
-import { VirtualNode } from '@/utils';
+import { VirtualNode, extractContextSchema } from '@/utils';
+
+const CONTEXT_BINDABLE_ATTRS = new Set([
+  'v-model',
+  ':modelValue',
+  'modelValue',
+  'v-model:ten',
+  'v-model:ma',
+  'path',
+  'path-items',
+  ':items'
+]);
 
 const attributeSuggestionMap: Record<string, string[]> = {
   div: ['style', 'class', 'id'],
@@ -173,6 +190,10 @@ export default {
       type: Object as PropType<VirtualNode | null>,
       default: null,
     },
+    context: {
+      type: Object as PropType<Record<string, any>>,
+      default: () => ({}),
+    },
   },
   emits: ["close"],
   data() {
@@ -224,15 +245,11 @@ export default {
       const used = new Set(Object.keys(this.currentAttributes || {}));
       return Array.from(new Set(specific)).filter((k) => !this.isInternalAttribute(k) && !used.has(k));
     },
+    contextPathSuggestions(): string[] {
+      return extractContextSchema(this.context, { maxItems: 5000 }).map((item) => item.path);
+    },
     currentValueSuggestions(): string[] {
-      const tag = this.selectedNode?.tagName ?? '';
-      const key = this.newAttribute.key;
-      const perTag = this.attributeValueSuggestionMap[tag] || this.attributeValueSuggestionMap[tag.toLowerCase()] || {};
-      const suggestions = perTag[key];
-
-      if (Array.isArray(suggestions)) return suggestions;
-
-      return [];
+      return this.getValueSuggestions(this.newAttribute.key);
     }
   },
   watch: {
@@ -275,13 +292,15 @@ export default {
     },
 
     getValueSuggestions(key: string): string[] {
+      if (CONTEXT_BINDABLE_ATTRS.has(key) && this.contextPathSuggestions.length > 0) {
+        return this.contextPathSuggestions;
+      }
+
       const tag = this.selectedNode?.tagName ?? '';
       const perTag = this.attributeValueSuggestionMap[tag] || this.attributeValueSuggestionMap[tag.toLowerCase()] || {};
       const suggestions = perTag[key];
 
-      if (Array.isArray(suggestions)) return suggestions;
-
-      return [];
+      return Array.isArray(suggestions) ? suggestions : [];
     },
 
     confirmAddAttribute() {
