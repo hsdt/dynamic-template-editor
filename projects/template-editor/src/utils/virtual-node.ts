@@ -17,7 +17,10 @@ export class VirtualNode {
   // --- Serialization ---
   _serialize(isClean = false): string {
     if (this.tagName === '#text') {
-      return this.textContent;
+      return this.textContent
+        .split(/(\{\{[\s\S]*?\}\})/g)
+        .map((part, idx) => (idx % 2 === 1 ? part : part.replace(/</g, '&lt;')))
+        .join('');
     }
 
     let attrs = '';
