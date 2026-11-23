@@ -51,6 +51,7 @@ export default {
 .hs-signature {
   display: block;
   pointer-events: auto !important;
+  line-height: 1.5;
 }
 .signature-code {
   font-style: italic;
