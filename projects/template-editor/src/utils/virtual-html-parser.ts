@@ -57,6 +57,7 @@ export class VirtualHTMLParser {
     const normalizedHtml = htmlString
       .replace(/\r\n/g, '\n')
       .replace(/\r/g, '\n')
+      .replace(/<\s+\/([a-zA-Z][a-zA-Z0-9:-]*)\s*>/g, '</$1>')
       .trim();
 
     try {
